@@ -23,5 +23,8 @@
         }
     },
     "autoload-dev": {
+    },
+    "suggest": {
+        "guzzlehttp/guzzle": "For using this library. It was created for Guzzle6."
     }
 }
