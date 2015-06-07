@@ -15,10 +15,16 @@ use Psr\Http\Message\ResponseInterface;
 class CacheMiddleware
 {
 
-    public static function getMiddleware()
+    /**
+     * @param array $config
+     * @return \Closure the Middleware for Guzzle HandlerStack
+     */
+    public static function getMiddleware(array $config = [])
     {
-        return function (callable $handler) {
-            return function ($request, array $options) use ($handler) {
+        // TODO Check $config
+
+        return function (callable $handler) use ($config) {
+            return function ($request, array $options) use ($handler, $config) {
                 // TODO Add logic here for HTTP Caching
                 // If cache => return new FulfilledPromise(...) with response
 
