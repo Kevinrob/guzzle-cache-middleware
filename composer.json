@@ -1,0 +1,27 @@
+{
+    "name": "kevinrob/guzzle-cache-middleware",
+    "type": "library",
+    "description": "A HTTP Cache for Guzzle 6. It's a simple Middleware to be added in the HandlerStack.",
+    "keywords": ["guzzle", "cache", "http", "psr7"],
+    "homepage": "https://github.com/Kevinrob/guzzle-cache-middleware",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kevin Robatel",
+            "email": "kevinrob2@gmail.com",
+            "homepage": "https://github.com/Kevinrob"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Kevinrob\\GuzzleCache\\": "src/"
+        }
+    },
+    "autoload-dev": {
+    }
+}
