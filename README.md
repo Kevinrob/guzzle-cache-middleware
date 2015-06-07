@@ -15,7 +15,7 @@ With a simple Middleware added at the top of the `HandlerStack` of Guzzle6.
 $stack = HandlerStack::create();
 
 // Add this middleware to the top with `push`
-$stack->push(\Kevinrob\GuzzleCache\CacheMiddleware::getMiddleware());
+$stack->push(\Kevinrob\GuzzleCache\CacheMiddleware::getMiddleware(), 'cache');
 
 // Initialize the client with the handler option
 $client = new Client(['handler' => $stack]);
