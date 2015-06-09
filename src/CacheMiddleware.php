@@ -14,6 +14,7 @@ use Psr\Http\Message\ResponseInterface;
 
 class CacheMiddleware
 {
+    const CONFIG_STORAGE = 'storage';
 
     /**
      * @param array $config
@@ -21,7 +22,16 @@ class CacheMiddleware
      */
     public static function getMiddleware(array $config = [])
     {
-        // TODO Check $config
+        if (isset($config[self::CONFIG_STORAGE])) {
+            if (! $config[self::CONFIG_STORAGE] instanceof CacheStorageInterface) {
+                throw new \InvalidArgumentException(
+                    'Storage for cache must implement CacheStorageInterface. ' .
+                    '"' . get_class($config[self::CONFIG_STORAGE]) . '" given.'
+                );
+            }
+        } else {
+            // TODO new default cache storage
+        }
 
         return function (callable $handler) use ($config) {
             return function ($request, array $options) use ($handler, $config) {
