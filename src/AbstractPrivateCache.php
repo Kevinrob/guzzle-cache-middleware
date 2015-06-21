@@ -32,7 +32,7 @@ abstract class AbstractPrivateCache implements CacheStorageInterface
         }
 
         if ($response->hasHeader("Expires")) {
-            $expireAt = \DateTime::createFromFormat('D, d M Y H:i:s T', $response->getHeader("Expires"));
+            $expireAt = \DateTime::createFromFormat('D, d M Y H:i:s T', $response->getHeaderLine("Expires"));
             if ($expireAt !== FALSE) {
                 return new CacheEntry($response, $expireAt);
             }
