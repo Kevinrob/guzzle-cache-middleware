@@ -67,6 +67,14 @@ class CacheEntry
     /**
      * @return bool
      */
+    public function isFresh()
+    {
+        return !$this->isStale();
+    }
+
+    /**
+     * @return bool
+     */
     public function isStale()
     {
         // This object is immutable
