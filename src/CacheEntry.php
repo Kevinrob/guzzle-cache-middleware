@@ -78,7 +78,10 @@ class CacheEntry
     public function isStale()
     {
         // This object is immutable
-        static $timestamp = $this->staleAt->getTimestamp();
+        static $timestamp;
+        if ($timestamp == null) {
+            $timestamp = $this->staleAt->getTimestamp();
+        }
 
         return $timestamp < (new \DateTime())->getTimestamp();
     }
