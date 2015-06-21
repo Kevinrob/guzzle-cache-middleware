@@ -29,6 +29,12 @@ class CacheEntry
      */
     protected $staleIfError;
 
+    /**
+     * Cached timestamp of staleAt variable
+     * @var int
+     */
+    private $timestampStale;
+
 
     /**
      * @param ResponseInterface $response
@@ -78,12 +84,11 @@ class CacheEntry
     public function isStale()
     {
         // This object is immutable
-        static $timestamp;
-        if ($timestamp == null) {
-            $timestamp = $this->staleAt->getTimestamp();
+        if ($this->timestampStale == null) {
+            $this->timestampStale = $this->staleAt->getTimestamp();
         }
 
-        return $timestamp < (new \DateTime())->getTimestamp();
+        return $this->timestampStale < (new \DateTime())->getTimestamp();
     }
 
     /**
