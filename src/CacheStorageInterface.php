@@ -16,12 +16,10 @@ interface CacheStorageInterface
 {
 
     /**
-     * Return a ResponseInterface with X-Cache-Fresh set:
-     *  True if the cache entry in fresh
-     *  False if the cache entry can be use when error occurred
+     * Return a CacheEntry or null if no cache.
      *
      * @param RequestInterface $request
-     * @return ResponseInterface|null with X-Cache-Fresh set
+     * @return CacheEntry|null
      */
     function fetch(RequestInterface $request);
 
