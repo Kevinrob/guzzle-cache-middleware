@@ -9,6 +9,7 @@
 namespace Kevinrob\GuzzleCache;
 
 
+use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
 use Psr\Http\Message\ResponseInterface;
 
@@ -29,25 +30,36 @@ class CacheMiddleware
                     '"' . get_class($config[self::CONFIG_STORAGE]) . '" given.'
                 );
             }
+
+            /** @var CacheStorageInterface $cacheStorage */
+            $cacheStorage = $config[self::CONFIG_STORAGE];
         } else {
-            // TODO new default cache storage
+            $cacheStorage = new DefaultPrivateCache();
         }
 
-        return function (callable $handler) use ($config) {
-            return function ($request, array $options) use ($handler, $config) {
-                // TODO Add logic here for HTTP Caching
+        return function (callable $handler) use ($cacheStorage) {
+            return function ($request, array $options) use ($handler, $cacheStorage) {
                 // If cache => return new FulfilledPromise(...) with response
+                $cacheEntry = $cacheStorage->fetch($request);
+                if ($cacheEntry != null && $cacheEntry->isFresh()) {
+                    // Cache HIT!
+                    return new FulfilledPromise($cacheEntry->getResponse()->withHeader("X-Cache", "HIT"));
+                }
 
                 /** @var Promise $promise */
                 $promise = $handler($request, $options);
                 return $promise->then(
-                    function (ResponseInterface $response) use (&$cache) {
+                    function (ResponseInterface $response) use ($request, $cacheStorage) {
                         if ($response->getStatusCode() >= 500) {
-                            // TODO Check if we have a stale response to serve (stale-if-error)
-                            // return new FulfilledPromise(...);
+                            // Find a stale response to serve
+                            $cacheEntry = $cacheStorage->fetch($request);
+                            if ($cacheEntry != null && $cacheEntry->serveStaleIfError()) {
+                                return new FulfilledPromise($cacheEntry->getResponse());
+                            }
                         }
 
-                        // TODO Add logic for adding response to cache
+                        // Add to the cache
+                        $cacheStorage->cache($request, $response);
 
                         return $response;
                     }
