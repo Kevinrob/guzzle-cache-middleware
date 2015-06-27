@@ -11,6 +11,7 @@ namespace Kevinrob\GuzzleCache;
 
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class CacheMiddleware
@@ -38,24 +39,49 @@ class CacheMiddleware
         }
 
         return function (callable $handler) use ($cacheStorage) {
-            return function ($request, array $options) use ($handler, $cacheStorage) {
+            return function (RequestInterface $request, array $options) use ($handler, $cacheStorage) {
                 // If cache => return new FulfilledPromise(...) with response
                 $cacheEntry = $cacheStorage->fetch($request);
-                if ($cacheEntry != null && $cacheEntry->isFresh()) {
-                    // Cache HIT!
-                    return new FulfilledPromise($cacheEntry->getResponse()->withHeader("X-Cache", "HIT"));
+                if ($cacheEntry != null) {
+                    if ($cacheEntry->isFresh()) {
+                        // Cache HIT!
+                        return new FulfilledPromise($cacheEntry->getResponse()->withHeader("X-Cache", "HIT"));
+                    } else {
+                        // Re-validation header?
+                        if ($cacheEntry->getResponse()->hasHeader("Last-Modified")) {
+                            $request = $request->withHeader(
+                                "If-Modified-Since",
+                                $cacheEntry->getResponse()->getHeader("Last-Modified")
+                            );
+                        }
+                        if ($cacheEntry->getResponse()->hasHeader("Etag")) {
+                            $request = $request->withHeader(
+                                "If-None-Match",
+                                $cacheEntry->getResponse()->getHeader("Etag")
+                            );
+                        }
+                    }
                 }
 
                 /** @var Promise $promise */
                 $promise = $handler($request, $options);
                 return $promise->then(
-                    function (ResponseInterface $response) use ($request, $cacheStorage) {
+                    function (ResponseInterface $response) use ($request, $cacheStorage, $cacheEntry) {
                         if ($response->getStatusCode() >= 500) {
-                            // Find a stale response to serve
-                            $cacheEntry = $cacheStorage->fetch($request);
+                            // Return staled cache entry if we can
                             if ($cacheEntry != null && $cacheEntry->serveStaleIfError()) {
-                                return new FulfilledPromise($cacheEntry->getResponse());
+                                return $cacheEntry->getResponse();
                             }
+                        }
+
+                        if ($response->getStatusCode() == 304 && $cacheEntry != null) {
+                            // Not modified => cache entry is re-validate
+                            /** @var ResponseInterface $response */
+                            $response = $response
+                                ->withStatus($cacheEntry->getResponse()->getStatusCode())
+                                ->withHeader("X-Cache", "HIT with validation")
+                            ;
+                            $response = $response->withBody($cacheEntry->getResponse()->getBody());
                         }
 
                         // Add to the cache
