@@ -1,6 +1,6 @@
 # guzzle-cache-middleware
-A (future) HTTP Cache for Guzzle 6. It's a simple Middleware to be added in the HandlerStack.
-It's in development.
+A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Middleware to be added in the HandlerStack.
+This project is under development but it's already functional.
 
 `composer require kevinrob/guzzle-cache-middleware:dev-master`
 
