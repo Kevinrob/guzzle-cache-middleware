@@ -2,7 +2,7 @@
          xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootrap="./vendor/autoload.php"
+         bootstrap="./vendor/autoload.php"
 >
 
   <testsuites>
