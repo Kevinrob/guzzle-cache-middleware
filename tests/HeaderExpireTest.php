@@ -1,9 +1,10 @@
 <?php
+namespace Kevinrob\GuzzleCache;
+
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Response;
-use Kevinrob\GuzzleCache\CacheMiddleware;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -12,7 +13,7 @@ use Psr\Http\Message\RequestInterface;
  * Date: 29.06.2015
  * Time: 22:48
  */
-class HeaderExpireTest extends PHPUnit_Framework_TestCase
+class HeaderExpireTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Client

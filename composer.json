@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Kevinrob\\GuzzleCache\\": "src/"
+            "Kevinrob\\GuzzleCache\\": ["src/", "tests/"]
         }
     },
     "autoload-dev": {
