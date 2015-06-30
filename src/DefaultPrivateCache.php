@@ -44,7 +44,7 @@ class DefaultPrivateCache extends AbstractPrivateCache
     public function cache(RequestInterface $request, ResponseInterface $response)
     {
         $entry = $this->getCacheObject($response);
-        if ($entry != null) {
+        if ($entry instanceof CacheEntry) {
             $this->cache[$this->getCacheKey($request)] = $entry;
         }
     }

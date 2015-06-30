@@ -42,7 +42,7 @@ class CacheMiddleware
             return function (RequestInterface $request, array $options) use ($handler, $cacheStorage) {
                 // If cache => return new FulfilledPromise(...) with response
                 $cacheEntry = $cacheStorage->fetch($request);
-                if ($cacheEntry != null) {
+                if ($cacheEntry instanceof CacheEntry) {
                     if ($cacheEntry->isFresh()) {
                         // Cache HIT!
                         return new FulfilledPromise($cacheEntry->getResponse()->withHeader("X-Cache", "HIT"));
@@ -69,12 +69,12 @@ class CacheMiddleware
                     function (ResponseInterface $response) use ($request, $cacheStorage, $cacheEntry) {
                         if ($response->getStatusCode() >= 500) {
                             // Return staled cache entry if we can
-                            if ($cacheEntry != null && $cacheEntry->serveStaleIfError()) {
+                            if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
                                 return $cacheEntry->getResponse();
                             }
                         }
 
-                        if ($response->getStatusCode() == 304 && $cacheEntry != null) {
+                        if ($response->getStatusCode() == 304 && $cacheEntry instanceof CacheEntry) {
                             // Not modified => cache entry is re-validate
                             /** @var ResponseInterface $response */
                             $response = $response
