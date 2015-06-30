@@ -40,6 +40,12 @@ class CacheMiddleware
 
         return function(callable $handler) use ($cacheStorage) {
             return function(RequestInterface $request, array $options) use ($handler, $cacheStorage) {
+                $reqMethod = $request->getMethod();
+                if ($reqMethod !== 'GET' && $reqMethod !== 'HEAD') {
+                    // No caching for others methods
+                    return $handler($request, $options);
+                }
+
                 // If cache => return new FulfilledPromise(...) with response
                 $cacheEntry = $cacheStorage->fetch($request);
                 if ($cacheEntry instanceof CacheEntry) {
