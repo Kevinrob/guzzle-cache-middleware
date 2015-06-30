@@ -28,6 +28,12 @@ abstract class AbstractPrivateCache implements CacheStorageInterface
                 return null;
             }
 
+            if (in_array("no-cache", $cacheControlDirectives)) {
+                // Stale response (RFC 7234 5.2.1.4)
+                $entry = new CacheEntry($response, new \DateTime('-1 seconds'));
+                return $entry->hasValidationInformation() ? $entry : null;
+            }
+
             foreach ($cacheControlDirectives as $directive) {
                 $matches = [];
 

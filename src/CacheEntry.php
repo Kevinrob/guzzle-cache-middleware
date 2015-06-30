@@ -99,4 +99,12 @@ class CacheEntry
         return (bool)$this->staleIfError;
     }
 
+    /**
+     * @return bool
+     */
+    public function hasValidationInformation()
+    {
+        return $this->response->hasHeader("Etag") || $this->response->hasHeader("Last-Modified");
+    }
+
 }

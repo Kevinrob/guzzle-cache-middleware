@@ -35,6 +35,16 @@ class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
                         (new Response())
                             ->withAddedHeader("Cache-Control", "no-store")
                     );
+                case '/no-cache':
+                    if ($request->getHeaderLine("If-None-Match") == "TheHash") {
+                        return new FulfilledPromise(new Response(304));
+                    }
+
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader("Cache-Control", "no-cache")
+                            ->withAddedHeader("Etag", "TheHash")
+                    );
             }
 
             throw new \InvalidArgumentException();
@@ -66,6 +76,14 @@ class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->client->get("http://test.com/no-store");
         $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+    }
+
+    public function testNoCacheHeader()
+    {
+        $this->client->get("http://test.com/no-cache");
+
+        $response = $this->client->get("http://test.com/no-cache");
+        $this->assertEquals("HIT with validation", $response->getHeaderLine("X-Cache"));
     }
 
 }
