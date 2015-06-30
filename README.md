@@ -14,11 +14,15 @@ Performance. It's very common to do some HTTP calls to an API for rendering a pa
 With a simple Middleware added at the top of the `HandlerStack` of Guzzle6.
 
 ```php
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use Kevinrob\GuzzleCache;
+
 // Create default HandlerStack
 $stack = HandlerStack::create();
 
 // Add this middleware to the top with `push`
-$stack->push(\Kevinrob\GuzzleCache\CacheMiddleware::getMiddleware(), 'cache');
+$stack->push(CacheMiddleware::getMiddleware(), 'cache');
 
 // Initialize the client with the handler option
 $client = new Client(['handler' => $stack]);
