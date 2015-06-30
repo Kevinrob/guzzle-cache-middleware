@@ -25,7 +25,7 @@ class CacheMiddleware
     public static function getMiddleware(array $config = [])
     {
         if (isset($config[self::CONFIG_STORAGE])) {
-            if (! $config[self::CONFIG_STORAGE] instanceof CacheStorageInterface) {
+            if (!$config[self::CONFIG_STORAGE] instanceof CacheStorageInterface) {
                 throw new \InvalidArgumentException(
                     'Storage for cache must implement CacheStorageInterface. ' .
                     '"' . get_class($config[self::CONFIG_STORAGE]) . '" given.'
@@ -38,8 +38,8 @@ class CacheMiddleware
             $cacheStorage = new DefaultPrivateCache();
         }
 
-        return function (callable $handler) use ($cacheStorage) {
-            return function (RequestInterface $request, array $options) use ($handler, $cacheStorage) {
+        return function(callable $handler) use ($cacheStorage) {
+            return function(RequestInterface $request, array $options) use ($handler, $cacheStorage) {
                 // If cache => return new FulfilledPromise(...) with response
                 $cacheEntry = $cacheStorage->fetch($request);
                 if ($cacheEntry instanceof CacheEntry) {
@@ -66,7 +66,7 @@ class CacheMiddleware
                 /** @var Promise $promise */
                 $promise = $handler($request, $options);
                 return $promise->then(
-                    function (ResponseInterface $response) use ($request, $cacheStorage, $cacheEntry) {
+                    function(ResponseInterface $response) use ($request, $cacheStorage, $cacheEntry) {
                         if ($response->getStatusCode() >= 500) {
                             // Return staled cache entry if we can
                             if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
