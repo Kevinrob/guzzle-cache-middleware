@@ -29,6 +29,7 @@ class BaseTest extends \PHPUnit_Framework_TestCase
             return new FulfilledPromise(
                 (new Response())
                     ->withBody(\GuzzleHttp\Psr7\stream_for('Hello world!'))
+                    ->withHeader("Expires", gmdate('D, d M Y H:i:s T', time() + 120))
             );
         });
 
@@ -45,6 +46,25 @@ class BaseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Hello world!', $response->getBody());
+    }
+
+    public function testNoCacheOtherMethod()
+    {
+        $this->client->post("anything");
+        $response = $this->client->post("anything");
+        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+
+        $this->client->put("anything");
+        $response = $this->client->put("anything");
+        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+
+        $this->client->delete("anything");
+        $response = $this->client->delete("anything");
+        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+
+        $this->client->patch("anything");
+        $response = $this->client->patch("anything");
+        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
     }
 
 }
