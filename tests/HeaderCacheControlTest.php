@@ -10,10 +10,10 @@ use Psr\Http\Message\RequestInterface;
 /**
  * Created by IntelliJ IDEA.
  * User: Kevin
- * Date: 29.06.2015
- * Time: 22:48
+ * Date: 30.06.2015
+ * Time: 12:58
  */
-class HeaderExpireTest extends \PHPUnit_Framework_TestCase
+class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Client
@@ -25,15 +25,15 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
         // Create default HandlerStack
         $stack = HandlerStack::create(function(RequestInterface $request, array $options) {
             switch ($request->getUri()->getPath()) {
-                case '/expired':
-                    return new FulfilledPromise(
-                        (new Response())
-                            ->withHeader("Expires", gmdate('D, d M Y H:i:s T', time() - 10))
-                    );
                 case '/2s':
                     return new FulfilledPromise(
                         (new Response())
-                            ->withHeader("Expires", gmdate('D, d M Y H:i:s T', time() + 2))
+                            ->withAddedHeader("Cache-Control", "max-age=2")
+                    );
+                case '/no-store':
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader("Cache-Control", "no-store")
                     );
             }
 
@@ -47,14 +47,7 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
         $this->client = new Client(['handler' => $stack]);
     }
 
-    public function testAlreadyExpiredHeader()
-    {
-        $this->client->get("http://test.com/expired");
-        $response = $this->client->get("http://test.com/expired");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
-    }
-
-    public function testExpiredHeader()
+    public function testMaxAgeHeader()
     {
         $this->client->get("http://test.com/2s");
 
@@ -64,6 +57,14 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
         sleep(3);
 
         $response = $this->client->get("http://test.com/2s");
+        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+    }
+
+    public function testNoStoreHeader()
+    {
+        $this->client->get("http://test.com/no-store");
+
+        $response = $this->client->get("http://test.com/no-store");
         $this->assertEquals("", $response->getHeaderLine("X-Cache"));
     }
 
