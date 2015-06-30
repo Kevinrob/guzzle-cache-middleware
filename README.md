@@ -5,7 +5,7 @@
 A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Middleware to be added in the HandlerStack.
 This project is under development but it's already functional.
 
-`composer require kevinrob/guzzle-cache-middleware:dev-master`
+`composer require kevinrob/guzzle-cache-middleware:0.*`
 
 # Why?
 Performance. It's very common to do some HTTP calls to an API for rendering a page and it takes times to do it.
