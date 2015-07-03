@@ -75,10 +75,9 @@ class CacheMiddleware
                 return $promise->then(
                     function(ResponseInterface $response) use ($request, $cacheStorage, $cacheEntry) {
                         if ($response->getStatusCode() >= 500) {
-                            // Return staled cache entry if we can
-                            if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
-                                return $cacheEntry->getResponse()
-                                    ->withHeader("X-Cache", "HIT stale");
+                            $response = CacheMiddleware::getStaleResponse($cacheEntry);
+                            if ($response != null) {
+                                return $response;
                             }
                         }
 
@@ -99,10 +98,9 @@ class CacheMiddleware
                     },
                     function(\Exception $ex) use ($cacheEntry) {
                         if ($ex instanceof TransferException) {
-                            // Return staled cache entry if we can
-                            if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
-                                return $cacheEntry->getResponse()
-                                    ->withHeader("X-Cache", "HIT stale");
+                            $response = CacheMiddleware::getStaleResponse($cacheEntry);
+                            if ($response != null) {
+                                return $response;
                             }
                         }
 
@@ -111,6 +109,21 @@ class CacheMiddleware
                 );
             };
         };
+    }
+
+    /**
+     * @param CacheEntry $cacheEntry
+     * @return null|ResponseInterface
+     */
+    public static function getStaleResponse(CacheEntry $cacheEntry)
+    {
+        // Return staled cache entry if we can
+        if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
+            return $cacheEntry->getResponse()
+                ->withHeader("X-Cache", "HIT stale");
+        }
+
+        return null;
     }
 
 }
