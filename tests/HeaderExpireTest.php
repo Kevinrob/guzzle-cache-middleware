@@ -20,6 +20,11 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
      */
     protected $client;
 
+    /**
+     * @var bool
+     */
+    protected $sendError = false;
+
     public function setUp()
     {
         // Create default HandlerStack
@@ -34,6 +39,16 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
                     return new FulfilledPromise(
                         (new Response())
                             ->withHeader("Expires", gmdate('D, d M Y H:i:s T', time() + 2))
+                    );
+                case '/stale-if-error':
+                    if ($this->sendError) {
+                        return new FulfilledPromise(
+                            new Response(500)
+                        );
+                    }
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withHeader("Cache-Control", "stale-if-error=120")
                     );
             }
 
@@ -65,6 +80,16 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->client->get("http://test.com/2s");
         $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+    }
+
+    public function testStaleIfErrorHeader()
+    {
+        $this->client->get("http://test.com/stale-if-error");
+
+        $this->sendError = true;
+        $response = $this->client->get("http://test.com/stale-if-error");
+        $this->assertEquals("HIT stale", $response->getHeaderLine("X-Cache"));
+        $this->sendError = false;
     }
 
 }
