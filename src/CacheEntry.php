@@ -50,7 +50,7 @@ class CacheEntry
             foreach ($response->getHeader("Cache-Control") as $directive) {
                 $matches = [];
                 if (preg_match('/^stale-if-error=([0-9]*)$/', $directive, $matches)) {
-                    $this->staleIfErrorTo =  new \DateTime('+' . $matches[1] . 'seconds');
+                    $this->staleIfErrorTo = new \DateTime('+' . $matches[1] . 'seconds');
                     break;
                 }
             }
