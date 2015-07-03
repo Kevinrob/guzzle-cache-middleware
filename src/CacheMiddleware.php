@@ -9,6 +9,7 @@
 namespace Kevinrob\GuzzleCache;
 
 
+use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
 use Psr\Http\Message\RequestInterface;
@@ -95,6 +96,17 @@ class CacheMiddleware
                         $cacheStorage->cache($request, $response);
 
                         return $response;
+                    },
+                    function(\Exception $ex) use ($cacheEntry) {
+                        if ($ex instanceof TransferException) {
+                            // Return staled cache entry if we can
+                            if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
+                                return $cacheEntry->getResponse()
+                                    ->withHeader("X-Cache", "HIT stale");
+                            }
+                        }
+
+                        throw $ex;
                     }
                 );
             };
