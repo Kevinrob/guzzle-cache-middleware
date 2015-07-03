@@ -25,9 +25,9 @@ class CacheEntry
     protected $staleAt;
 
     /**
-     * @var bool
+     * @var \DateTime
      */
-    protected $staleIfError;
+    protected $staleIfErrorTo;
 
     /**
      * Cached timestamp of staleAt variable
@@ -39,18 +39,23 @@ class CacheEntry
     /**
      * @param ResponseInterface $response
      * @param \DateTime $staleAt
-     * @param bool|null $staleIfError if null, detected with the headers (RFC 5861)
+     * @param \DateTime|null $staleIfErrorTo if null, detected with the headers (RFC 5861)
      */
-    public function __construct(ResponseInterface $response, \DateTime $staleAt, $staleIfError = null)
+    public function __construct(ResponseInterface $response, \DateTime $staleAt, \DateTime $staleIfErrorTo = null)
     {
         $this->response = $response;
         $this->staleAt  = $staleAt;
 
-        if ($staleIfError === null) {
-            $this->staleIfError =
-                $response->hasHeader("Cache-Control")
-                && in_array('stale-if-error', $response->getHeader("Cache-Control"))
-            ;
+        if ($staleIfErrorTo === null) {
+            foreach ($response->getHeader("Cache-Control") as $directive) {
+                $matches = [];
+                if (preg_match('/^stale-if-error=([0-9]*)$/', $directive, $matches)) {
+                    $this->staleIfErrorTo =  new \DateTime('+' . $matches[1] . 'seconds');
+                    break;
+                }
+            }
+        } else {
+            $this->staleIfErrorTo = $staleIfErrorTo;
         }
     }
 
@@ -96,7 +101,8 @@ class CacheEntry
      */
     public function serveStaleIfError()
     {
-        return (bool)$this->staleIfError;
+        return $this->staleIfErrorTo != null
+            && $this->staleIfErrorTo->getTimestamp() >= (new \DateTime())->getTimestamp();
     }
 
     /**

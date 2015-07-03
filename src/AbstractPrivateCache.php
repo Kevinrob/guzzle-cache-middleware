@@ -51,7 +51,7 @@ abstract class AbstractPrivateCache implements CacheStorageInterface
             }
         }
 
-        return null;
+        return new CacheEntry($response, new \DateTime('1 days ago'));
     }
 
 }

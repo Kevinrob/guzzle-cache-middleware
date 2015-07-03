@@ -76,7 +76,8 @@ class CacheMiddleware
                         if ($response->getStatusCode() >= 500) {
                             // Return staled cache entry if we can
                             if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
-                                return $cacheEntry->getResponse();
+                                return $cacheEntry->getResponse()
+                                    ->withHeader("X-Cache", "HIT stale");
                             }
                         }
 
