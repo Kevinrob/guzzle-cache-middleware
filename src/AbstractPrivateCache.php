@@ -29,7 +29,7 @@ abstract class AbstractPrivateCache implements CacheStorageInterface
             }
 
             if (in_array("no-cache", $cacheControlDirectives)) {
-                // Stale response (RFC 7234 5.2.1.4)
+                // Stale response see RFC7234 section 5.2.1.4
                 $entry = new CacheEntry($response, new \DateTime('-1 seconds'));
                 return $entry->hasValidationInformation() ? $entry : null;
             }
