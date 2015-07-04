@@ -101,7 +101,7 @@ class CacheEntry
      */
     public function serveStaleIfError()
     {
-        return $this->staleIfErrorTo != null
+        return $this->staleIfErrorTo !== null
             && $this->staleIfErrorTo->getTimestamp() >= (new \DateTime())->getTimestamp();
     }
 
