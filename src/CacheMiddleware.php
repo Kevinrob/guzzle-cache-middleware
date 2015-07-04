@@ -76,7 +76,7 @@ class CacheMiddleware
                     function(ResponseInterface $response) use ($request, $cacheStorage, $cacheEntry) {
                         if ($response->getStatusCode() >= 500) {
                             $response = CacheMiddleware::getStaleResponse($cacheEntry);
-                            if ($response != null) {
+                            if ($response instanceof ResponseInterface) {
                                 return $response;
                             }
                         }
@@ -99,7 +99,7 @@ class CacheMiddleware
                     function(\Exception $ex) use ($cacheEntry) {
                         if ($ex instanceof TransferException) {
                             $response = CacheMiddleware::getStaleResponse($cacheEntry);
-                            if ($response != null) {
+                            if ($response instanceof ResponseInterface) {
                                 return $response;
                             }
                         }
