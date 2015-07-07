@@ -9,10 +9,23 @@
 namespace Kevinrob\GuzzleCache;
 
 
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\Cache;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-abstract class AbstractPrivateCache implements CacheStorageInterface
+class PrivateCache implements CacheStorageInterface
 {
+
+    /**
+     * @var Cache
+     */
+    protected $storage;
+
+    public function __construct(Cache $cache = null)
+    {
+        $this->storage = $cache != null ? $cache : new ArrayCache();
+    }
 
     /**
      * @param ResponseInterface $response
@@ -54,4 +67,35 @@ abstract class AbstractPrivateCache implements CacheStorageInterface
         return new CacheEntry($response, new \DateTime('1 days ago'));
     }
 
+    /**
+     * @param RequestInterface $request
+     * @return string
+     */
+    protected function getCacheKey(RequestInterface $request)
+    {
+        return sha1(
+            $request->getMethod() . $request->getUri()
+        );
+    }
+
+    /**
+     * Return a CacheEntry or null if no cache.
+     *
+     * @param RequestInterface $request
+     * @return CacheEntry|null
+     */
+    function fetch(RequestInterface $request)
+    {
+        return $this->storage->fetch($this->getCacheKey($request));
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @return bool true if success
+     */
+    function cache(RequestInterface $request, ResponseInterface $response)
+    {
+        $this->storage->save($this->getCacheKey($request), $this->getCacheObject($response));
+    }
 }

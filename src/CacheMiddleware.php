@@ -20,27 +20,17 @@ class CacheMiddleware
     const CONFIG_STORAGE = 'storage';
 
     /**
-     * @param array $config
+     * @param CacheStorageInterface $cacheStorage
      * @return \Closure the Middleware for Guzzle HandlerStack
      */
-    public static function getMiddleware(array $config = [])
+    public static function getMiddleware(CacheStorageInterface $cacheStorage = null)
     {
-        if (isset($config[self::CONFIG_STORAGE])) {
-            if (!$config[self::CONFIG_STORAGE] instanceof CacheStorageInterface) {
-                throw new \InvalidArgumentException(
-                    'Storage for cache must implement CacheStorageInterface. ' .
-                    '"' . get_class($config[self::CONFIG_STORAGE]) . '" given.'
-                );
-            }
-
-            /** @var CacheStorageInterface $cacheStorage */
-            $cacheStorage = $config[self::CONFIG_STORAGE];
-        } else {
-            $cacheStorage = new DefaultPrivateCache();
+        if ($cacheStorage == null) {
+            $cacheStorage = new PrivateCache();
         }
 
-        return function(callable $handler) use ($cacheStorage) {
-            return function(RequestInterface $request, array $options) use ($handler, $cacheStorage) {
+        return function(callable $handler) use (&$cacheStorage) {
+            return function(RequestInterface $request, array $options) use ($handler, &$cacheStorage) {
                 $reqMethod = $request->getMethod();
                 if ($reqMethod !== 'GET' && $reqMethod !== 'HEAD') {
                     // No caching for others methods
@@ -73,11 +63,11 @@ class CacheMiddleware
                 /** @var Promise $promise */
                 $promise = $handler($request, $options);
                 return $promise->then(
-                    function(ResponseInterface $response) use ($request, $cacheStorage, $cacheEntry) {
+                    function(ResponseInterface $response) use ($request, &$cacheStorage, $cacheEntry) {
                         if ($response->getStatusCode() >= 500) {
-                            $response = CacheMiddleware::getStaleResponse($cacheEntry);
-                            if ($response instanceof ResponseInterface) {
-                                return $response;
+                            $responseStale = CacheMiddleware::getStaleResponse($cacheEntry);
+                            if ($responseStale instanceof ResponseInterface) {
+                                return $responseStale;
                             }
                         }
 
@@ -115,7 +105,7 @@ class CacheMiddleware
      * @param CacheEntry $cacheEntry
      * @return null|ResponseInterface
      */
-    public static function getStaleResponse(CacheEntry $cacheEntry)
+    public static function getStaleResponse(CacheEntry $cacheEntry = null)
     {
         // Return staled cache entry if we can
         if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
