@@ -33,21 +33,18 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                     return new FulfilledPromise(
                         (new Response())
                             ->withHeader("Etag", 'MyBeautifulHash')
-                            ->withAddedHeader("Cache-Control", 'max-age=0')
                     );
                 case '/etag-changed':
                     if ($request->getHeaderLine("If-None-Match") == 'MyBeautifulHash') {
                         return new FulfilledPromise(
                             (new Response())
                                 ->withHeader("Etag", 'MyBeautifulHash2')
-                                ->withAddedHeader("Cache-Control", 'max-age=0')
                         );
                     }
 
                     return new FulfilledPromise(
                         (new Response())
                             ->withHeader("Etag", 'MyBeautifulHash')
-                            ->withAddedHeader("Cache-Control", 'max-age=0')
                     );
             }
 
