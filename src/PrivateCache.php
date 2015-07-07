@@ -93,6 +93,6 @@ class PrivateCache implements CacheStorageInterface
      */
     public function cache(RequestInterface $request, ResponseInterface $response)
     {
-        $this->storage->save($this->getCacheKey($request), $this->getCacheObject($response));
+        return $this->storage->save($this->getCacheKey($request), $this->getCacheObject($response));
     }
 }
