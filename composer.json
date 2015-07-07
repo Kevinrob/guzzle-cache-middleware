@@ -1,33 +1,33 @@
 {
-    "name": "kevinrob/guzzle-cache-middleware",
-    "type": "library",
-    "description": "A HTTP Cache for Guzzle 6. It's a simple Middleware to be added in the HandlerStack.",
-    "keywords": ["guzzle", "cache", "http", "psr7"],
-    "homepage": "https://github.com/Kevinrob/guzzle-cache-middleware",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Kevin Robatel",
-            "email": "kevinrob2@gmail.com",
-            "homepage": "https://github.com/Kevinrob"
-        }
-    ],
-    "require": {
-        "php": ">=5.5.0",
-        "doctrine/cache": "1.*"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "4.*",
-        "guzzlehttp/guzzle": "^6.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Kevinrob\\GuzzleCache\\": ["src/", "tests/"]
-        }
-    },
-    "autoload-dev": {
-    },
-    "suggest": {
-        "guzzlehttp/guzzle": "For using this library. It was created for Guzzle6."
+  "name": "kevinrob/guzzle-cache-middleware",
+  "type": "library",
+  "description": "A HTTP Cache for Guzzle 6. It's a simple Middleware to be added in the HandlerStack.",
+  "keywords": ["guzzle", "cache", "http", "psr7"],
+  "homepage": "https://github.com/Kevinrob/guzzle-cache-middleware",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Kevin Robatel",
+      "email": "kevinrob2@gmail.com",
+      "homepage": "https://github.com/Kevinrob"
     }
+  ],
+  "require": {
+    "php": ">=5.5.0",
+    "doctrine/cache": "1.*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.*",
+    "guzzlehttp/guzzle": "^6.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Kevinrob\\GuzzleCache\\": ["src/", "tests/"]
+    }
+  },
+  "autoload-dev": {
+  },
+  "suggest": {
+    "guzzlehttp/guzzle": "For using this library. It was created for Guzzle6."
+  }
 }
