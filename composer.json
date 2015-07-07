@@ -13,7 +13,8 @@
         }
     ],
     "require": {
-        "php": ">=5.5.0"
+        "php": ">=5.5.0",
+        "doctrine/cache": "1.*"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*",
