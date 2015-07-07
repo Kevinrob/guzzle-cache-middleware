@@ -47,13 +47,10 @@ class PrivateCache implements CacheStorageInterface
                 return $entry->hasValidationInformation() ? $entry : null;
             }
 
-            foreach ($cacheControlDirectives as $directive) {
-                $matches = [];
-
-                if (preg_match('/^max-age=([0-9]*)$/', $directive, $matches)) {
-                    // Handle max-age header
-                    return new CacheEntry($response, new \DateTime('+' . $matches[1] . 'seconds'));
-                }
+            $matches = [];
+            if (preg_match('/^max-age=([0-9]*)$/', $response->getHeaderLine("Cache-Control"), $matches)) {
+                // Handle max-age header
+                return new CacheEntry($response, new \DateTime('+' . $matches[1] . 'seconds'));
             }
         }
 
