@@ -47,11 +47,15 @@ class CacheEntry
         $this->staleAt  = $staleAt;
 
         if ($staleIfErrorTo === null) {
-            foreach ($response->getHeader("Cache-Control") as $directive) {
-                $matches = [];
-                if (preg_match('/^stale-if-error=([0-9]*)$/', $directive, $matches)) {
-                    $this->staleIfErrorTo = new \DateTime('+' . $matches[1] . 'seconds');
-                    break;
+            $headersCacheControl = $response->getHeader("Cache-Control");
+
+            if (!in_array("must-revalidate", $headersCacheControl)) {
+                foreach ($headersCacheControl as $directive) {
+                    $matches = [];
+                    if (preg_match('/^stale-if-error=([0-9]*)$/', $directive, $matches)) {
+                        $this->staleIfErrorTo = new \DateTime('+' . $matches[1] . 'seconds');
+                        break;
+                    }
                 }
             }
         } else {
