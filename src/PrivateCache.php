@@ -24,7 +24,7 @@ class PrivateCache implements CacheStorageInterface
 
     public function __construct(Cache $cache = null)
     {
-        $this->storage = $cache != null ? $cache : new ArrayCache();
+        $this->storage = $cache !== null ? $cache : new ArrayCache();
     }
 
     /**

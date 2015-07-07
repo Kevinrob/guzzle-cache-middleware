@@ -25,7 +25,7 @@ class CacheMiddleware
      */
     public static function getMiddleware(CacheStorageInterface $cacheStorage = null)
     {
-        if ($cacheStorage == null) {
+        if ($cacheStorage === null) {
             $cacheStorage = new PrivateCache();
         }
 
