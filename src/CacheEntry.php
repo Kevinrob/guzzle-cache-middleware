@@ -30,6 +30,11 @@ class CacheEntry
     protected $staleIfErrorTo;
 
     /**
+     * @var \DateTime
+     */
+    protected $staleWhileRevalidateTo;
+
+    /**
      * Cached timestamp of staleAt variable
      * @var int
      */
@@ -40,9 +45,14 @@ class CacheEntry
      * @param ResponseInterface $response
      * @param \DateTime $staleAt
      * @param \DateTime|null $staleIfErrorTo if null, detected with the headers (RFC 5861)
+     * @param \DateTime $staleWhileRevalidateTo
      */
-    public function __construct(ResponseInterface $response, \DateTime $staleAt, \DateTime $staleIfErrorTo = null)
-    {
+    public function __construct(
+        ResponseInterface $response,
+        \DateTime $staleAt,
+        \DateTime $staleIfErrorTo = null,
+        \DateTime $staleWhileRevalidateTo = null
+    ) {
         $this->response = $response;
         $this->staleAt  = $staleAt;
 
@@ -60,6 +70,18 @@ class CacheEntry
             }
         } else {
             $this->staleIfErrorTo = $staleIfErrorTo;
+        }
+
+        if ($staleWhileRevalidateTo === null) {
+            foreach ($response->getHeader("Cache-Control") as $directive) {
+                $matches = [];
+                if (preg_match('/^stale-while-revalidate=([0-9]*)$/', $directive, $matches)) {
+                    $this->staleWhileRevalidateTo = new \DateTime('+' . $matches[1] . 'seconds');
+                    break;
+                }
+            }
+        } else {
+            $this->staleWhileRevalidateTo = $staleWhileRevalidateTo;
         }
     }
 
@@ -107,6 +129,15 @@ class CacheEntry
     {
         return $this->staleIfErrorTo !== null
             && $this->staleIfErrorTo->getTimestamp() >= (new \DateTime())->getTimestamp();
+    }
+
+    /**
+     * @return bool
+     */
+    public function staleWhileValidate()
+    {
+        return $this->staleWhileRevalidateTo !== null
+            && $this->staleWhileRevalidateTo->getTimestamp() >= (new \DateTime())->getTimestamp();
     }
 
     /**

@@ -46,6 +46,20 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
                         (new Response())
                             ->withHeader("Etag", 'MyBeautifulHash')
                     );
+                case '/stale-while-revalidate':
+                    if ($request->getHeaderLine("If-None-Match") == 'MyBeautifulHash') {
+                        return new FulfilledPromise(
+                            (new Response(304))
+                                ->withHeader("Cache-Control", 'max-age=10')
+                        );
+                    }
+
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withHeader("Etag", 'MyBeautifulHash')
+                            ->withHeader("Cache-Control", 'max-age=1')
+                            ->withAddedHeader("Cache-Control", 'stale-while-revalidate=60')
+                    );
             }
 
             throw new \InvalidArgumentException();
@@ -56,6 +70,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
 
         // Initialize the client with the handler option
         $this->client = new Client(['handler' => $stack]);
+        CacheMiddleware::setClient($this->client);
     }
 
     public function testEtagHeader()
@@ -76,6 +91,22 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->client->get("http://test.com/etag-changed");
         $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+    }
+
+    public function testStaleWhileRevalidateHeader()
+    {
+        $this->client->get("http://test.com/stale-while-revalidate");
+
+        sleep(2);
+
+        $response = $this->client->get("http://test.com/stale-while-revalidate");
+        $this->assertEquals("Stale while revalidate", $response->getHeaderLine("X-Cache"));
+
+        // Do that at the end of the php script...
+        CacheMiddleware::purgeReValidation();
+
+        $response = $this->client->get("http://test.com/stale-while-revalidate");
+        $this->assertEquals("HIT", $response->getHeaderLine("X-Cache"));
     }
 
 }
