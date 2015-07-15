@@ -50,6 +50,10 @@ class CacheMiddleware
             $cacheStorage = new PrivateCache();
         }
 
+        register_shutdown_function(function() {
+            static::purgeReValidation();
+        });
+
         return function(callable $handler) use (&$cacheStorage) {
             return function(RequestInterface $request, array $options) use ($handler, &$cacheStorage) {
                 $reqMethod = $request->getMethod();
