@@ -15,7 +15,6 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use function GuzzleHttp\Promise\unwrap;
 
 class CacheMiddleware
 {
@@ -38,7 +37,7 @@ class CacheMiddleware
 
     public static function purgeReValidation()
     {
-        unwrap(static::$waitingRevalidate);
+        \GuzzleHttp\Promise\unwrap(static::$waitingRevalidate);
     }
 
     /**
