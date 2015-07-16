@@ -75,23 +75,7 @@ class CacheMiddleware
                         $request = static::getRequestWithReValidationHeader($request, $cacheEntry);
 
                         if ($cacheEntry->staleWhileValidate()) {
-                            // Add the promise for revalidate
-                            if (static::$client !== null) {
-                                /** @var RequestInterface $reValidationRequest */
-                                $reValidationRequest = $request->withHeader("X-ReValidation", "1");
-                                static::$waitingRevalidate[] = static::$client
-                                    ->sendAsync($reValidationRequest)
-                                    ->then(function (ResponseInterface $response) use ($request, &$cacheStorage, $cacheEntry) {
-                                        if ($response->getStatusCode() == 304) {
-                                            // Not modified => cache entry is re-validate
-                                            /** @var ResponseInterface $response */
-                                            $response = $response->withStatus($cacheEntry->getResponse()->getStatusCode());
-                                            $response = $response->withBody($cacheEntry->getResponse()->getBody());
-                                        }
-
-                                        $cacheStorage->cache($request, $response);
-                                    });
-                            }
+                            static::addReValidationRequest($request, $cacheStorage, $cacheEntry);
 
                             return new FulfilledPromise(
                                 $cacheEntry->getResponse()
@@ -178,6 +162,40 @@ class CacheMiddleware
         }
 
         return $request;
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param CacheStorageInterface $cacheStorage
+     * @param CacheEntry $cacheEntry
+     * @return bool if added
+     */
+    protected static function addReValidationRequest(
+        RequestInterface $request,
+        CacheStorageInterface &$cacheStorage,
+        CacheEntry $cacheEntry
+    ) {
+        // Add the promise for revalidate
+        if (static::$client !== null) {
+            /** @var RequestInterface $request */
+            $request = $request->withHeader("X-ReValidation", "1");
+            static::$waitingRevalidate[] = static::$client
+                ->sendAsync($request)
+                ->then(function (ResponseInterface $response) use ($request, &$cacheStorage, $cacheEntry) {
+                    if ($response->getStatusCode() == 304) {
+                        // Not modified => cache entry is re-validate
+                        /** @var ResponseInterface $response */
+                        $response = $response->withStatus($cacheEntry->getResponse()->getStatusCode());
+                        $response = $response->withBody($cacheEntry->getResponse()->getBody());
+                    }
+
+                    $cacheStorage->cache($request, $response);
+                });
+
+            return true;
+        }
+
+        return false;
     }
 
 }
