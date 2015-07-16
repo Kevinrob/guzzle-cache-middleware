@@ -50,9 +50,7 @@ class CacheMiddleware
             $cacheStorage = new PrivateCache();
         }
 
-        register_shutdown_function(function() {
-            static::purgeReValidation();
-        });
+        register_shutdown_function(['Kevinrob\GuzzleCache\CacheMiddleware', 'purgeReValidation']);
 
         return function(callable $handler) use (&$cacheStorage) {
             return function(RequestInterface $request, array $options) use ($handler, &$cacheStorage) {
@@ -74,26 +72,15 @@ class CacheMiddleware
                         return new FulfilledPromise($cacheEntry->getResponse()->withHeader("X-Cache", "HIT"));
                     } elseif ($cacheEntry->hasValidationInformation()) {
                         // Re-validation header
-                        if ($cacheEntry->getResponse()->hasHeader("Last-Modified")) {
-                            $request = $request->withHeader(
-                                "If-Modified-Since",
-                                $cacheEntry->getResponse()->getHeader("Last-Modified")
-                            );
-                        }
-                        if ($cacheEntry->getResponse()->hasHeader("Etag")) {
-                            $request = $request->withHeader(
-                                "If-None-Match",
-                                $cacheEntry->getResponse()->getHeader("Etag")
-                            );
-                        }
+                        $request = static::getRequestWithReValidationHeader($request, $cacheEntry);
 
                         if ($cacheEntry->staleWhileValidate()) {
                             // Add the promise for revalidate
                             if (static::$client !== null) {
+                                /** @var RequestInterface $reValidationRequest */
+                                $reValidationRequest = $request->withHeader("X-ReValidation", "1");
                                 static::$waitingRevalidate[] = static::$client
-                                    ->sendAsync(
-                                        $request->withHeader("X-ReValidation", "1")
-                                    )
+                                    ->sendAsync($reValidationRequest)
                                     ->then(function (ResponseInterface $response) use ($request, &$cacheStorage, $cacheEntry) {
                                         if ($response->getStatusCode() == 304) {
                                             // Not modified => cache entry is re-validate
@@ -159,7 +146,7 @@ class CacheMiddleware
      * @param CacheEntry $cacheEntry
      * @return null|ResponseInterface
      */
-    public static function getStaleResponse(CacheEntry $cacheEntry = null)
+    private static function getStaleResponse(CacheEntry $cacheEntry = null)
     {
         // Return staled cache entry if we can
         if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
@@ -168,6 +155,29 @@ class CacheMiddleware
         }
 
         return null;
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param CacheEntry $cacheEntry
+     * @return RequestInterface
+     */
+    private static function getRequestWithReValidationHeader(RequestInterface $request, CacheEntry $cacheEntry)
+    {
+        if ($cacheEntry->getResponse()->hasHeader("Last-Modified")) {
+            $request = $request->withHeader(
+                "If-Modified-Since",
+                $cacheEntry->getResponse()->getHeader("Last-Modified")
+            );
+        }
+        if ($cacheEntry->getResponse()->hasHeader("Etag")) {
+            $request = $request->withHeader(
+                "If-None-Match",
+                $cacheEntry->getResponse()->getHeader("Etag")
+            );
+        }
+
+        return $request;
     }
 
 }
