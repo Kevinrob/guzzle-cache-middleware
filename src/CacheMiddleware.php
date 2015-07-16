@@ -106,7 +106,7 @@ class CacheMiddleware
                 return $promise->then(
                     function(ResponseInterface $response) use ($request, &$cacheStorage, $cacheEntry) {
                         if ($response->getStatusCode() >= 500) {
-                            $responseStale = CacheMiddleware::getStaleResponse($cacheEntry);
+                            $responseStale = static::getStaleResponse($cacheEntry);
                             if ($responseStale instanceof ResponseInterface) {
                                 return $responseStale;
                             }
@@ -129,7 +129,7 @@ class CacheMiddleware
                     },
                     function(\Exception $ex) use ($cacheEntry) {
                         if ($ex instanceof TransferException) {
-                            $response = CacheMiddleware::getStaleResponse($cacheEntry);
+                            $response = static::getStaleResponse($cacheEntry);
                             if ($response instanceof ResponseInterface) {
                                 return $response;
                             }
@@ -146,7 +146,7 @@ class CacheMiddleware
      * @param CacheEntry $cacheEntry
      * @return null|ResponseInterface
      */
-    private static function getStaleResponse(CacheEntry $cacheEntry = null)
+    protected static function getStaleResponse(CacheEntry $cacheEntry = null)
     {
         // Return staled cache entry if we can
         if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
@@ -162,7 +162,7 @@ class CacheMiddleware
      * @param CacheEntry $cacheEntry
      * @return RequestInterface
      */
-    private static function getRequestWithReValidationHeader(RequestInterface $request, CacheEntry $cacheEntry)
+    protected static function getRequestWithReValidationHeader(RequestInterface $request, CacheEntry $cacheEntry)
     {
         if ($cacheEntry->getResponse()->hasHeader("Last-Modified")) {
             $request = $request->withHeader(
