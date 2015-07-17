@@ -9,7 +9,6 @@
 namespace Kevinrob\GuzzleCache;
 
 
-use GuzzleHttp\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface;
 
 class CacheEntry
@@ -21,6 +20,9 @@ class CacheEntry
     protected $response;
 
     /**
+     * This field is only use for serialize.
+     * Response::body is a stream and can't be serialized.
+     *
      * @var string
      */
     protected $responseBody;
@@ -166,12 +168,10 @@ class CacheEntry
     public function __wakeup()
     {
         if ($this->response !== null) {
-            $stream = fopen('php://memory', 'r+');
-            fwrite($stream, $this->responseBody);
-            rewind($stream);
-
             $this->response = $this->response
-                ->withBody(new Stream($stream));
+                ->withBody(
+                    \GuzzleHttp\Psr7\stream_for($this->responseBody)
+                );
         }
     }
 
