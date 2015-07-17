@@ -166,7 +166,7 @@ class CacheEntry
     public function __wakeup()
     {
         if ($this->response !== null) {
-            $stream = fopen('php://memory','r+');
+            $stream = fopen('php://memory', 'r+');
             fwrite($stream, $this->responseBody);
             rewind($stream);
 
