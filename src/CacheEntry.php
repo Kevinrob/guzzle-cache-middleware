@@ -9,6 +9,7 @@
 namespace Kevinrob\GuzzleCache;
 
 
+use GuzzleHttp\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface;
 
 class CacheEntry
@@ -18,6 +19,11 @@ class CacheEntry
      * @var ResponseInterface
      */
     protected $response;
+
+    /**
+     * @var string
+     */
+    protected $responseBody;
 
     /**
      * @var \DateTime
@@ -146,6 +152,27 @@ class CacheEntry
     public function hasValidationInformation()
     {
         return $this->response->hasHeader("Etag") || $this->response->hasHeader("Last-Modified");
+    }
+
+    public function __sleep()
+    {
+        if ($this->response !== null) {
+            $this->responseBody = (string)$this->response->getBody();
+        }
+
+        return array_keys(get_object_vars($this));
+    }
+
+    public function __wakeup()
+    {
+        if ($this->response !== null) {
+            $stream = fopen('php://memory','r+');
+            fwrite($stream, $this->responseBody);
+            rewind($stream);
+
+            $this->response = $this->response
+                ->withBody(new Stream($stream));
+        }
     }
 
 }

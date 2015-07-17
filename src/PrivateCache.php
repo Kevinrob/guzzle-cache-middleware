@@ -47,7 +47,6 @@ class PrivateCache implements CacheStorageInterface
                 return $entry->hasValidationInformation() ? $entry : null;
             }
 
-            $matches = [];
             foreach ($cacheControlDirectives as $directive) {
                 $matches = [];
                 if (preg_match('/^max-age=([0-9]*)$/', $directive, $matches)) {
@@ -87,7 +86,7 @@ class PrivateCache implements CacheStorageInterface
     public function fetch(RequestInterface $request)
     {
         try {
-            return $this->storage->fetch($this->getCacheKey($request));
+            return unserialize($this->storage->fetch($this->getCacheKey($request)));
         } catch (\Exception $ignored) {
             return null;
         }
@@ -101,7 +100,7 @@ class PrivateCache implements CacheStorageInterface
     public function cache(RequestInterface $request, ResponseInterface $response)
     {
         try {
-            return $this->storage->save($this->getCacheKey($request), $this->getCacheObject($response));
+            return $this->storage->save($this->getCacheKey($request), serialize($this->getCacheObject($response)));
         } catch (\Exception $ignored) {
             return false;
         }
