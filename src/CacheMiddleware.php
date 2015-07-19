@@ -108,11 +108,11 @@ class CacheMiddleware
      */
     public function __invoke(\Closure $handler)
     {
-        return function (RequestInterface $request, array $options) use (&$handler) {
-            if (!isset($this->httpMethods[ strtoupper($request->getMethod()) ])) {
+        return function(RequestInterface $request, array $options) use (&$handler) {
+            if (!isset($this->httpMethods[strtoupper($request->getMethod())])) {
                 // No caching for this method allowed
                 return $handler($request, $options)->then(
-                    function (ResponseInterface $response) {
+                    function(ResponseInterface $response) {
                         return $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }
                 );
@@ -147,7 +147,7 @@ class CacheMiddleware
             /** @var Promise $promise */
             $promise = $handler($request, $options);
             return $promise->then(
-                function (ResponseInterface $response) use ($request, $cacheEntry) {
+                function(ResponseInterface $response) use ($request, $cacheEntry) {
                     // Check if error and looking for a staled content
                     if ($response->getStatusCode() >= 500) {
                         $responseStale = static::getStaleResponse($cacheEntry);
@@ -172,7 +172,7 @@ class CacheMiddleware
 
                     return $response;
                 },
-                function (\Exception $ex) use ($cacheEntry) {
+                function(\Exception $ex) use ($cacheEntry) {
                     if ($ex instanceof TransferException) {
                         $response = static::getStaleResponse($cacheEntry);
                         if ($response instanceof ResponseInterface) {
