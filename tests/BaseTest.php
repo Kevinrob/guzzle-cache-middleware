@@ -34,7 +34,7 @@ class BaseTest extends \PHPUnit_Framework_TestCase
         });
 
         // Add this middleware to the top with `push`
-        $stack->push(CacheMiddleware::getMiddleware(), 'cache');
+        $stack->push(new CacheMiddleware(), 'cache');
 
         // Initialize the client with the handler option
         $this->client = new Client(['handler' => $stack]);

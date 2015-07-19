@@ -20,6 +20,11 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     protected $client;
 
+    /**
+     * @var CacheMiddleware
+     */
+    protected $cache;
+
     public function setUp()
     {
         // Create default HandlerStack
@@ -65,12 +70,14 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             throw new \InvalidArgumentException();
         });
 
+        $this->cache = new CacheMiddleware();
+
         // Add this middleware to the top with `push`
-        $stack->push(CacheMiddleware::getMiddleware(), 'cache');
+        $stack->push($this->cache, 'cache');
 
         // Initialize the client with the handler option
         $this->client = new Client(['handler' => $stack]);
-        CacheMiddleware::setClient($this->client);
+        $this->cache->setClient($this->client);
     }
 
     public function testEtagHeader()
@@ -103,7 +110,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("Stale while revalidate", $response->getHeaderLine("X-Cache"));
 
         // Do that at the end of the php script...
-        CacheMiddleware::purgeReValidation();
+        $this->cache->purgeReValidation();
 
         $response = $this->client->get("http://test.com/stale-while-revalidate");
         $this->assertEquals("HIT", $response->getHeaderLine("X-Cache"));
