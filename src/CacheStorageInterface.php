@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: Kevin
- * Date: 07.06.2015
- * Time: 19:20
- */
 
 namespace Kevinrob\GuzzleCache;
 

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by IntelliJ IDEA.
- * User: Kevin
- * Date: 07.06.2015
- * Time: 15:44
- */
 
 namespace Kevinrob\GuzzleCache;
 
@@ -16,6 +10,10 @@ use GuzzleHttp\Promise\Promise;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Class CacheMiddleware
+ * @package Kevinrob\GuzzleCache
+ */
 class CacheMiddleware
 {
     const CONFIG_STORAGE = 'storage';
@@ -54,16 +52,19 @@ class CacheMiddleware
         $this->client = $client;
     }
 
+    /**
+     * Will be called at the end of the script
+     */
     public function purgeReValidation()
     {
         \GuzzleHttp\Promise\inspect_all($this->waitingRevalidate);
     }
 
     /**
-     * @param $handler
+     * @param \Closure $handler
      * @return \Closure
      */
-    public function __invoke($handler)
+    public function __invoke(\Closure $handler)
     {
         return function (RequestInterface $request, array $options) use (&$handler) {
             $reqMethod = $request->getMethod();

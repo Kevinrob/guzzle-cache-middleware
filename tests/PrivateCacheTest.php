@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Kevin
- * Date: 30.06.2015
- * Time: 11:58
- */
 
 namespace Kevinrob\GuzzleCache;
 

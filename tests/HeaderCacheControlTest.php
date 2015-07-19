@@ -1,5 +1,7 @@
 <?php
+
 namespace Kevinrob\GuzzleCache;
+
 
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
