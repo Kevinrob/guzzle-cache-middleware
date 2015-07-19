@@ -152,6 +152,7 @@ class CacheEntry
 
     public function __sleep()
     {
+        // Stream/Resource can't be serialized... So we copy the content
         if ($this->response !== null) {
             $this->responseBody = (string)$this->response->getBody();
         }
@@ -161,6 +162,7 @@ class CacheEntry
 
     public function __wakeup()
     {
+        // We re-create the stream of the response
         if ($this->response !== null) {
             $this->response = $this->response
                 ->withBody(
