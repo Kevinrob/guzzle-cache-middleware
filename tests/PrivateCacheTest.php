@@ -41,6 +41,8 @@ class PrivateCacheTest extends \PHPUnit_Framework_TestCase
             $cache->cache($request, $response);
             $entry = $cache->fetch($request);
 
+            $this->assertNotNull($entry);
+
             $this->assertEquals(
                 (string)$response->getBody(),
                 (string)$entry->getResponse()->getBody()
