@@ -16,11 +16,11 @@ use Psr\Http\Message\ResponseInterface;
  */
 class CacheMiddleware
 {
-    const HEADER_RE_VALIDATION = 'X-Kevinrob-GuzzleCache-ReValidation';
-    const HEADER_CACHE_INFO = 'X-Kevinrob-Cache';
-    const HEADER_CACHE_HIT = 'HIT';
-    const HEADER_CACHE_MISS = 'MISS';
-    const HEADER_CACHE_STALE = 'STALE';
+    const HEADER_RE_VALIDATION  = 'X-Kevinrob-GuzzleCache-ReValidation';
+    const HEADER_CACHE_INFO     = 'X-Kevinrob-Cache';
+    const HEADER_CACHE_HIT      = 'HIT';
+    const HEADER_CACHE_MISS     = 'MISS';
+    const HEADER_CACHE_STALE    = 'STALE';
 
     /**
      * @var array of Promise
