@@ -28,25 +28,24 @@ class PrivateCache implements CacheStorageInterface
     protected function getCacheObject(ResponseInterface $response)
     {
         if ($response->hasHeader("Cache-Control")) {
-            $cacheControlDirectives = $response->getHeader("Cache-Control");
+            $values = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
 
-            if (in_array("no-store", $cacheControlDirectives)) {
+            if ($values->has('no-store')) {
                 // No store allowed (maybe some sensitives data...)
                 return null;
             }
 
-            if (in_array("no-cache", $cacheControlDirectives)) {
+            if ($values->has('no-cache')) {
                 // Stale response see RFC7234 section 5.2.1.4
                 $entry = new CacheEntry($response, new \DateTime('-1 seconds'));
                 return $entry->hasValidationInformation() ? $entry : null;
             }
 
-            foreach ($cacheControlDirectives as $directive) {
-                $matches = [];
-                if (preg_match('/^max-age=([0-9]*)$/', $directive, $matches)) {
-                    // Handle max-age header
-                    return new CacheEntry($response, new \DateTime('+' . $matches[1] . 'seconds'));
-                }
+            if ($values->has('max-age')) {
+                return new CacheEntry(
+                    $response,
+                    new \DateTime('+' . $values->get('max-age') . 'seconds')
+                );
             }
         }
 
@@ -80,10 +79,15 @@ class PrivateCache implements CacheStorageInterface
     public function fetch(RequestInterface $request)
     {
         try {
-            return unserialize($this->storage->fetch($this->getCacheKey($request)));
+            $cache = unserialize($this->storage->fetch($this->getCacheKey($request)));
+            if ($cache instanceof CacheEntry) {
+                return $cache;
+            }
         } catch (\Exception $ignored) {
             return null;
         }
+
+        return null;
     }
 
     /**

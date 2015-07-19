@@ -58,30 +58,16 @@ class CacheEntry
         $this->response = $response;
         $this->staleAt  = $staleAt;
 
-        if ($staleIfErrorTo === null) {
-            $headersCacheControl = $response->getHeader("Cache-Control");
+        $values = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
 
-            if (!in_array("must-revalidate", $headersCacheControl)) {
-                foreach ($headersCacheControl as $directive) {
-                    $matches = [];
-                    if (preg_match('/^stale-if-error=([0-9]*)$/', $directive, $matches)) {
-                        $this->staleIfErrorTo = new \DateTime('+' . $matches[1] . 'seconds');
-                        break;
-                    }
-                }
-            }
+        if ($staleIfErrorTo === null && $values->has('stale-if-error')) {
+            $this->staleIfErrorTo = new \DateTime('+' . $values->get('stale-if-error') . 'seconds');
         } else {
             $this->staleIfErrorTo = $staleIfErrorTo;
         }
 
-        if ($staleWhileRevalidateTo === null) {
-            foreach ($response->getHeader("Cache-Control") as $directive) {
-                $matches = [];
-                if (preg_match('/^stale-while-revalidate=([0-9]*)$/', $directive, $matches)) {
-                    $this->staleWhileRevalidateTo = new \DateTime('+' . $matches[1] . 'seconds');
-                    break;
-                }
-            }
+        if ($staleWhileRevalidateTo === null && $values->has('stale-while-revalidate')) {
+            $this->staleWhileRevalidateTo = new \DateTime('+' . $values->get('stale-while-revalidate') . 'seconds');
         } else {
             $this->staleWhileRevalidateTo = $staleWhileRevalidateTo;
         }
