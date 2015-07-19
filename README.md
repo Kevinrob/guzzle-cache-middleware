@@ -8,7 +8,7 @@ This project is under development but it's already functional.
 
 ## Installation
 
-`composer require kevinrob/guzzle-cache-middleware:~0.4.2`
+`composer require kevinrob/guzzle-cache-middleware:~0.5`
 
 or add it the your `composer.json` and make a `composer update kevinrob/guzzle-cache-middleware`.
 
@@ -27,7 +27,7 @@ use Kevinrob\GuzzleCache;
 $stack = HandlerStack::create();
 
 // Add this middleware to the top with `push`
-$stack->push(CacheMiddleware::getMiddleware(), 'cache');
+$stack->push(new CacheMiddleware(), 'cache');
 
 // Initialize the client with the handler option
 $client = new Client(['handler' => $stack]);
@@ -39,7 +39,7 @@ You can use a custom Cache with:
 use Doctrine\Common\Cache;
 
 [...]
-$stack->push(CacheMiddleware::getMiddleware(new PrivateCache(new FilesystemCache('/tmp/')), 'cache');
+$stack->push(new CacheMiddleware(new PrivateCache(new FilesystemCache('/tmp/')), 'cache');
 ```
 
 You can use `ChainCache` for using multiple `CacheProvider`. With that provider, you have to sort the different cache from the faster to the slower. Like that, you can have a very fast cache.
@@ -48,7 +48,7 @@ You can use `ChainCache` for using multiple `CacheProvider`. With that provider,
 use Doctrine\Common\Cache;
 
 [...]
-$stack->push(CacheMiddleware::getMiddleware(new ChainCache([
+$stack->push(new CacheMiddleware(new ChainCache([
   new ArrayCache(),
   new ApcCache(),
   new FileCache('/tmp/'),
