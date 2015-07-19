@@ -53,6 +53,22 @@ class CacheMiddleware
     }
 
     /**
+     * @param CacheStorageInterface $cacheStorage
+     */
+    public function setCacheStorage(CacheStorageInterface $cacheStorage)
+    {
+        $this->cacheStorage = $cacheStorage;
+    }
+
+    /**
+     * @return CacheStorageInterface
+     */
+    public function getCacheStorage()
+    {
+        return $this->cacheStorage;
+    }
+
+    /**
      * Will be called at the end of the script
      */
     public function purgeReValidation()
