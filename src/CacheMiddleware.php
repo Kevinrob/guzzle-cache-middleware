@@ -16,7 +16,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 class CacheMiddleware
 {
-    const CONFIG_STORAGE = 'storage';
 
     /**
      * @var array of Promise
