@@ -111,6 +111,7 @@ class CacheMiddleware
             }
 
             if ($request->hasHeader(self::HEADER_RE_VALIDATION)) {
+                // It's a re-validation request, so bypass the cache!
                 return $handler($request->withoutHeader(self::HEADER_RE_VALIDATION), $options);
             }
 
