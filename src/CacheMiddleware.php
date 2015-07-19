@@ -33,6 +33,15 @@ class CacheMiddleware
      */
     protected $cacheStorage;
 
+    /**
+     * List of allowed HTTP methods to cache
+     * Key = method name (upscaling)
+     * Value = true
+     *
+     * @var array
+     */
+    protected $httpMethods = ['GET' => true];
+
 
     /**
      * @param CacheStorageInterface|null $cacheStorage
@@ -69,6 +78,19 @@ class CacheMiddleware
     }
 
     /**
+     * @param array $methods
+     */
+    public function setHttpMethods(array $methods)
+    {
+        $this->httpMethods = $methods;
+    }
+
+    public function getHttpMethods()
+    {
+        return $this->httpMethods;
+    }
+
+    /**
      * Will be called at the end of the script
      */
     public function purgeReValidation()
@@ -83,9 +105,8 @@ class CacheMiddleware
     public function __invoke(\Closure $handler)
     {
         return function (RequestInterface $request, array $options) use (&$handler) {
-            $reqMethod = $request->getMethod();
-            if ($reqMethod !== 'GET' && $reqMethod !== 'HEAD') {
-                // No caching for others methods
+            if (!isset($this->httpMethods[ strtoupper($request->getMethod()) ])) {
+                // No caching for this method allowed
                 return $handler($request, $options);
             }
 
