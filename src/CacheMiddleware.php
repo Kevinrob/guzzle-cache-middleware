@@ -16,6 +16,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 class CacheMiddleware
 {
+    const HEADER_RE_VALIDATION = 'X-Kevinrob-GuzzleCache-ReValidation';
 
     /**
      * @var array of Promise
@@ -109,8 +110,8 @@ class CacheMiddleware
                 return $handler($request, $options);
             }
 
-            if ($request->hasHeader("X-ReValidation")) {
-                return $handler($request->withoutHeader("X-ReValidation"), $options);
+            if ($request->hasHeader(self::HEADER_RE_VALIDATION)) {
+                return $handler($request->withoutHeader(self::HEADER_RE_VALIDATION), $options);
             }
 
             // If cache => return new FulfilledPromise(...) with response
@@ -187,7 +188,7 @@ class CacheMiddleware
         // Add the promise for revalidate
         if ($this->client !== null) {
             /** @var RequestInterface $request */
-            $request = $request->withHeader("X-ReValidation", "1");
+            $request = $request->withHeader(self::HEADER_RE_VALIDATION, "1");
             $this->waitingRevalidate[] = $this->client
                 ->sendAsync($request)
                 ->then(function(ResponseInterface $response) use ($request, &$cacheStorage, $cacheEntry) {
