@@ -17,6 +17,10 @@ use Psr\Http\Message\ResponseInterface;
 class CacheMiddleware
 {
     const HEADER_RE_VALIDATION = 'X-Kevinrob-GuzzleCache-ReValidation';
+    const HEADER_CACHE_INFO = 'X-Kevinrob-Cache';
+    const HEADER_CACHE_HIT = 'HIT';
+    const HEADER_CACHE_MISS = 'MISS';
+    const HEADER_CACHE_STALE = 'STALE';
 
     /**
      * @var array of Promise
@@ -107,7 +111,11 @@ class CacheMiddleware
         return function (RequestInterface $request, array $options) use (&$handler) {
             if (!isset($this->httpMethods[ strtoupper($request->getMethod()) ])) {
                 // No caching for this method allowed
-                return $handler($request, $options);
+                return $handler($request, $options)->then(
+                    function (ResponseInterface $response) {
+                        return $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
+                    }
+                );
             }
 
             if ($request->hasHeader(self::HEADER_RE_VALIDATION)) {
@@ -120,7 +128,7 @@ class CacheMiddleware
             if ($cacheEntry instanceof CacheEntry) {
                 if ($cacheEntry->isFresh()) {
                     // Cache HIT!
-                    return new FulfilledPromise($cacheEntry->getResponse()->withHeader("X-Cache", "HIT"));
+                    return new FulfilledPromise($cacheEntry->getResponse()->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT));
                 } elseif ($cacheEntry->hasValidationInformation()) {
                     // Re-validation header
                     $request = static::getRequestWithReValidationHeader($request, $cacheEntry);
@@ -130,7 +138,7 @@ class CacheMiddleware
 
                         return new FulfilledPromise(
                             $cacheEntry->getResponse()
-                                ->withHeader("X-Cache", "Stale while revalidate")
+                                ->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_STALE)
                         );
                     }
                 }
@@ -140,6 +148,7 @@ class CacheMiddleware
             $promise = $handler($request, $options);
             return $promise->then(
                 function (ResponseInterface $response) use ($request, $cacheEntry) {
+                    // Check if error and looking for a staled content
                     if ($response->getStatusCode() >= 500) {
                         $responseStale = static::getStaleResponse($cacheEntry);
                         if ($responseStale instanceof ResponseInterface) {
@@ -152,8 +161,10 @@ class CacheMiddleware
                         /** @var ResponseInterface $response */
                         $response = $response
                             ->withStatus($cacheEntry->getResponse()->getStatusCode())
-                            ->withHeader("X-Cache", "HIT with validation");
+                            ->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT);
                         $response = $response->withBody($cacheEntry->getResponse()->getBody());
+                    } else {
+                        $response = $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }
 
                     // Add to the cache
@@ -218,7 +229,7 @@ class CacheMiddleware
         // Return staled cache entry if we can
         if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
             return $cacheEntry->getResponse()
-                ->withHeader("X-Cache", "HIT stale");
+                ->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_STALE);
         }
 
         return null;

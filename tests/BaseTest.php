@@ -46,19 +46,19 @@ class BaseTest extends \PHPUnit_Framework_TestCase
     {
         $this->client->post("anything");
         $response = $this->client->post("anything");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
         $this->client->put("anything");
         $response = $this->client->put("anything");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
         $this->client->delete("anything");
         $response = $this->client->delete("anything");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
         $this->client->patch("anything");
         $response = $this->client->patch("anything");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
 }

@@ -64,12 +64,12 @@ class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
         $this->client->get("http://test.com/2s");
 
         $response = $this->client->get("http://test.com/2s");
-        $this->assertEquals("HIT", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
         sleep(3);
 
         $response = $this->client->get("http://test.com/2s");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
     public function testNoStoreHeader()
@@ -77,7 +77,7 @@ class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
         $this->client->get("http://test.com/no-store");
 
         $response = $this->client->get("http://test.com/no-store");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
     public function testNoCacheHeader()
@@ -85,7 +85,7 @@ class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
         $this->client->get("http://test.com/no-cache");
 
         $response = $this->client->get("http://test.com/no-cache");
-        $this->assertEquals("HIT with validation", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
 }

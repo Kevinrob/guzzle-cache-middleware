@@ -89,7 +89,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         sleep(1);
 
         $response = $this->client->get("http://test.com/etag");
-        $this->assertEquals("HIT with validation", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
     public function testEtagChangeHeader()
@@ -99,7 +99,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         sleep(1);
 
         $response = $this->client->get("http://test.com/etag-changed");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
     public function testStaleWhileRevalidateHeader()
@@ -109,13 +109,13 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
         sleep(2);
 
         $response = $this->client->get("http://test.com/stale-while-revalidate");
-        $this->assertEquals("Stale while revalidate", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_STALE, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
         // Do that at the end of the php script...
         $this->cache->purgeReValidation();
 
         $response = $this->client->get("http://test.com/stale-while-revalidate");
-        $this->assertEquals("HIT", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
 }

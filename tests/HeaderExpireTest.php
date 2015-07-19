@@ -68,7 +68,7 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
     {
         $this->client->get("http://test.com/expired");
         $response = $this->client->get("http://test.com/expired");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
     public function testExpiredHeader()
@@ -76,12 +76,12 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
         $this->client->get("http://test.com/2s");
 
         $response = $this->client->get("http://test.com/2s");
-        $this->assertEquals("HIT", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
         sleep(3);
 
         $response = $this->client->get("http://test.com/2s");
-        $this->assertEquals("", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
     public function testStaleIfErrorHeader()
@@ -90,7 +90,7 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
 
         $this->sendError = true;
         $response = $this->client->get("http://test.com/stale-if-error");
-        $this->assertEquals("HIT stale", $response->getHeaderLine("X-Cache"));
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_STALE, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
         $this->sendError = false;
     }
 
