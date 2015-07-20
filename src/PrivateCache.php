@@ -98,15 +98,18 @@ class PrivateCache implements CacheStorageInterface
     public function cache(RequestInterface $request, ResponseInterface $response)
     {
         try {
-            $lifeTime = $this->getCacheObject($response)->getStaleAt()->getTimestamp() - time();
-            if($lifeTime > 0) {
-                return $this->storage->save($this->getCacheKey($request), serialize($this->getCacheObject($response)), $lifeTime);
-            }
-            else {
-                return false;
+            $cacheObject = $this->getCacheObject($response);
+            if(isset($cacheObject))
+            {
+                $lifeTime = $this->getCacheObject($response)->getStaleAt()->getTimestamp() - time();
+                if($lifeTime > 0) {
+                    return $this->storage->save($this->getCacheKey($request), serialize($this->getCacheObject($response)), $lifeTime);
+                }
             }
         } catch (\Exception $ignored) {
             return false;
         }
+        
+        return false;
     }
 }
