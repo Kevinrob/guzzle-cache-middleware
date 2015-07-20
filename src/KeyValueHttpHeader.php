@@ -34,7 +34,7 @@ class KeyValueHttpHeader
      */
     public function has($key)
     {
-        // For performance, we can use "isset()",
+        // For performance, we can use isset,
         // but it will not match if value == 0
         return isset($this->values[$key]) || array_key_exists($key, $this->values);
     }
