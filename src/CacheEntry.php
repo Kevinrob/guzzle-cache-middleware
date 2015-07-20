@@ -141,8 +141,17 @@ class CacheEntry
      */
     public function getTTL()
     {
-        // TODO
-        return 0;
+        if ($this->hasValidationInformation()) {
+            // No TTL if we have a way to re-validate the cache
+            return 0;
+        }
+        if ($this->staleIfErrorTo !== null) {
+            // Keep it when stale if error
+            return $this->staleIfErrorTo->getTimestamp() - time();
+        }
+
+        // Keep it until it become stale
+        return $this->staleAt->getTimestamp() - time();
     }
 
     public function __sleep()
