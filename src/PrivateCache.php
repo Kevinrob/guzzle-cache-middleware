@@ -47,6 +47,8 @@ class PrivateCache implements CacheStorageInterface
                     new \DateTime('+' . $values->get('max-age') . 'seconds')
                 );
             }
+
+            return new CacheEntry($response, new \DateTime());
         }
 
         if ($response->hasHeader("Expires")) {
@@ -56,7 +58,7 @@ class PrivateCache implements CacheStorageInterface
             }
         }
 
-        return new CacheEntry($response, new \DateTime('1 days ago'));
+        return new CacheEntry($response, new \DateTime('-1 seconds'));
     }
 
     /**

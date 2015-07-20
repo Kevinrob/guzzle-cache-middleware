@@ -88,6 +88,8 @@ class HeaderExpireTest extends \PHPUnit_Framework_TestCase
     {
         $this->client->get("http://test.com/stale-if-error");
 
+        sleep(1);
+
         $this->sendError = true;
         $response = $this->client->get("http://test.com/stale-if-error");
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_STALE, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
