@@ -48,9 +48,13 @@ You can use `ChainCache` for using multiple `CacheProvider`. With that provider,
 use Doctrine\Common\Cache;
 
 [...]
-$stack->push(new CacheMiddleware(new ChainCache([
-  new ArrayCache(),
-  new ApcCache(),
-  new FileCache('/tmp/'),
-]), 'cache');
+$stack->push(new CacheMiddleware(
+  new PrivateCache(
+    new ChainCache([
+      new ArrayCache(),
+      new ApcCache(),
+      new FileCache('/tmp/'),
+    ])
+  )
+), 'cache');
 ```
