@@ -141,6 +141,7 @@ class CacheEntry
         // Stream/Resource can't be serialized... So we copy the content
         if ($this->response !== null) {
             $this->responseBody = (string)$this->response->getBody();
+            $this->response->getBody()->rewind();
         }
 
         return array_keys(get_object_vars($this));
