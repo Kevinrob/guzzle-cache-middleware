@@ -136,6 +136,15 @@ class CacheEntry
         return $this->response->hasHeader("Etag") || $this->response->hasHeader("Last-Modified");
     }
 
+    /**
+     * @return int TTL in seconds (0 = infinite)
+     */
+    public function getTTL()
+    {
+        // TODO
+        return 0;
+    }
+
     public function __sleep()
     {
         // Stream/Resource can't be serialized... So we copy the content
