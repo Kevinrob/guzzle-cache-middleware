@@ -40,6 +40,12 @@ class BaseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Hello world!', $response->getBody());
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+
+        $response = $this->client->get("anything");
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Hello world!', $response->getBody());
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
     public function testNoCacheOtherMethod()
