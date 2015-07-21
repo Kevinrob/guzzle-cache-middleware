@@ -147,13 +147,17 @@ class CacheEntry
             // No TTL if we have a way to re-validate the cache
             return 0;
         }
+
         if ($this->staleIfErrorTo !== null) {
             // Keep it when stale if error
-            return $this->staleIfErrorTo->getTimestamp() - time();
+            $ttl = $this->staleIfErrorTo->getTimestamp() - time();
+        } else {
+            // Keep it until it become stale
+            $ttl = $this->staleAt->getTimestamp() - time();
         }
 
-        // Keep it until it become stale
-        return $this->staleAt->getTimestamp() - time();
+        // Don't return 0, it's reserved for infinite TTL
+        return $ttl != 0 ? $ttl : -1;
     }
 
     public function __sleep()
