@@ -142,7 +142,7 @@ class CacheMiddleware
                         );
                     }
                 }
-            }else{
+            } else {
                 $cacheEntry = null;
             }
 
