@@ -142,6 +142,8 @@ class CacheMiddleware
                         );
                     }
                 }
+            }else{
+                $cacheEntry = null;
             }
 
             /** @var Promise $promise */
