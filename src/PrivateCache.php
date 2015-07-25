@@ -101,10 +101,10 @@ class PrivateCache implements CacheStorageInterface
     {
         try {
             $cacheObject = $this->getCacheObject($response);
-            if($cacheObject !== null)
+            if ($cacheObject !== null)
             {
                 $lifeTime = $cacheObject->getTTL();
-                if($lifeTime >= 0) {
+                if ($lifeTime >= 0) {
                     return $this->storage->save(
                         $this->getCacheKey($request),
                         serialize($cacheObject),
