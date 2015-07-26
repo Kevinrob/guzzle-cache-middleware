@@ -39,7 +39,7 @@ You can use a custom Cache with:
 use Doctrine\Common\Cache;
 
 [...]
-$stack->push(new CacheMiddleware(new PrivateCache(new FilesystemCache('/tmp/')), 'cache');
+$stack->push(new CacheMiddleware(new PrivateCache(new FilesystemCache('/tmp/'))), 'cache');
 ```
 
 You can use `ChainCache` for using multiple `CacheProvider`. With that provider, you have to sort the different cache from the faster to the slower. Like that, you can have a very fast cache.
