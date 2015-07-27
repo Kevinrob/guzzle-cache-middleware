@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Guzzle Cache Middleware by Kevinrob</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Guzzle Cache Middleware</h1>
+      <h2 class="project-tagline">A HTTP Cache for Guzzle 6. It&#39;s a simple Middleware to be added in the HandlerStack.</h2>
+      <a href="https://github.com/Kevinrob/guzzle-cache-middleware" class="btn">View on GitHub</a>
+      <a href="https://github.com/Kevinrob/guzzle-cache-middleware/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/Kevinrob/guzzle-cache-middleware/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="guzzle-cache-middleware" class="anchor" href="#guzzle-cache-middleware" aria-hidden="true"><span class="octicon octicon-link"></span></a>guzzle-cache-middleware</h1>
+
+<p><a href="https://packagist.org/packages/kevinrob/guzzle-cache-middleware"><img src="https://poser.pugx.org/kevinrob/guzzle-cache-middleware/v/stable" alt="Latest Stable Version"></a> <a href="https://packagist.org/packages/kevinrob/guzzle-cache-middleware"><img src="https://poser.pugx.org/kevinrob/guzzle-cache-middleware/downloads" alt="Total Downloads"></a> <a href="https://packagist.org/packages/kevinrob/guzzle-cache-middleware"><img src="https://poser.pugx.org/kevinrob/guzzle-cache-middleware/license" alt="License"></a> <a href="https://travis-ci.org/Kevinrob/guzzle-cache-middleware"><img src="https://travis-ci.org/Kevinrob/guzzle-cache-middleware.svg" alt="Build Status"></a><br>
+<a href="https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master"><img src="https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/quality-score.png?b=master" alt="Scrutinizer Code Quality"></a> <a href="https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802"><img src="https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802/mini.png" alt="SensioLabsInsight"></a></p>
+
+<p>A HTTP Cache for <a href="https://github.com/guzzle/guzzle">Guzzle</a> 6. It's a simple Middleware to be added in the HandlerStack.
+This project is under development but it's already functional.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p><code>composer require kevinrob/guzzle-cache-middleware:~0.5</code></p>
+
+<p>or add it the your <code>composer.json</code> and make a <code>composer update kevinrob/guzzle-cache-middleware</code>.</p>
+
+<h1>
+<a id="why" class="anchor" href="#why" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why?</h1>
+
+<p>Performance. It's very common to do some HTTP calls to an API for rendering a page and it takes times to do it.</p>
+
+<h1>
+<a id="how" class="anchor" href="#how" aria-hidden="true"><span class="octicon octicon-link"></span></a>How?</h1>
+
+<p>With a simple Middleware added at the top of the <code>HandlerStack</code> of Guzzle6.</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">GuzzleHttp\Client</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">GuzzleHttp\HandlerStack</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Kevinrob\GuzzleCache</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">// Create default HandlerStack</span></span>
+<span class="pl-s1"><span class="pl-smi">$stack</span> <span class="pl-k">=</span> <span class="pl-c1">HandlerStack</span><span class="pl-k">::</span>create();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">// Add this middleware to the top with `push`</span></span>
+<span class="pl-s1"><span class="pl-smi">$stack</span><span class="pl-k">-&gt;</span>push(<span class="pl-k">new</span> <span class="pl-c1">CacheMiddleware</span>(), <span class="pl-s"><span class="pl-pds">'</span>cache<span class="pl-pds">'</span></span>);</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">// Initialize the client with the handler option</span></span>
+<span class="pl-s1"><span class="pl-smi">$client</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">Client</span>([<span class="pl-s"><span class="pl-pds">'</span>handler<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-smi">$stack</span>]);</span></pre></div>
+
+<p>You can use a custom Cache with:</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1">[<span class="pl-k">...</span>]</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">[<span class="pl-k">...</span>]</span>
+<span class="pl-s1"><span class="pl-smi">$stack</span><span class="pl-k">-&gt;</span>push(<span class="pl-k">new</span> <span class="pl-c1">CacheMiddleware</span>(<span class="pl-k">new</span> <span class="pl-c1">PrivateCache</span>(<span class="pl-k">new</span> <span class="pl-c1">FilesystemCache</span>(<span class="pl-sr"><span class="pl-pds">'/</span>tmp<span class="pl-pds">/'</span></span>))), <span class="pl-s"><span class="pl-pds">'</span>cache<span class="pl-pds">'</span></span>);</span></pre></div>
+
+<p>You can use <code>ChainCache</code> for using multiple <code>CacheProvider</code>. With that provider, you have to sort the different cache from the faster to the slower. Like that, you can have a very fast cache.</p>
+
+<div class="highlight highlight-php"><pre><span class="pl-s1">[<span class="pl-k">...</span>]</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">[<span class="pl-k">...</span>]</span>
+<span class="pl-s1"><span class="pl-smi">$stack</span><span class="pl-k">-&gt;</span>push(<span class="pl-k">new</span> <span class="pl-c1">CacheMiddleware</span>(</span>
+<span class="pl-s1">  <span class="pl-k">new</span> <span class="pl-c1">PrivateCache</span>(</span>
+<span class="pl-s1">    <span class="pl-k">new</span> <span class="pl-c1">ChainCache</span>([</span>
+<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">ArrayCache</span>(),</span>
+<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">ApcCache</span>(),</span>
+<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">FileCache</span>(<span class="pl-sr"><span class="pl-pds">'/</span>tmp<span class="pl-pds">/'</span></span>),</span>
+<span class="pl-s1">    ])</span>
+<span class="pl-s1">  )</span>
+<span class="pl-s1">), <span class="pl-s"><span class="pl-pds">'</span>cache<span class="pl-pds">'</span></span>);</span></pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/Kevinrob/guzzle-cache-middleware">Guzzle Cache Middleware</a> is maintained by <a href="https://github.com/Kevinrob">Kevinrob</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-15972421-4");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
+
