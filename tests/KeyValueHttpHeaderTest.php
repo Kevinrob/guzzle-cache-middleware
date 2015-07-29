@@ -24,7 +24,7 @@ class KeyValueHttpHeaderTest extends \PHPUnit_Framework_TestCase
                 'zero=0',
                 'nothing = ',
                 'false = false',
-                'with-comma=1,yeah=2'
+                'with-comma=1,yeah="2"'
             ]
         ]);
 

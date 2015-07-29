@@ -5,7 +5,12 @@ namespace Kevinrob\GuzzleCache;
 
 class KeyValueHttpHeader
 {
-    const REGEX_SPLIT = '/^([^=]*)=(.*)$/';
+
+    /**
+     * Take from https://github.com/hapijs/wreck
+     * and modified for accepting space before and after the "=".
+     */
+    const REGEX_SPLIT = '/(?:^|(?:\s*\,\s*))([^\x00-\x20\(\)<>@\,;\:\\\\"\/\[\]\?\=\{\}\x7F]+)(?:\s*\=\s*(?:([^\x00-\x20\(\)<>@\,;\:\\\\"\/\[\]\?\=\{\}\x7F]+)|(?:\"((?:[^"\\\\]|\\\\.)*)\")))?/';
 
     /**
      * @var string[]
@@ -19,15 +24,17 @@ class KeyValueHttpHeader
     public function __construct(array $values)
     {
         foreach ($values as $value) {
-            // FIXME make it better with the RFC ABNF rule
-            $exploded = explode(',', $value);
+            $matches = [];
+            if (preg_match_all(self::REGEX_SPLIT, $value, $matches, PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $val = '';
+                    if (count($match) == 3) {
+                        $val = $match[2];
+                    } else if (count($match) > 3) {
+                        $val = $match[3];
+                    }
 
-            foreach ($exploded as $fragment) {
-                $matches = [];
-                if (preg_match(self::REGEX_SPLIT, $fragment, $matches)) {
-                    $this->values[trim($matches[1])] = trim($matches[2]);
-                } else {
-                    $this->values[trim($fragment)] = true;
+                    $this->values[$match[1]] = $val;
                 }
             }
         }
