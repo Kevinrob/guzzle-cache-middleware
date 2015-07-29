@@ -18,22 +18,16 @@ class KeyValueHttpHeader
      */
     public function __construct(array $values)
     {
-        foreach ($values as $key => $value) {
+        foreach ($values as $value) {
             $exploded = explode(',', $value);
 
-            if (count($exploded) > 1) {
-                // contain a comma!
-                unset($values[$key]);
-                $values = array_merge($values, $exploded);
-            }
-        }
-
-        foreach ($values as $value) {
-            $matches = [];
-            if (preg_match(self::REGEX_SPLIT, $value, $matches)) {
-                $this->values[trim($matches[1])] = trim($matches[2]);
-            } else {
-                $this->values[trim($value)] = true;
+            foreach ($exploded as $fragment) {
+                $matches = [];
+                if (preg_match(self::REGEX_SPLIT, $fragment, $matches)) {
+                    $this->values[trim($matches[1])] = trim($matches[2]);
+                } else {
+                    $this->values[trim($fragment)] = true;
+                }
             }
         }
     }
