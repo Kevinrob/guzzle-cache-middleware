@@ -24,6 +24,7 @@ class KeyValueHttpHeaderTest extends \PHPUnit_Framework_TestCase
                 'zero=0',
                 'nothing = ',
                 'false = false',
+                'with-comma=1,yeah=2'
             ]
         ]);
 
@@ -35,12 +36,16 @@ class KeyValueHttpHeaderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($values->has('zero'));
         $this->assertTrue($values->has('nothing'));
         $this->assertTrue($values->has('false'));
+        $this->assertTrue($values->has('with-comma'));
+        $this->assertTrue($values->has('yeah'));
 
         $this->assertEquals(120, $values->get('max-age'));
         $this->assertEquals(60, $values->get('stale-while-revalidate'));
         $this->assertEquals(0, $values->get('zero'));
         $this->assertEquals('', $values->get('nothing'));
         $this->assertEquals('false', $values->get('false'));
+        $this->assertEquals(1, $values->get('with-comma'));
+        $this->assertEquals(2, $values->get('yeah'));
     }
 
 }

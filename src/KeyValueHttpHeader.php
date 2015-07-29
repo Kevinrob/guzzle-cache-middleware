@@ -18,6 +18,16 @@ class KeyValueHttpHeader
      */
     public function __construct(array $values)
     {
+        foreach ($values as $key => $value) {
+            $exploded = explode(',', $value);
+
+            if (count($exploded) > 1) {
+                // contain a comma!
+                unset($values[$key]);
+                $values = array_merge($values, $exploded);
+            }
+        }
+
         foreach ($values as $value) {
             $matches = [];
             if (preg_match(self::REGEX_SPLIT, $value, $matches)) {
