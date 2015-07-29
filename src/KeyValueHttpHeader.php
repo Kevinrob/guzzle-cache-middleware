@@ -19,6 +19,7 @@ class KeyValueHttpHeader
     public function __construct(array $values)
     {
         foreach ($values as $value) {
+            // FIXME make it better with the RFC ABNF rule
             $exploded = explode(',', $value);
 
             foreach ($exploded as $fragment) {
