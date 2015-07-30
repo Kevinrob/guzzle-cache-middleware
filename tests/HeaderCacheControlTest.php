@@ -32,6 +32,11 @@ class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
                         (new Response())
                             ->withAddedHeader("Cache-Control", "max-age=2")
                     );
+                case '/2s-complex':
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader("Cache-Control", "invalid-token =\"yes\", max-age=2, stale-while-revalidate= 60")
+                    );
                 case '/no-store':
                     return new FulfilledPromise(
                         (new Response())
@@ -69,6 +74,19 @@ class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
         sleep(3);
 
         $response = $this->client->get("http://test.com/2s");
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+    }
+
+    public function testMaxAgeComplexHeader()
+    {
+        $this->client->get("http://test.com/2s-complex");
+
+        $response = $this->client->get("http://test.com/2s-complex");
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+
+        sleep(3);
+
+        $response = $this->client->get("http://test.com/2s-complex");
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
