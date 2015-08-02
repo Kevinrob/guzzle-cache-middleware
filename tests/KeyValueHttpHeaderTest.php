@@ -18,12 +18,12 @@ class KeyValueHttpHeaderTest extends \PHPUnit_Framework_TestCase
     {
         $response = new Response(200, [
             'Cache-Control' => [
-                'max-age = 120',
-                ' stale-while-revalidate=  60 ',
+                'max-age=120',
+                ' stale-while-revalidate=60 ',
                 '  private ',
                 'zero=0',
-                'nothing = ',
-                'false = false',
+                'nothing=',
+                'false=false',
                 'with-comma=1,yeah="2"'
             ]
         ]);
