@@ -16,6 +16,19 @@ class PrivateCache implements CacheStorageInterface
      */
     protected $storage;
 
+    /**
+     * @var int[]
+     */
+    protected $statusAccepted = [
+        200 => 200,
+        204 => 204,
+        400 => 400,
+        404 => 404,
+        405 => 405,
+        414 => 414,
+        418 => 418,
+    ];
+
     public function __construct(Cache $cache = null)
     {
         $this->storage = $cache !== null ? $cache : new ArrayCache();
@@ -27,6 +40,11 @@ class PrivateCache implements CacheStorageInterface
      */
     protected function getCacheObject(ResponseInterface $response)
     {
+        if (!isset($this->statusAccepted[$response->getStatusCode()])) {
+            // Don't cache it
+            return null;
+        }
+
         if ($response->hasHeader("Cache-Control")) {
             $values = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
 
