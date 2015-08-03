@@ -11,6 +11,8 @@ use Psr\Http\Message\ResponseInterface;
 class PrivateCache implements CacheStorageInterface
 {
 
+    const RFC_1123_DATE_FORMAT = 'D, d M Y H:i:s T';
+
     /**
      * @var Cache
      */
@@ -48,35 +50,45 @@ class PrivateCache implements CacheStorageInterface
         if ($response->hasHeader("Cache-Control")) {
             $values = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
 
-            if ($values->has('no-store')) {
-                // No store allowed (maybe some sensitives data...)
-                return null;
+            if (!$values->isEmpty()) {
+                return $this->getCacheObjectForCacheControl($response, $values);
             }
-
-            if ($values->has('no-cache')) {
-                // Stale response see RFC7234 section 5.2.1.4
-                $entry = new CacheEntry($response, new \DateTime('-1 seconds'));
-                return $entry->hasValidationInformation() ? $entry : null;
-            }
-
-            if ($values->has('max-age')) {
-                return new CacheEntry(
-                    $response,
-                    new \DateTime('+' . $values->get('max-age') . 'seconds')
-                );
-            }
-
-            return new CacheEntry($response, new \DateTime());
         }
 
-        if ($response->hasHeader("Expires")) {
-            $expireAt = \DateTime::createFromFormat('D, d M Y H:i:s T', $response->getHeaderLine("Expires"));
-            if ($expireAt !== FALSE) {
-                return new CacheEntry($response, $expireAt);
-            }
+        if ($response->hasHeader("Expires")
+            && $expireAt = \DateTime::createFromFormat(self::RFC_1123_DATE_FORMAT, $response->getHeaderLine("Expires"))) {
+            return new CacheEntry($response, $expireAt);
         }
 
         return new CacheEntry($response, new \DateTime('-1 seconds'));
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @param KeyValueHttpHeader $cacheControl
+     * @return CacheEntry|null
+     */
+    protected function getCacheObjectForCacheControl(ResponseInterface $response, KeyValueHttpHeader $cacheControl)
+    {
+        if ($cacheControl->has('no-store')) {
+            // No store allowed (maybe some sensitives data...)
+            return null;
+        }
+
+        if ($cacheControl->has('no-cache')) {
+            // Stale response see RFC7234 section 5.2.1.4
+            $entry = new CacheEntry($response, new \DateTime('-1 seconds'));
+            return $entry->hasValidationInformation() ? $entry : null;
+        }
+
+        if ($cacheControl->has('max-age')) {
+            return new CacheEntry(
+                $response,
+                new \DateTime('+' . (int)$cacheControl->get('max-age') . 'seconds')
+            );
+        }
+
+        return new CacheEntry($response, new \DateTime());
     }
 
     /**

@@ -63,4 +63,12 @@ class KeyValueHttpHeader
         return "";
     }
 
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return count($this->values) === 0;
+    }
+
 }
