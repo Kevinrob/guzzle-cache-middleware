@@ -11,8 +11,6 @@ use Psr\Http\Message\ResponseInterface;
 class PrivateCache implements CacheStorageInterface
 {
 
-    const RFC_1123_DATE_FORMAT = 'D, d M Y H:i:s T';
-
     /**
      * @var Cache
      */
@@ -56,7 +54,7 @@ class PrivateCache implements CacheStorageInterface
         }
 
         if ($response->hasHeader("Expires")
-            && $expireAt = \DateTime::createFromFormat(self::RFC_1123_DATE_FORMAT, $response->getHeaderLine("Expires"))) {
+            && $expireAt = \DateTime::createFromFormat(\DateTime::RFC1123, $response->getHeaderLine("Expires"))) {
             return new CacheEntry($response, $expireAt);
         }
 
