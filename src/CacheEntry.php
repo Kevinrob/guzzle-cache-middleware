@@ -47,7 +47,7 @@ class CacheEntry
      * @param ResponseInterface $response
      * @param \DateTime $staleAt
      * @param \DateTime|null $staleIfErrorTo if null, detected with the headers (RFC 5861)
-     * @param \DateTime $staleWhileRevalidateTo
+     * @param \DateTime|null $staleWhileRevalidateTo
      */
     public function __construct(
         ResponseInterface $response,
@@ -139,7 +139,7 @@ class CacheEntry
     }
 
     /**
-     * @return int TTL in seconds (0 = infinite)
+     * @return double TTL in seconds (0 = infinite)
      */
     public function getTTL()
     {

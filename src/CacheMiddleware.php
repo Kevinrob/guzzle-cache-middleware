@@ -223,7 +223,7 @@ class CacheMiddleware
     }
 
     /**
-     * @param CacheEntry $cacheEntry
+     * @param CacheEntry|null $cacheEntry
      * @return null|ResponseInterface
      */
     protected static function getStaleResponse(CacheEntry $cacheEntry = null)
@@ -261,8 +261,8 @@ class CacheMiddleware
     }
 
     /**
-     * @param CacheStorageInterface $cacheStorage
-     * @return \Closure the Middleware for Guzzle HandlerStack
+     * @param CacheStorageInterface|null $cacheStorage
+     * @return CacheMiddleware the Middleware for Guzzle HandlerStack
      *
      * @deprecated Use constructor => `new CacheMiddleware()`
      */
