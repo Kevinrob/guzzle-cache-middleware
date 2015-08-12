@@ -13,3 +13,7 @@ matrix:
 
 before_script:
   - composer install
+
+cache:
+  directories:
+  - vendor

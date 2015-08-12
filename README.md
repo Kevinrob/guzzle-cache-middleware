@@ -7,11 +7,19 @@
 A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Middleware to be added in the HandlerStack.
 This project is under development but it's already functional.
 
+## Goals
+- RFC 7234 compliance
+- Performance and transparency
+- Assured compatibility with PSR-7
+
 ## Installation
 
 `composer require kevinrob/guzzle-cache-middleware:~0.5`
 
 or add it the your `composer.json` and make a `composer update kevinrob/guzzle-cache-middleware`.
+
+# Dependencies
+- Currently it depends on and works only with [Doctrine\Cache](https://github.com/doctrine/cache) as the actual caching backend. (#27)
 
 # Why?
 Performance. It's very common to do some HTTP calls to an API for rendering a page and it takes times to do it.
