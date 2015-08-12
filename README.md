@@ -47,7 +47,16 @@ use Kevinrob\GuzzleCache\Manager;
 use Kevinrob\GuzzleCache\Storage;
 
 [...]
-$stack->push(new CacheMiddleware(new PrivateCache(new DoctrineCacheWrapper(new FilesystemCache('/tmp/')))), 'cache');
+$stack->push(
+  new CacheMiddleware(
+    new PrivateCache(
+      new DoctrineCacheWrapper(
+        new FilesystemCache('/tmp/')
+      )
+    )
+  ), 
+  'cache'
+);
 ```
 
 You can use `ChainCache` for using multiple `CacheProvider`. With that provider, you have to sort the different cache from the faster to the slower. Like that, you can have a very fast cache.
