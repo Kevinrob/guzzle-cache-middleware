@@ -39,28 +39,34 @@ $stack->push(new CacheMiddleware(), 'cache');
 $client = new Client(['handler' => $stack]);
 ```
 
-You can use a custom Cache with:
+You can use a cache from `Doctrine/Cache`:
 ```php
 [...]
 use Doctrine\Common\Cache;
+use Kevinrob\GuzzleCache\Manager;
+use Kevinrob\GuzzleCache\Storage;
 
 [...]
-$stack->push(new CacheMiddleware(new PrivateCache(new FilesystemCache('/tmp/'))), 'cache');
+$stack->push(new CacheMiddleware(new PrivateCache(new DoctrineCacheWrapper(new FilesystemCache('/tmp/')))), 'cache');
 ```
 
 You can use `ChainCache` for using multiple `CacheProvider`. With that provider, you have to sort the different cache from the faster to the slower. Like that, you can have a very fast cache.
 ```php
 [...]
 use Doctrine\Common\Cache;
+use Kevinrob\GuzzleCache\Manager;
+use Kevinrob\GuzzleCache\Storage;
 
 [...]
 $stack->push(new CacheMiddleware(
   new PrivateCache(
-    new ChainCache([
-      new ArrayCache(),
-      new ApcCache(),
-      new FileCache('/tmp/'),
-    ])
+    new DoctrineCacheWrapper(
+      new ChainCache([
+        new ArrayCache(),
+        new ApcCache(),
+        new FileCache('/tmp/'),
+      ])
+    )
   )
 ), 'cache');
 ```
