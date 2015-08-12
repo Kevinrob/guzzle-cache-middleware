@@ -1,12 +1,13 @@
 <?php
 
-namespace Kevinrob\GuzzleCache;
+namespace Kevinrob\GuzzleCache\Manager;
 
 
+use Kevinrob\GuzzleCache\CacheEntry;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-interface CacheStorageInterface
+interface CacheManagerInterface
 {
 
     /**

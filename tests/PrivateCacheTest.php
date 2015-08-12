@@ -10,6 +10,8 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\Common\Cache\PhpFileCache;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Kevinrob\GuzzleCache\Manager\PrivateCacheManager;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
 
 class PrivateCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +39,9 @@ class PrivateCacheTest extends \PHPUnit_Framework_TestCase
         foreach ($cacheProviders as $cacheProvider) {
             $this->rrmdir($TMP_DIR);
 
-            $cache = new PrivateCache($cacheProvider);
+            $cache = new PrivateCacheManager(
+                new DoctrineCacheWrapper($cacheProvider)
+            );
             $cache->cache($request, $response);
             $entry = $cache->fetch($request);
 
