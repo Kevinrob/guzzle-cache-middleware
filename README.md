@@ -7,6 +7,11 @@
 A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Middleware to be added in the HandlerStack.
 This project is under development but it's already functional.
 
+## Goals
+- RFC 7234 compliance
+- Performance and transparency
+- Assured compatibility with PSR-7
+
 ## Installation
 
 `composer require kevinrob/guzzle-cache-middleware:~0.5`
