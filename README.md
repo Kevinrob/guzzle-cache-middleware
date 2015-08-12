@@ -30,7 +30,7 @@ With a simple Middleware added at the top of the `HandlerStack` of Guzzle6.
 ```php
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
-use Kevinrob\GuzzleCache;
+use Kevinrob\GuzzleCache\CacheMiddleware;
 
 // Create default HandlerStack
 $stack = HandlerStack::create();
