@@ -53,7 +53,9 @@ class DoctrineCacheWrapper implements CacheStorageInterface
                     $lifeTime
                 );
             }
-        } catch (\Exception $ignored) { }
+        } catch (\Exception $ignored) {
+            // No fail if we can't save it the storage
+        }
 
         return false;
     }
