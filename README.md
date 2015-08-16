@@ -14,7 +14,7 @@ This project is under development but it's already functional.
 
 ## Installation
 
-`composer require kevinrob/guzzle-cache-middleware:~0.5`
+`composer require kevinrob/guzzle-cache-middleware:~0.6`
 
 or add it the your `composer.json` and make a `composer update kevinrob/guzzle-cache-middleware`.
 
@@ -64,7 +64,6 @@ You can use `ChainCache` for using multiple `CacheProvider`. With that provider,
 [...]
 use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\ApcCache;
 use Doctrine\Common\Cache\FilesystemCache;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
@@ -75,10 +74,45 @@ $stack->push(new CacheMiddleware(
     new DoctrineCacheWrapper(
       new ChainCache([
         new ArrayCache(),
-        new ApcCache(),
         new FilesystemCache('/tmp/'),
       ])
     )
   )
 ), 'cache');
+```
+
+It's possible to add a public shared cache to the stack:
+```php
+[...]
+use Doctrine\Common\Cache\FilesystemCache;
+use Doctrine\Common\Cache\PredisCache;
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
+
+[...]
+// Private caching
+$stack->push(
+  new CacheMiddleware(
+    new PrivateCacheStrategy(
+      new DoctrineCacheWrapper(
+        new FilesystemCache('/tmp/')
+      )
+    )
+  ), 
+  'cache'
+);
+
+// Public caching
+$stack->push(
+  new CacheMiddleware(
+    new PrivateCacheStrategy(
+      new DoctrineCacheWrapper(
+        new PredisCache(
+          new Predis\Client('tcp://10.0.0.1:6379')
+        )
+      )
+    )
+  ), 
+  'cache'
+);
 ```
