@@ -1,6 +1,6 @@
 <?php
 
-namespace Kevinrob\GuzzleCache\Manager;
+namespace Kevinrob\GuzzleCache\Strategy;
 
 
 use Doctrine\Common\Cache\ArrayCache;
@@ -11,7 +11,7 @@ use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class PrivateCacheManager implements CacheManagerInterface
+class PrivateCacheStrategy implements CacheStrategyInterface
 {
 
     /**

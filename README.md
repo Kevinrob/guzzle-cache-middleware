@@ -43,13 +43,13 @@ You can use a cache from `Doctrine/Cache`:
 ```php
 [...]
 use Doctrine\Common\Cache\FilesystemCache;
-use Kevinrob\GuzzleCache\Manager\PrivateCacheManager;
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
 
 [...]
 $stack->push(
   new CacheMiddleware(
-    new PrivateCacheManager(
+    new PrivateCacheStrategy(
       new DoctrineCacheWrapper(
         new FilesystemCache('/tmp/')
       )
@@ -66,12 +66,12 @@ use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ApcCache;
 use Doctrine\Common\Cache\FilesystemCache;
-use Kevinrob\GuzzleCache\Manager\PrivateCacheManager;
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
 
 [...]
 $stack->push(new CacheMiddleware(
-  new PrivateCacheManager(
+  new PrivateCacheStrategy(
     new DoctrineCacheWrapper(
       new ChainCache([
         new ArrayCache(),
