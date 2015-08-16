@@ -99,7 +99,7 @@ $stack->push(
       )
     )
   ), 
-  'cache'
+  'private-cache'
 );
 
 // Public caching
@@ -113,6 +113,6 @@ $stack->push(
       )
     )
   ), 
-  'cache'
+  'shared-cache'
 );
 ```
