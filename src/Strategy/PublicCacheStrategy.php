@@ -42,7 +42,7 @@ class PublicCacheStrategy extends PrivateCacheStrategy
             return null;
         }
 
-         return parent::getCacheObjectForCacheControl($response, $cacheControl);
+        return parent::getCacheObjectForCacheControl($response, $cacheControl);
     }
 
 }
