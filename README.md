@@ -18,9 +18,6 @@ This project is under development but it's already functional.
 
 or add it the your `composer.json` and make a `composer update kevinrob/guzzle-cache-middleware`.
 
-# Dependencies
-- Currently it depends on and works only with [Doctrine\Cache](https://github.com/doctrine/cache) as the actual caching backend. (#27)
-
 # Why?
 Performance. It's very common to do some HTTP calls to an API for rendering a page and it takes times to do it.
 
@@ -42,28 +39,46 @@ $stack->push(new CacheMiddleware(), 'cache');
 $client = new Client(['handler' => $stack]);
 ```
 
-You can use a custom Cache with:
+You can use a cache from `Doctrine/Cache`:
 ```php
 [...]
-use Doctrine\Common\Cache;
+use Doctrine\Common\Cache\FilesystemCache;
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
 
 [...]
-$stack->push(new CacheMiddleware(new PrivateCache(new FilesystemCache('/tmp/'))), 'cache');
+$stack->push(
+  new CacheMiddleware(
+    new PrivateCacheStrategy(
+      new DoctrineCacheWrapper(
+        new FilesystemCache('/tmp/')
+      )
+    )
+  ), 
+  'cache'
+);
 ```
 
 You can use `ChainCache` for using multiple `CacheProvider`. With that provider, you have to sort the different cache from the faster to the slower. Like that, you can have a very fast cache.
 ```php
 [...]
-use Doctrine\Common\Cache;
+use Doctrine\Common\Cache\ChainCache;
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\ApcCache;
+use Doctrine\Common\Cache\FilesystemCache;
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
 
 [...]
 $stack->push(new CacheMiddleware(
-  new PrivateCache(
-    new ChainCache([
-      new ArrayCache(),
-      new ApcCache(),
-      new FileCache('/tmp/'),
-    ])
+  new PrivateCacheStrategy(
+    new DoctrineCacheWrapper(
+      new ChainCache([
+        new ArrayCache(),
+        new ApcCache(),
+        new FilesystemCache('/tmp/'),
+      ])
+    )
   )
 ), 'cache');
 ```

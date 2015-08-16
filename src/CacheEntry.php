@@ -139,7 +139,7 @@ class CacheEntry
     }
 
     /**
-     * @return double TTL in seconds (0 = infinite)
+     * @return int TTL in seconds (0 = infinite)
      */
     public function getTTL()
     {
@@ -157,7 +157,7 @@ class CacheEntry
         }
 
         // Don't return 0, it's reserved for infinite TTL
-        return $ttl != 0 ? $ttl : -1;
+        return $ttl !== 0 ? (int)$ttl : -1;
     }
 
     public function __sleep()

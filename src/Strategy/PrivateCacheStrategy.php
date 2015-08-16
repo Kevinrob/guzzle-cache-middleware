@@ -1,18 +1,34 @@
 <?php
 
-namespace Kevinrob\GuzzleCache;
+namespace Kevinrob\GuzzleCache\Strategy;
 
 
 use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\Cache;
+use Kevinrob\GuzzleCache\CacheEntry;
+use Kevinrob\GuzzleCache\KeyValueHttpHeader;
+use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class PrivateCache implements CacheStorageInterface
+/**
+ * This strategy represent a "private" HTTP client.
+ * Pay attention to share storage between application with caution!
+ *
+ * For example, a response with cache-control header "private, max-age=60"
+ * will be cached by this strategy.
+ *
+ * The rules applied are from RFC 7234.
+ *
+ * @see https://tools.ietf.org/html/rfc7234
+ *
+ * @package Kevinrob\GuzzleCache\Strategy
+ */
+class PrivateCacheStrategy implements CacheStrategyInterface
 {
 
     /**
-     * @var Cache
+     * @var CacheStorageInterface
      */
     protected $storage;
 
@@ -33,9 +49,9 @@ class PrivateCache implements CacheStorageInterface
         501 => 501,
     ];
 
-    public function __construct(Cache $cache = null)
+    public function __construct(CacheStorageInterface $cache = null)
     {
-        $this->storage = $cache !== null ? $cache : new ArrayCache();
+        $this->storage = $cache !== null ? $cache : new DoctrineCacheWrapper(new ArrayCache());
     }
 
     /**
@@ -112,16 +128,7 @@ class PrivateCache implements CacheStorageInterface
      */
     public function fetch(RequestInterface $request)
     {
-        try {
-            $cache = unserialize($this->storage->fetch($this->getCacheKey($request)));
-            if ($cache instanceof CacheEntry) {
-                return $cache;
-            }
-        } catch (\Exception $ignored) {
-            return null;
-        }
-
-        return null;
+        return $this->storage->fetch($this->getCacheKey($request));
     }
 
     /**
@@ -131,21 +138,13 @@ class PrivateCache implements CacheStorageInterface
      */
     public function cache(RequestInterface $request, ResponseInterface $response)
     {
-        try {
-            $cacheObject = $this->getCacheObject($response);
-            if ($cacheObject !== null)
-            {
-                $lifeTime = $cacheObject->getTTL();
-                if ($lifeTime >= 0) {
-                    return $this->storage->save(
-                        $this->getCacheKey($request),
-                        serialize($cacheObject),
-                        $lifeTime
-                    );
-                }
-            }
-        } catch (\Exception $ignored) {
-            return false;
+        $cacheObject = $this->getCacheObject($response);
+        if ($cacheObject !== null)
+        {
+            return $this->storage->save(
+                $this->getCacheKey($request),
+                $cacheObject
+            );
         }
         
         return false;

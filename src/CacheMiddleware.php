@@ -7,6 +7,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
+use Kevinrob\GuzzleCache\Strategy\CacheStrategyInterface;
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -33,7 +35,7 @@ class CacheMiddleware
     protected $client;
 
     /**
-     * @var CacheStorageInterface
+     * @var CacheStrategyInterface
      */
     protected $cacheStorage;
 
@@ -48,11 +50,11 @@ class CacheMiddleware
 
 
     /**
-     * @param CacheStorageInterface|null $cacheStorage
+     * @param CacheStrategyInterface|null $cacheStorage
      */
-    public function __construct(CacheStorageInterface $cacheStorage = null)
+    public function __construct(CacheStrategyInterface $cacheStorage = null)
     {
-        $this->cacheStorage = $cacheStorage !== null ? $cacheStorage : new PrivateCache();
+        $this->cacheStorage = $cacheStorage !== null ? $cacheStorage : new PrivateCacheStrategy();
 
         register_shutdown_function([$this, 'purgeReValidation']);
     }
@@ -66,15 +68,15 @@ class CacheMiddleware
     }
 
     /**
-     * @param CacheStorageInterface $cacheStorage
+     * @param CacheStrategyInterface $cacheStorage
      */
-    public function setCacheStorage(CacheStorageInterface $cacheStorage)
+    public function setCacheStorage(CacheStrategyInterface $cacheStorage)
     {
         $this->cacheStorage = $cacheStorage;
     }
 
     /**
-     * @return CacheStorageInterface
+     * @return CacheStrategyInterface
      */
     public function getCacheStorage()
     {
@@ -190,13 +192,13 @@ class CacheMiddleware
 
     /**
      * @param RequestInterface $request
-     * @param CacheStorageInterface $cacheStorage
+     * @param CacheStrategyInterface $cacheStorage
      * @param CacheEntry $cacheEntry
      * @return bool if added
      */
     protected function addReValidationRequest(
         RequestInterface $request,
-        CacheStorageInterface & $cacheStorage,
+        CacheStrategyInterface & $cacheStorage,
         CacheEntry $cacheEntry
     ) {
         // Add the promise for revalidate
@@ -261,12 +263,12 @@ class CacheMiddleware
     }
 
     /**
-     * @param CacheStorageInterface|null $cacheStorage
+     * @param CacheStrategyInterface|null $cacheStorage
      * @return CacheMiddleware the Middleware for Guzzle HandlerStack
      *
      * @deprecated Use constructor => `new CacheMiddleware()`
      */
-    public static function getMiddleware(CacheStorageInterface $cacheStorage = null)
+    public static function getMiddleware(CacheStrategyInterface $cacheStorage = null)
     {
         return new self($cacheStorage);
     }
