@@ -11,6 +11,19 @@ use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * This strategy represent a "private" HTTP client.
+ * Pay attention to share storage between application with caution!
+ *
+ * For example, a response with cache-control header "private, max-age=60"
+ * will be cached by this strategy.
+ *
+ * The rules applied are from RFC 7234.
+ *
+ * @see https://tools.ietf.org/html/rfc7234
+ *
+ * @package Kevinrob\GuzzleCache\Strategy
+ */
 class PrivateCacheStrategy implements CacheStrategyInterface
 {
 
