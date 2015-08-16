@@ -49,6 +49,13 @@ class PrivateCacheStrategy implements CacheStrategyInterface
         501 => 501,
     ];
 
+    /**
+     * @var string[]
+     */
+    protected $ageKey = [
+        'max-age'
+    ];
+
     public function __construct(CacheStorageInterface $cache = null)
     {
         $this->storage = $cache !== null ? $cache : new DoctrineCacheWrapper(new ArrayCache());
@@ -99,11 +106,13 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             return $entry->hasValidationInformation() ? $entry : null;
         }
 
-        if ($cacheControl->has('max-age')) {
-            return new CacheEntry(
-                $response,
-                new \DateTime('+' . (int)$cacheControl->get('max-age') . 'seconds')
-            );
+        foreach ($this->ageKey as $key) {
+            if ($cacheControl->has($key)) {
+                return new CacheEntry(
+                    $response,
+                    new \DateTime('+' . (int)$cacheControl->get($key) . 'seconds')
+                );
+            }
         }
 
         return new CacheEntry($response, new \DateTime());

@@ -50,11 +50,11 @@ class CacheMiddleware
 
 
     /**
-     * @param CacheStrategyInterface|null $cacheStorage
+     * @param CacheStrategyInterface|null $cacheStrategy
      */
-    public function __construct(CacheStrategyInterface $cacheStorage = null)
+    public function __construct(CacheStrategyInterface $cacheStrategy = null)
     {
-        $this->cacheStorage = $cacheStorage !== null ? $cacheStorage : new PrivateCacheStrategy();
+        $this->cacheStorage = $cacheStrategy !== null ? $cacheStrategy : new PrivateCacheStrategy();
 
         register_shutdown_function([$this, 'purgeReValidation']);
     }
