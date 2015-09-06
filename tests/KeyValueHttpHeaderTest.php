@@ -1,19 +1,17 @@
 <?php
+
 /**
  * Created by IntelliJ IDEA.
  * User: Kevin
  * Date: 19.07.2015
- * Time: 16:21
+ * Time: 16:21.
  */
-
 namespace Kevinrob\GuzzleCache;
-
 
 use GuzzleHttp\Psr7\Response;
 
 class KeyValueHttpHeaderTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testBase()
     {
         $response = new Response(200, [
@@ -24,8 +22,8 @@ class KeyValueHttpHeaderTest extends \PHPUnit_Framework_TestCase
                 'zero=0',
                 'nothing=',
                 'false=false',
-                'with-comma=1,yeah="2"'
-            ]
+                'with-comma=1,yeah="2"',
+            ],
         ]);
 
         $values = new KeyValueHttpHeader($response->getHeader('Cache-Control'));
@@ -47,5 +45,4 @@ class KeyValueHttpHeaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $values->get('with-comma'));
         $this->assertEquals(2, $values->get('yeah'));
     }
-
 }

@@ -2,7 +2,6 @@
 
 namespace Kevinrob\GuzzleCache\Strategy;
 
-
 use Doctrine\Common\Cache\ArrayCache;
 use Kevinrob\GuzzleCache\CacheEntry;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
@@ -21,12 +20,9 @@ use Psr\Http\Message\ResponseInterface;
  * The rules applied are from RFC 7234.
  *
  * @see https://tools.ietf.org/html/rfc7234
- *
- * @package Kevinrob\GuzzleCache\Strategy
  */
 class PrivateCacheStrategy implements CacheStrategyInterface
 {
-
     /**
      * @var CacheStorageInterface
      */
@@ -53,7 +49,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
      * @var string[]
      */
     protected $ageKey = [
-        'max-age'
+        'max-age',
     ];
 
     public function __construct(CacheStorageInterface $cache = null)
@@ -63,25 +59,27 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
     /**
      * @param ResponseInterface $response
+     *
      * @return CacheEntry|null entry to save, null if can't cache it
      */
     protected function getCacheObject(ResponseInterface $response)
     {
         if (!isset($this->statusAccepted[$response->getStatusCode()])) {
             // Don't cache it
-            return null;
+            return;
         }
 
-        $cacheControl = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
+        $cacheControl = new KeyValueHttpHeader($response->getHeader('Cache-Control'));
 
         if ($cacheControl->has('no-store')) {
             // No store allowed (maybe some sensitives data...)
-            return null;
+            return;
         }
 
         if ($cacheControl->has('no-cache')) {
             // Stale response see RFC7234 section 5.2.1.4
             $entry = new CacheEntry($response, new \DateTime('-1 seconds'));
+
             return $entry->hasValidationInformation() ? $entry : null;
         }
 
@@ -89,13 +87,13 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             if ($cacheControl->has($key)) {
                 return new CacheEntry(
                     $response,
-                    new \DateTime('+' . (int)$cacheControl->get($key) . 'seconds')
+                    new \DateTime('+'.(int) $cacheControl->get($key).'seconds')
                 );
             }
         }
 
-        if ($response->hasHeader("Expires")) {
-            $expireAt = \DateTime::createFromFormat(\DateTime::RFC1123, $response->getHeaderLine("Expires"));
+        if ($response->hasHeader('Expires')) {
+            $expireAt = \DateTime::createFromFormat(\DateTime::RFC1123, $response->getHeaderLine('Expires'));
             if ($expireAt !== false) {
                 return new CacheEntry(
                     $response,
@@ -109,12 +107,13 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
     /**
      * @param RequestInterface $request
+     *
      * @return string
      */
     protected function getCacheKey(RequestInterface $request)
     {
         return sha1(
-            $request->getMethod() . $request->getUri()
+            $request->getMethod().$request->getUri()
         );
     }
 
@@ -122,6 +121,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
      * Return a CacheEntry or null if no cache.
      *
      * @param RequestInterface $request
+     *
      * @return CacheEntry|null
      */
     public function fetch(RequestInterface $request)
@@ -130,21 +130,21 @@ class PrivateCacheStrategy implements CacheStrategyInterface
     }
 
     /**
-     * @param RequestInterface $request
+     * @param RequestInterface  $request
      * @param ResponseInterface $response
+     *
      * @return bool true if success
      */
     public function cache(RequestInterface $request, ResponseInterface $response)
     {
         $cacheObject = $this->getCacheObject($response);
-        if ($cacheObject !== null)
-        {
+        if ($cacheObject !== null) {
             return $this->storage->save(
                 $this->getCacheKey($request),
                 $cacheObject
             );
         }
-        
+
         return false;
     }
 }

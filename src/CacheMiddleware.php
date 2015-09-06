@@ -2,7 +2,6 @@
 
 namespace Kevinrob\GuzzleCache;
 
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\FulfilledPromise;
@@ -13,16 +12,15 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class CacheMiddleware
- * @package Kevinrob\GuzzleCache
+ * Class CacheMiddleware.
  */
 class CacheMiddleware
 {
-    const HEADER_RE_VALIDATION  = 'X-Kevinrob-GuzzleCache-ReValidation';
-    const HEADER_CACHE_INFO     = 'X-Kevinrob-Cache';
-    const HEADER_CACHE_HIT      = 'HIT';
-    const HEADER_CACHE_MISS     = 'MISS';
-    const HEADER_CACHE_STALE    = 'STALE';
+    const HEADER_RE_VALIDATION = 'X-Kevinrob-GuzzleCache-ReValidation';
+    const HEADER_CACHE_INFO = 'X-Kevinrob-Cache';
+    const HEADER_CACHE_HIT = 'HIT';
+    const HEADER_CACHE_MISS = 'MISS';
+    const HEADER_CACHE_STALE = 'STALE';
 
     /**
      * @var array of Promise
@@ -42,12 +40,11 @@ class CacheMiddleware
     /**
      * List of allowed HTTP methods to cache
      * Key = method name (upscaling)
-     * Value = true
+     * Value = true.
      *
      * @var array
      */
     protected $httpMethods = ['GET' => true];
-
 
     /**
      * @param CacheStrategyInterface|null $cacheStrategy
@@ -97,7 +94,7 @@ class CacheMiddleware
     }
 
     /**
-     * Will be called at the end of the script
+     * Will be called at the end of the script.
      */
     public function purgeReValidation()
     {
@@ -106,15 +103,16 @@ class CacheMiddleware
 
     /**
      * @param \Closure $handler
+     *
      * @return \Closure
      */
     public function __invoke(\Closure $handler)
     {
-        return function(RequestInterface $request, array $options) use (&$handler) {
+        return function (RequestInterface $request, array $options) use (&$handler) {
             if (!isset($this->httpMethods[strtoupper($request->getMethod())])) {
                 // No caching for this method allowed
                 return $handler($request, $options)->then(
-                    function(ResponseInterface $response) {
+                    function (ResponseInterface $response) {
                         return $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }
                 );
@@ -150,8 +148,9 @@ class CacheMiddleware
 
             /** @var Promise $promise */
             $promise = $handler($request, $options);
+
             return $promise->then(
-                function(ResponseInterface $response) use ($request, $cacheEntry) {
+                function (ResponseInterface $response) use ($request, $cacheEntry) {
                     // Check if error and looking for a staled content
                     if ($response->getStatusCode() >= 500) {
                         $responseStale = static::getStaleResponse($cacheEntry);
@@ -176,7 +175,7 @@ class CacheMiddleware
 
                     return $response;
                 },
-                function(\Exception $ex) use ($cacheEntry) {
+                function (\Exception $ex) use ($cacheEntry) {
                     if ($ex instanceof TransferException) {
                         $response = static::getStaleResponse($cacheEntry);
                         if ($response instanceof ResponseInterface) {
@@ -191,23 +190,24 @@ class CacheMiddleware
     }
 
     /**
-     * @param RequestInterface $request
+     * @param RequestInterface       $request
      * @param CacheStrategyInterface $cacheStorage
-     * @param CacheEntry $cacheEntry
+     * @param CacheEntry             $cacheEntry
+     *
      * @return bool if added
      */
     protected function addReValidationRequest(
         RequestInterface $request,
-        CacheStrategyInterface & $cacheStorage,
+        CacheStrategyInterface &$cacheStorage,
         CacheEntry $cacheEntry
     ) {
         // Add the promise for revalidate
         if ($this->client !== null) {
             /** @var RequestInterface $request */
-            $request = $request->withHeader(self::HEADER_RE_VALIDATION, "1");
+            $request = $request->withHeader(self::HEADER_RE_VALIDATION, '1');
             $this->waitingRevalidate[] = $this->client
                 ->sendAsync($request)
-                ->then(function(ResponseInterface $response) use ($request, &$cacheStorage, $cacheEntry) {
+                ->then(function (ResponseInterface $response) use ($request, &$cacheStorage, $cacheEntry) {
                     if ($response->getStatusCode() == 304) {
                         // Not modified => cache entry is re-validate
                         /** @var ResponseInterface $response */
@@ -226,6 +226,7 @@ class CacheMiddleware
 
     /**
      * @param CacheEntry|null $cacheEntry
+     *
      * @return null|ResponseInterface
      */
     protected static function getStaleResponse(CacheEntry $cacheEntry = null)
@@ -236,26 +237,27 @@ class CacheMiddleware
                 ->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_STALE);
         }
 
-        return null;
+        return;
     }
 
     /**
      * @param RequestInterface $request
-     * @param CacheEntry $cacheEntry
+     * @param CacheEntry       $cacheEntry
+     *
      * @return RequestInterface
      */
     protected static function getRequestWithReValidationHeader(RequestInterface $request, CacheEntry $cacheEntry)
     {
-        if ($cacheEntry->getResponse()->hasHeader("Last-Modified")) {
+        if ($cacheEntry->getResponse()->hasHeader('Last-Modified')) {
             $request = $request->withHeader(
-                "If-Modified-Since",
-                $cacheEntry->getResponse()->getHeader("Last-Modified")
+                'If-Modified-Since',
+                $cacheEntry->getResponse()->getHeader('Last-Modified')
             );
         }
-        if ($cacheEntry->getResponse()->hasHeader("Etag")) {
+        if ($cacheEntry->getResponse()->hasHeader('Etag')) {
             $request = $request->withHeader(
-                "If-None-Match",
-                $cacheEntry->getResponse()->getHeader("Etag")
+                'If-None-Match',
+                $cacheEntry->getResponse()->getHeader('Etag')
             );
         }
 
@@ -264,6 +266,7 @@ class CacheMiddleware
 
     /**
      * @param CacheStrategyInterface|null $cacheStorage
+     *
      * @return CacheMiddleware the Middleware for Guzzle HandlerStack
      *
      * @deprecated Use constructor => `new CacheMiddleware()`
@@ -272,5 +275,4 @@ class CacheMiddleware
     {
         return new self($cacheStorage);
     }
-
 }

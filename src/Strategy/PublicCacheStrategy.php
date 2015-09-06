@@ -2,7 +2,6 @@
 
 namespace Kevinrob\GuzzleCache\Strategy;
 
-
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -17,12 +16,9 @@ use Psr\Http\Message\ResponseInterface;
  * The rules applied are from RFC 7234.
  *
  * @see https://tools.ietf.org/html/rfc7234
- *
- * @package Kevinrob\GuzzleCache\Strategy
  */
 class PublicCacheStrategy extends PrivateCacheStrategy
 {
-
     public function __construct(CacheStorageInterface $cache = null)
     {
         parent::__construct($cache);
@@ -31,16 +27,15 @@ class PublicCacheStrategy extends PrivateCacheStrategy
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function getCacheObject(ResponseInterface $response)
     {
-        $cacheControl = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
+        $cacheControl = new KeyValueHttpHeader($response->getHeader('Cache-Control'));
         if ($cacheControl->has('private')) {
-            return null;
+            return;
         }
 
         return parent::getCacheObject($response);
     }
-
 }

@@ -2,13 +2,11 @@
 
 namespace Kevinrob\GuzzleCache\Storage;
 
-
 use Doctrine\Common\Cache\Cache;
 use Kevinrob\GuzzleCache\CacheEntry;
 
 class DoctrineCacheWrapper implements CacheStorageInterface
 {
-
     /**
      * @var Cache
      */
@@ -23,7 +21,7 @@ class DoctrineCacheWrapper implements CacheStorageInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function fetch($key)
     {
@@ -33,14 +31,14 @@ class DoctrineCacheWrapper implements CacheStorageInterface
                 return $cache;
             }
         } catch (\Exception $ignored) {
-            return null;
+            return;
         }
 
-        return null;
+        return;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function save($key, CacheEntry $data)
     {
@@ -59,5 +57,4 @@ class DoctrineCacheWrapper implements CacheStorageInterface
 
         return false;
     }
-
 }

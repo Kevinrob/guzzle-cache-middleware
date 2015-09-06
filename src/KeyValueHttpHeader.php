@@ -2,12 +2,10 @@
 
 namespace Kevinrob\GuzzleCache;
 
-
 class KeyValueHttpHeader
 {
-
     /**
-     * Take from https://github.com/hapijs/wreck
+     * Take from https://github.com/hapijs/wreck.
      */
     const REGEX_SPLIT = '/(?:^|(?:\s*\,\s*))([^\x00-\x20\(\)<>@\,;\:\\\\"\/\[\]\?\=\{\}\x7F]+)(?:\=(?:([^\x00-\x20\(\)<>@\,;\:\\\\"\/\[\]\?\=\{\}\x7F]+)|(?:\"((?:[^"\\\\]|\\\\.)*)\")))?/';
 
@@ -15,7 +13,6 @@ class KeyValueHttpHeader
      * @var string[]
      */
     protected $values = [];
-
 
     /**
      * @param array $values
@@ -29,7 +26,7 @@ class KeyValueHttpHeader
                     $val = '';
                     if (count($match) == 3) {
                         $val = $match[2];
-                    } else if (count($match) > 3) {
+                    } elseif (count($match) > 3) {
                         $val = $match[3];
                     }
 
@@ -41,6 +38,7 @@ class KeyValueHttpHeader
 
     /**
      * @param string $key
+     *
      * @return bool
      */
     public function has($key)
@@ -52,6 +50,7 @@ class KeyValueHttpHeader
 
     /**
      * @param string $key
+     *
      * @return string
      */
     public function get($key)
@@ -60,7 +59,7 @@ class KeyValueHttpHeader
             return $this->values[$key];
         }
 
-        return "";
+        return '';
     }
 
     /**
@@ -70,5 +69,4 @@ class KeyValueHttpHeader
     {
         return count($this->values) === 0;
     }
-
 }

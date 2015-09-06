@@ -2,7 +2,6 @@
 
 namespace Kevinrob\GuzzleCache;
 
-
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\ChainCache;
@@ -15,10 +14,9 @@ use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 
 class PrivateCacheTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testCacheProvider()
     {
-        $TMP_DIR = __DIR__ . '/tmp/';
+        $TMP_DIR = __DIR__.'/tmp/';
 
         $cacheProviders = [
             new ArrayCache(),
@@ -30,7 +28,7 @@ class PrivateCacheTest extends \PHPUnit_Framework_TestCase
         $request = new Request('GET', 'test.local');
         $response = new Response(
             200, [
-                'Cache-Control' => 'max-age=60'
+                'Cache-Control' => 'max-age=60',
             ],
             'Test content'
         );
@@ -48,8 +46,8 @@ class PrivateCacheTest extends \PHPUnit_Framework_TestCase
             $this->assertNotNull($entry);
 
             $this->assertEquals(
-                (string)$response->getBody(),
-                (string)$entry->getResponse()->getBody()
+                (string) $response->getBody(),
+                (string) $entry->getResponse()->getBody()
             );
         }
 
@@ -61,15 +59,16 @@ class PrivateCacheTest extends \PHPUnit_Framework_TestCase
      *
      * http://stackoverflow.com/a/9760541/244702
      */
-    protected function rrmdir($dir) {
+    protected function rrmdir($dir)
+    {
         if (is_dir($dir)) {
             $objects = scandir($dir);
             foreach ($objects as $object) {
-                if ($object != "." && $object != "..") {
-                    if (filetype($dir."/".$object) == "dir") {
-                        $this->rrmdir($dir."/".$object);
+                if ($object != '.' && $object != '..') {
+                    if (filetype($dir.'/'.$object) == 'dir') {
+                        $this->rrmdir($dir.'/'.$object);
                     } else {
-                        unlink($dir."/".$object);
+                        unlink($dir.'/'.$object);
                     }
                 }
             }
@@ -77,5 +76,4 @@ class PrivateCacheTest extends \PHPUnit_Framework_TestCase
             rmdir($dir);
         }
     }
-
 }

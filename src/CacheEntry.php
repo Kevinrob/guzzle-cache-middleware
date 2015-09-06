@@ -2,12 +2,10 @@
 
 namespace Kevinrob\GuzzleCache;
 
-
 use Psr\Http\Message\ResponseInterface;
 
 class CacheEntry
 {
-
     /**
      * @var ResponseInterface
      */
@@ -37,17 +35,17 @@ class CacheEntry
     protected $staleWhileRevalidateTo;
 
     /**
-     * Cached timestamp of staleAt variable
+     * Cached timestamp of staleAt variable.
+     *
      * @var int
      */
     private $timestampStale;
 
-
     /**
      * @param ResponseInterface $response
-     * @param \DateTime $staleAt
-     * @param \DateTime|null $staleIfErrorTo if null, detected with the headers (RFC 5861)
-     * @param \DateTime|null $staleWhileRevalidateTo
+     * @param \DateTime         $staleAt
+     * @param \DateTime|null    $staleIfErrorTo         if null, detected with the headers (RFC 5861)
+     * @param \DateTime|null    $staleWhileRevalidateTo
      */
     public function __construct(
         ResponseInterface $response,
@@ -56,20 +54,20 @@ class CacheEntry
         \DateTime $staleWhileRevalidateTo = null
     ) {
         $this->response = $response;
-        $this->staleAt  = $staleAt;
+        $this->staleAt = $staleAt;
 
-        $values = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
+        $values = new KeyValueHttpHeader($response->getHeader('Cache-Control'));
 
         if ($staleIfErrorTo === null && $values->has('stale-if-error')) {
             $this->staleIfErrorTo = (new \DateTime(
-                '@' . ($this->staleAt->getTimestamp() + (int)$values->get('stale-if-error'))
+                '@'.($this->staleAt->getTimestamp() + (int) $values->get('stale-if-error'))
             ));
         } else {
             $this->staleIfErrorTo = $staleIfErrorTo;
         }
 
         if ($staleWhileRevalidateTo === null && $values->has('stale-while-revalidate')) {
-            $this->staleWhileRevalidateTo = new \DateTime('+' . $values->get('stale-while-revalidate') . 'seconds');
+            $this->staleWhileRevalidateTo = new \DateTime('+'.$values->get('stale-while-revalidate').'seconds');
         } else {
             $this->staleWhileRevalidateTo = $staleWhileRevalidateTo;
         }
@@ -135,7 +133,7 @@ class CacheEntry
      */
     public function hasValidationInformation()
     {
-        return $this->response->hasHeader("Etag") || $this->response->hasHeader("Last-Modified");
+        return $this->response->hasHeader('Etag') || $this->response->hasHeader('Last-Modified');
     }
 
     /**
@@ -157,14 +155,14 @@ class CacheEntry
         }
 
         // Don't return 0, it's reserved for infinite TTL
-        return $ttl !== 0 ? (int)$ttl : -1;
+        return $ttl !== 0 ? (int) $ttl : -1;
     }
 
     public function __sleep()
     {
         // Stream/Resource can't be serialized... So we copy the content
         if ($this->response !== null) {
-            $this->responseBody = (string)$this->response->getBody();
+            $this->responseBody = (string) $this->response->getBody();
             $this->response->getBody()->rewind();
         }
 
@@ -181,5 +179,4 @@ class CacheEntry
                 );
         }
     }
-
 }
