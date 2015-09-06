@@ -61,9 +61,9 @@ class CacheEntry
         $values = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
 
         if ($staleIfErrorTo === null && $values->has('stale-if-error')) {
-            $this->staleIfErrorTo = (new \DateTime())->setTimestamp(
-                $this->staleAt->getTimestamp() + (int)$values->get('stale-if-error')
-            );
+            $this->staleIfErrorTo = (new \DateTime(
+                '@' . ($this->staleAt->getTimestamp() + (int)$values->get('stale-if-error'))
+            ));
         } else {
             $this->staleIfErrorTo = $staleIfErrorTo;
         }
