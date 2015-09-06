@@ -106,14 +106,6 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             return $entry->hasValidationInformation() ? $entry : null;
         }
 
-        if ($response->hasHeader("Expires")
-            && $expireAt = \DateTime::createFromFormat(\DateTime::RFC1123, $response->getHeaderLine("Expires"))) {
-            return new CacheEntry(
-                $response,
-                $expireAt
-            );
-        }
-
         foreach ($this->ageKey as $key) {
             if ($cacheControl->has($key)) {
                 return new CacheEntry(
@@ -121,6 +113,14 @@ class PrivateCacheStrategy implements CacheStrategyInterface
                     new \DateTime('+' . (int)$cacheControl->get($key) . 'seconds')
                 );
             }
+        }
+
+        if ($response->hasHeader("Expires")
+            && $expireAt = \DateTime::createFromFormat(\DateTime::RFC1123, $response->getHeaderLine("Expires"))) {
+            return new CacheEntry(
+                $response,
+                $expireAt
+            );
         }
 
         return new CacheEntry($response, new \DateTime());
