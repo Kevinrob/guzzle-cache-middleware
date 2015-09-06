@@ -72,29 +72,8 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             return null;
         }
 
-        if ($response->hasHeader("Cache-Control")) {
-            $values = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
+        $cacheControl = new KeyValueHttpHeader($response->getHeader("Cache-Control"));
 
-            if (!$values->isEmpty()) {
-                return $this->getCacheObjectForCacheControl($response, $values);
-            }
-        }
-
-        if ($response->hasHeader("Expires")
-            && $expireAt = \DateTime::createFromFormat(\DateTime::RFC1123, $response->getHeaderLine("Expires"))) {
-            return new CacheEntry($response, $expireAt);
-        }
-
-        return new CacheEntry($response, new \DateTime('-1 seconds'));
-    }
-
-    /**
-     * @param ResponseInterface $response
-     * @param KeyValueHttpHeader $cacheControl
-     * @return CacheEntry|null
-     */
-    protected function getCacheObjectForCacheControl(ResponseInterface $response, KeyValueHttpHeader $cacheControl)
-    {
         if ($cacheControl->has('no-store')) {
             // No store allowed (maybe some sensitives data...)
             return null;
@@ -115,15 +94,21 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             }
         }
 
-        if ($response->hasHeader("Expires")
-            && $expireAt = \DateTime::createFromFormat(\DateTime::RFC1123, $response->getHeaderLine("Expires"))) {
-            return new CacheEntry(
-                $response,
-                $expireAt
-            );
+        if ($response->hasHeader("Expires")) {
+            $expireAt = \DateTime::createFromFormat(\DateTime::RFC1123, $response->getHeaderLine("Expires"));
+            if ($expireAt !== false) {
+                return new CacheEntry(
+                    $response,
+                    $expireAt
+                );
+            }
         }
 
-        return new CacheEntry($response, new \DateTime());
+        if (!$cacheControl->isEmpty()) {
+            return new CacheEntry($response, new \DateTime());
+        }
+
+        return new CacheEntry($response, new \DateTime('-1 seconds'));
     }
 
     /**
