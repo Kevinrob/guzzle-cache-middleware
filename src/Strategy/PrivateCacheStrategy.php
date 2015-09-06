@@ -104,10 +104,6 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             }
         }
 
-        if (!$cacheControl->isEmpty()) {
-            return new CacheEntry($response, new \DateTime());
-        }
-
         return new CacheEntry($response, new \DateTime('-1 seconds'));
     }
 
