@@ -52,6 +52,12 @@ class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
                             ->withAddedHeader("Cache-Control", "no-cache")
                             ->withAddedHeader("Etag", "TheHash")
                     );
+                case '/2s-expires':
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader("Cache-Control", "public")
+                            ->withAddedHeader("Expires", gmdate('D, d M Y H:i:s T', time() + 2))
+                    );
             }
 
             throw new \InvalidArgumentException();
@@ -104,6 +110,19 @@ class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->client->get("http://test.com/no-cache");
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+    }
+
+    public function testWithExpires()
+    {
+        $this->client->get("http://test.com/2s-expires");
+
+        $response = $this->client->get("http://test.com/2s-expires");
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+
+        sleep(3);
+
+        $response = $this->client->get("http://test.com/2s-expires");
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 
 }
