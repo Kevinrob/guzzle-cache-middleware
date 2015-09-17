@@ -2,11 +2,10 @@
 
 namespace Kevinrob\GuzzleCache\Strategy;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Kevinrob\GuzzleCache\CacheEntry;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
+use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -54,7 +53,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
     public function __construct(CacheStorageInterface $cache = null)
     {
-        $this->storage = $cache !== null ? $cache : new DoctrineCacheWrapper(new ArrayCache());
+        $this->storage = $cache !== null ? $cache : new VolatileRuntimeStorage();
     }
 
     /**
