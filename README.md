@@ -14,7 +14,7 @@ This project is under development but it's already functional.
 
 ## Installation
 
-`composer require kevinrob/guzzle-cache-middleware:~0.6`
+`composer require kevinrob/guzzle-cache-middleware`
 
 or add it the your `composer.json` and make a `composer update kevinrob/guzzle-cache-middleware`.
 
@@ -44,13 +44,13 @@ You can use a cache from `Doctrine/Cache`:
 [...]
 use Doctrine\Common\Cache\FilesystemCache;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 
 [...]
 $stack->push(
   new CacheMiddleware(
     new PrivateCacheStrategy(
-      new DoctrineCacheWrapper(
+      new DoctrineCacheStorage(
         new FilesystemCache('/tmp/')
       )
     )
@@ -66,12 +66,12 @@ use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\FilesystemCache;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 
 [...]
 $stack->push(new CacheMiddleware(
   new PrivateCacheStrategy(
-    new DoctrineCacheWrapper(
+    new DoctrineCacheStorage(
       new ChainCache([
         new ArrayCache(),
         new FilesystemCache('/tmp/'),
@@ -87,14 +87,14 @@ It's possible to add a public shared cache to the stack:
 use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\Common\Cache\PredisCache;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 
 [...]
 // Private caching
 $stack->push(
   new CacheMiddleware(
     new PrivateCacheStrategy(
-      new DoctrineCacheWrapper(
+      new DoctrineCacheStorage(
         new FilesystemCache('/tmp/')
       )
     )
@@ -106,7 +106,7 @@ $stack->push(
 $stack->push(
   new CacheMiddleware(
     new PrivateCacheStrategy(
-      new DoctrineCacheWrapper(
+      new DoctrineCacheStorage(
         new PredisCache(
           new Predis\Client('tcp://10.0.0.1:6379')
         )
