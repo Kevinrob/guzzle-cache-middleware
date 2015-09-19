@@ -10,7 +10,9 @@ use Doctrine\Common\Cache\PhpFileCache;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
+use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
+use League\Flysystem\Adapter\Local;
 
 class PrivateCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,10 +21,11 @@ class PrivateCacheTest extends \PHPUnit_Framework_TestCase
         $TMP_DIR = __DIR__.'/tmp/';
 
         $cacheProviders = [
-            new ArrayCache(),
-            new ChainCache([new ArrayCache()]),
-            new FilesystemCache($TMP_DIR),
-            new PhpFileCache($TMP_DIR),
+            new DoctrineCacheWrapper(new ArrayCache()),
+            new DoctrineCacheWrapper(new ChainCache([new ArrayCache()])),
+            new DoctrineCacheWrapper(new FilesystemCache($TMP_DIR)),
+            new DoctrineCacheWrapper(new PhpFileCache($TMP_DIR)),
+            new FlysystemStorage(new Local($TMP_DIR)),
         ];
 
         $request = new Request('GET', 'test.local');
@@ -38,7 +41,7 @@ class PrivateCacheTest extends \PHPUnit_Framework_TestCase
             $this->rrmdir($TMP_DIR);
 
             $cache = new PrivateCacheStrategy(
-                new DoctrineCacheWrapper($cacheProvider)
+                $cacheProvider
             );
             $cache->cache($request, $response);
             $entry = $cache->fetch($request);
