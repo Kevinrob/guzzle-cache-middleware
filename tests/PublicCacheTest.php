@@ -12,7 +12,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheWrapper;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
 use Kevinrob\GuzzleCache\Strategy\PublicCacheStrategy;
 use League\Flysystem\Adapter\Local;
@@ -88,10 +88,10 @@ class PublicCacheTest extends \PHPUnit_Framework_TestCase
         $TMP_DIR = __DIR__.'/tmp/';
 
         $cacheProviders = [
-            new DoctrineCacheWrapper(new ArrayCache()),
-            new DoctrineCacheWrapper(new ChainCache([new ArrayCache()])),
-            new DoctrineCacheWrapper(new FilesystemCache($TMP_DIR)),
-            new DoctrineCacheWrapper(new PhpFileCache($TMP_DIR)),
+            new DoctrineCacheStorage(new ArrayCache()),
+            new DoctrineCacheStorage(new ChainCache([new ArrayCache()])),
+            new DoctrineCacheStorage(new FilesystemCache($TMP_DIR)),
+            new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)),
             new FlysystemStorage(new Local($TMP_DIR)),
         ];
 

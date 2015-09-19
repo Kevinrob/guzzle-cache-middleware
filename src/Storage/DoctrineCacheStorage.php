@@ -5,7 +5,7 @@ namespace Kevinrob\GuzzleCache\Storage;
 use Doctrine\Common\Cache\Cache;
 use Kevinrob\GuzzleCache\CacheEntry;
 
-class DoctrineCacheWrapper implements CacheStorageInterface
+class DoctrineCacheStorage implements CacheStorageInterface
 {
     /**
      * @var Cache
