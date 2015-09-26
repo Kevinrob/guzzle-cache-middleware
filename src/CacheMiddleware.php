@@ -102,11 +102,11 @@ class CacheMiddleware
     }
 
     /**
-     * @param \Closure $handler
+     * @param callable $handler
      *
-     * @return \Closure
+     * @return callable
      */
-    public function __invoke(\Closure $handler)
+    public function __invoke(callable $handler)
     {
         return function (RequestInterface $request, array $options) use (&$handler) {
             if (!isset($this->httpMethods[strtoupper($request->getMethod())])) {
