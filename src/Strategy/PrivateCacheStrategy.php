@@ -125,6 +125,12 @@ class PrivateCacheStrategy implements CacheStrategyInterface
      */
     public function fetch(RequestInterface $request)
     {
+        $reqCacheControl = new KeyValueHttpHeader($request->getHeader('Cache-Control'));
+        if ($reqCacheControl->has('no-cache')) {
+            // Can't return cache
+            return null;
+        }
+
         return $this->storage->fetch($this->getCacheKey($request));
     }
 
