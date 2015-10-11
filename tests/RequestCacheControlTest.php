@@ -41,7 +41,7 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
     {
         $this->client->get('http://test.com/2s', [
             'headers' => [
-                'Cache-Control' => 'no-store'
+                'Cache-Control' => 'no-store',
             ]
         ]);
 
@@ -58,7 +58,31 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
 
         $response = $this->client->get('http://test.com/2s', [
             'headers' => [
-                'Cache-Control' => 'no-cache'
+                'Cache-Control' => 'no-cache',
+            ]
+        ]);
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+    }
+
+    public function testPragmaNoCacheHeader()
+    {
+        $this->client->get('http://test.com/2s');
+
+        $response = $this->client->get('http://test.com/2s');
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+
+        // Pragma is not important if a Cache-Control is present
+        $response = $this->client->get('http://test.com/2s', [
+            'headers' => [
+                'Cache-Control' => '',
+                'Pragma' => 'no-cache',
+            ]
+        ]);
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+
+        $response = $this->client->get('http://test.com/2s', [
+            'headers' => [
+                'Pragma' => 'no-cache',
             ]
         ]);
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
