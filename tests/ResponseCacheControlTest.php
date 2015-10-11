@@ -8,13 +8,7 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 
-/**
- * Created by IntelliJ IDEA.
- * User: Kevin
- * Date: 30.06.2015
- * Time: 12:58.
- */
-class HeaderCacheControlTest extends \PHPUnit_Framework_TestCase
+class ResponseCacheControlTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Client

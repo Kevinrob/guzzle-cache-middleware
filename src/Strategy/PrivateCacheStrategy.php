@@ -136,6 +136,12 @@ class PrivateCacheStrategy implements CacheStrategyInterface
      */
     public function cache(RequestInterface $request, ResponseInterface $response)
     {
+        $reqCacheControl = new KeyValueHttpHeader($request->getHeader('Cache-Control'));
+        if ($reqCacheControl->has('no-store')) {
+            // No caching allowed
+            return false;
+        }
+
         $cacheObject = $this->getCacheObject($response);
         if ($cacheObject !== null) {
             return $this->storage->save(
