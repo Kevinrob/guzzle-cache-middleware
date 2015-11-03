@@ -114,7 +114,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
         $paramsKey = $this->getParamsKey($request);
 
         return sha1(
-            $request->getMethod().$request->getUri().$paramsKey;
+            $request->getMethod().$request->getUri().$paramsKey
         );
     }
 
