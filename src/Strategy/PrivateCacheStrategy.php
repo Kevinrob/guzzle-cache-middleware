@@ -135,7 +135,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
                 return null;
             }
 
-            $maxAge = $reqCacheControl->get('max-age');
+            $maxAge = $reqCacheControl->get('max-age', null);
         } elseif ($request->hasHeader('Pragma')) {
             $pragma = new KeyValueHttpHeader($request->getHeader('Pragma'));
             if ($pragma->has('no-cache')) {
