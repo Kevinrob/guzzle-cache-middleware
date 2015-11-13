@@ -20,6 +20,11 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {
             switch ($request->getUri()->getPath()) {
+                case '/1s':
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader('Cache-Control', 'max-age=1')
+                    );
                 case '/2s':
                     return new FulfilledPromise(
                         (new Response())
@@ -110,6 +115,29 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
                 'Cache-Control' => 'only-if-cached',
             ]
         ]);
+    }
+
+    public function testMaxStaleEmptyHeader()
+    {
+        $this->client->get('http://test.com/1s');
+
+        $response = $this->client->get('http://test.com/1s');
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_HIT,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        sleep(1);
+
+        $response = $this->client->get('http://test.com/1s', [
+            'headers' => [
+                'Cache-Control' => 'max-stale',
+            ]
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_HIT,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
     }
 
     public function testPragmaNoCacheHeader()
