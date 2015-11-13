@@ -5,7 +5,7 @@
     <title>Guzzle Cache Middleware by Kevinrob</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
@@ -23,15 +23,24 @@
 <a id="guzzle-cache-middleware" class="anchor" href="#guzzle-cache-middleware" aria-hidden="true"><span class="octicon octicon-link"></span></a>guzzle-cache-middleware</h1>
 
 <p><a href="https://packagist.org/packages/kevinrob/guzzle-cache-middleware"><img src="https://poser.pugx.org/kevinrob/guzzle-cache-middleware/v/stable" alt="Latest Stable Version"></a> <a href="https://packagist.org/packages/kevinrob/guzzle-cache-middleware"><img src="https://poser.pugx.org/kevinrob/guzzle-cache-middleware/downloads" alt="Total Downloads"></a> <a href="https://packagist.org/packages/kevinrob/guzzle-cache-middleware"><img src="https://poser.pugx.org/kevinrob/guzzle-cache-middleware/license" alt="License"></a> <a href="https://travis-ci.org/Kevinrob/guzzle-cache-middleware"><img src="https://travis-ci.org/Kevinrob/guzzle-cache-middleware.svg" alt="Build Status"></a><br>
-<a href="https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master"><img src="https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/quality-score.png?b=master" alt="Scrutinizer Code Quality"></a> <a href="https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802"><img src="https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802/mini.png" alt="SensioLabsInsight"></a></p>
+<a href="https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master"><img src="https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/quality-score.png?b=master" alt="Scrutinizer Code Quality"></a> <a href="https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802"><img src="https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802/mini.png" alt="SensioLabsInsight"></a> <a href="https://www.versioneye.com/php/kevinrob:guzzle-cache-middleware"><img src="https://www.versioneye.com/php/kevinrob:guzzle-cache-middleware/badge.png" alt="Dependency Status"></a></p>
 
 <p>A HTTP Cache for <a href="https://github.com/guzzle/guzzle">Guzzle</a> 6. It's a simple Middleware to be added in the HandlerStack.
 This project is under development but it's already functional.</p>
 
 <h2>
+<a id="goals" class="anchor" href="#goals" aria-hidden="true"><span class="octicon octicon-link"></span></a>Goals</h2>
+
+<ul>
+<li>RFC 7234 compliance</li>
+<li>Performance and transparency</li>
+<li>Assured compatibility with PSR-7</li>
+</ul>
+
+<h2>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p><code>composer require kevinrob/guzzle-cache-middleware:~0.5</code></p>
+<p><code>composer require kevinrob/guzzle-cache-middleware</code></p>
 
 <p>or add it the your <code>composer.json</code> and make a <code>composer update kevinrob/guzzle-cache-middleware</code>.</p>
 
@@ -45,9 +54,9 @@ This project is under development but it's already functional.</p>
 
 <p>With a simple Middleware added at the top of the <code>HandlerStack</code> of Guzzle6.</p>
 
-<div class="highlight highlight-php"><pre><span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">GuzzleHttp\Client</span>;</span>
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">GuzzleHttp\Client</span>;</span>
 <span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">GuzzleHttp\HandlerStack</span>;</span>
-<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Kevinrob\GuzzleCache</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Kevinrob\GuzzleCache\CacheMiddleware</span>;</span>
 <span class="pl-s1"></span>
 <span class="pl-s1"><span class="pl-c">// Create default HandlerStack</span></span>
 <span class="pl-s1"><span class="pl-smi">$stack</span> <span class="pl-k">=</span> <span class="pl-c1">HandlerStack</span><span class="pl-k">::</span>create();</span>
@@ -58,29 +67,80 @@ This project is under development but it's already functional.</p>
 <span class="pl-s1"><span class="pl-c">// Initialize the client with the handler option</span></span>
 <span class="pl-s1"><span class="pl-smi">$client</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">Client</span>([<span class="pl-s"><span class="pl-pds">'</span>handler<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-smi">$stack</span>]);</span></pre></div>
 
-<p>You can use a custom Cache with:</p>
+<p>You can use a cache from <code>Doctrine/Cache</code>:</p>
 
-<div class="highlight highlight-php"><pre><span class="pl-s1">[<span class="pl-k">...</span>]</span>
-<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache</span>;</span>
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">[<span class="pl-k">...</span>]</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache\FilesystemCache</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage</span>;</span>
 <span class="pl-s1"></span>
 <span class="pl-s1">[<span class="pl-k">...</span>]</span>
-<span class="pl-s1"><span class="pl-smi">$stack</span><span class="pl-k">-&gt;</span>push(<span class="pl-k">new</span> <span class="pl-c1">CacheMiddleware</span>(<span class="pl-k">new</span> <span class="pl-c1">PrivateCache</span>(<span class="pl-k">new</span> <span class="pl-c1">FilesystemCache</span>(<span class="pl-sr"><span class="pl-pds">'/</span>tmp<span class="pl-pds">/'</span></span>))), <span class="pl-s"><span class="pl-pds">'</span>cache<span class="pl-pds">'</span></span>);</span></pre></div>
+<span class="pl-s1"><span class="pl-smi">$stack</span><span class="pl-k">-&gt;</span>push(</span>
+<span class="pl-s1">  <span class="pl-k">new</span> <span class="pl-c1">CacheMiddleware</span>(</span>
+<span class="pl-s1">    <span class="pl-k">new</span> <span class="pl-c1">PrivateCacheStrategy</span>(</span>
+<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">DoctrineCacheStorage</span>(</span>
+<span class="pl-s1">        <span class="pl-k">new</span> <span class="pl-c1">FilesystemCache</span>(<span class="pl-sr"><span class="pl-pds">'/</span>tmp<span class="pl-pds">/'</span></span>)</span>
+<span class="pl-s1">      )</span>
+<span class="pl-s1">    )</span>
+<span class="pl-s1">  ), </span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>cache<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">);</span></pre></div>
 
 <p>You can use <code>ChainCache</code> for using multiple <code>CacheProvider</code>. With that provider, you have to sort the different cache from the faster to the slower. Like that, you can have a very fast cache.</p>
 
-<div class="highlight highlight-php"><pre><span class="pl-s1">[<span class="pl-k">...</span>]</span>
-<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache</span>;</span>
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">[<span class="pl-k">...</span>]</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache\ChainCache</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache\ArrayCache</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache\FilesystemCache</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage</span>;</span>
 <span class="pl-s1"></span>
 <span class="pl-s1">[<span class="pl-k">...</span>]</span>
 <span class="pl-s1"><span class="pl-smi">$stack</span><span class="pl-k">-&gt;</span>push(<span class="pl-k">new</span> <span class="pl-c1">CacheMiddleware</span>(</span>
-<span class="pl-s1">  <span class="pl-k">new</span> <span class="pl-c1">PrivateCache</span>(</span>
-<span class="pl-s1">    <span class="pl-k">new</span> <span class="pl-c1">ChainCache</span>([</span>
-<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">ArrayCache</span>(),</span>
-<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">ApcCache</span>(),</span>
-<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">FileCache</span>(<span class="pl-sr"><span class="pl-pds">'/</span>tmp<span class="pl-pds">/'</span></span>),</span>
-<span class="pl-s1">    ])</span>
+<span class="pl-s1">  <span class="pl-k">new</span> <span class="pl-c1">PrivateCacheStrategy</span>(</span>
+<span class="pl-s1">    <span class="pl-k">new</span> <span class="pl-c1">DoctrineCacheStorage</span>(</span>
+<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">ChainCache</span>([</span>
+<span class="pl-s1">        <span class="pl-k">new</span> <span class="pl-c1">ArrayCache</span>(),</span>
+<span class="pl-s1">        <span class="pl-k">new</span> <span class="pl-c1">FilesystemCache</span>(<span class="pl-sr"><span class="pl-pds">'/</span>tmp<span class="pl-pds">/'</span></span>),</span>
+<span class="pl-s1">      ])</span>
+<span class="pl-s1">    )</span>
 <span class="pl-s1">  )</span>
 <span class="pl-s1">), <span class="pl-s"><span class="pl-pds">'</span>cache<span class="pl-pds">'</span></span>);</span></pre></div>
+
+<p>It's possible to add a public shared cache to the stack:</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">[<span class="pl-k">...</span>]</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache\FilesystemCache</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Doctrine\Common\Cache\PredisCache</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy</span>;</span>
+<span class="pl-s1"><span class="pl-k">use</span> <span class="pl-c1">Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">[<span class="pl-k">...</span>]</span>
+<span class="pl-s1"><span class="pl-c">// Private caching</span></span>
+<span class="pl-s1"><span class="pl-smi">$stack</span><span class="pl-k">-&gt;</span>push(</span>
+<span class="pl-s1">  <span class="pl-k">new</span> <span class="pl-c1">CacheMiddleware</span>(</span>
+<span class="pl-s1">    <span class="pl-k">new</span> <span class="pl-c1">PrivateCacheStrategy</span>(</span>
+<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">DoctrineCacheStorage</span>(</span>
+<span class="pl-s1">        <span class="pl-k">new</span> <span class="pl-c1">FilesystemCache</span>(<span class="pl-sr"><span class="pl-pds">'/</span>tmp<span class="pl-pds">/'</span></span>)</span>
+<span class="pl-s1">      )</span>
+<span class="pl-s1">    )</span>
+<span class="pl-s1">  ), </span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>private-cache<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">);</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">// Public caching</span></span>
+<span class="pl-s1"><span class="pl-smi">$stack</span><span class="pl-k">-&gt;</span>push(</span>
+<span class="pl-s1">  <span class="pl-k">new</span> <span class="pl-c1">CacheMiddleware</span>(</span>
+<span class="pl-s1">    <span class="pl-k">new</span> <span class="pl-c1">PrivateCacheStrategy</span>(</span>
+<span class="pl-s1">      <span class="pl-k">new</span> <span class="pl-c1">DoctrineCacheStorage</span>(</span>
+<span class="pl-s1">        <span class="pl-k">new</span> <span class="pl-c1">PredisCache</span>(</span>
+<span class="pl-s1">          <span class="pl-k">new</span> <span class="pl-c1">Predis\</span><span class="pl-c1">Client</span>(<span class="pl-s"><span class="pl-pds">'</span>tcp://10.0.0.1:6379<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">        )</span>
+<span class="pl-s1">      )</span>
+<span class="pl-s1">    )</span>
+<span class="pl-s1">  ), </span>
+<span class="pl-s1">  <span class="pl-s"><span class="pl-pds">'</span>shared-cache<span class="pl-pds">'</span></span></span>
+<span class="pl-s1">);</span></pre></div>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/Kevinrob/guzzle-cache-middleware">Guzzle Cache Middleware</a> is maintained by <a href="https://github.com/Kevinrob">Kevinrob</a>.</span>
@@ -103,4 +163,3 @@ This project is under development but it's already functional.</p>
 
   </body>
 </html>
-
