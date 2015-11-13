@@ -128,12 +128,20 @@ class CacheMiddleware
             $onlyFromCache = $reqCacheControl->has('only-if-cached');
             $staleResponse = $reqCacheControl->has('max-stale')
                 && $reqCacheControl->get('max-stale') === '';
+            $maxStaleCache = $reqCacheControl->get('max-stale', null);
 
             // If cache => return new FulfilledPromise(...) with response
             $cacheEntry = $this->cacheStorage->fetch($request);
             if ($cacheEntry instanceof CacheEntry) {
-                if ($cacheEntry->isFresh() || $staleResponse) {
+                if ($cacheEntry->isFresh()) {
                     // Cache HIT!
+                    return new FulfilledPromise(
+                        $cacheEntry->getResponse()->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT)
+                    );
+                } elseif ($staleResponse
+                    || ($maxStaleCache !== null && $cacheEntry->getStaleAge() <= $maxStaleCache)
+                ) {
+                    // Staled cache!
                     return new FulfilledPromise(
                         $cacheEntry->getResponse()->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT)
                     );

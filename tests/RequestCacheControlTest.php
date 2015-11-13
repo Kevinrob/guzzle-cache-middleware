@@ -117,7 +117,7 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testMaxStaleEmptyHeader()
+    public function testMaxStaleHeader()
     {
         $this->client->get('http://test.com/1s');
 
@@ -136,6 +136,28 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
         ]);
         $this->assertEquals(
             CacheMiddleware::HEADER_CACHE_HIT,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        $response = $this->client->get('http://test.com/1s', [
+            'headers' => [
+                'Cache-Control' => 'max-stale=2',
+            ]
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_HIT,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        sleep(2);
+
+        $response = $this->client->get('http://test.com/1s', [
+            'headers' => [
+                'Cache-Control' => 'max-stale=1',
+            ]
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_MISS,
             $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
         );
     }

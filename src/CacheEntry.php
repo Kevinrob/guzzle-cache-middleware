@@ -108,12 +108,20 @@ class CacheEntry
      */
     public function isStale()
     {
+        return $this->getStaleAge() > 0;
+    }
+
+    /**
+     * @return int positive value equal staled
+     */
+    public function getStaleAge()
+    {
         // This object is immutable
         if ($this->timestampStale === null) {
             $this->timestampStale = $this->staleAt->getTimestamp();
         }
 
-        return $this->timestampStale < (new \DateTime())->getTimestamp();
+        return time() - $this->timestampStale;
     }
 
     /**
