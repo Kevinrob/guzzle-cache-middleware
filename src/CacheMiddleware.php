@@ -124,16 +124,20 @@ class CacheMiddleware
                 return $handler($request->withoutHeader(self::HEADER_RE_VALIDATION), $options);
             }
 
+            // Retrieve information from request (Cache-Control)
             $reqCacheControl = new KeyValueHttpHeader($request->getHeader('Cache-Control'));
             $onlyFromCache = $reqCacheControl->has('only-if-cached');
             $staleResponse = $reqCacheControl->has('max-stale')
                 && $reqCacheControl->get('max-stale') === '';
             $maxStaleCache = $reqCacheControl->get('max-stale', null);
+            $minFreshCache = $reqCacheControl->get('min-fresh', null);
 
             // If cache => return new FulfilledPromise(...) with response
             $cacheEntry = $this->cacheStorage->fetch($request);
             if ($cacheEntry instanceof CacheEntry) {
-                if ($cacheEntry->isFresh()) {
+                if ($cacheEntry->isFresh()
+                    && ($minFreshCache === null || $cacheEntry->getStaleAge() + (int)$minFreshCache <= 0)
+                ) {
                     // Cache HIT!
                     return new FulfilledPromise(
                         $cacheEntry->getResponse()->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT)

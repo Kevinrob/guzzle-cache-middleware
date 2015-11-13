@@ -162,6 +162,37 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testMinFreshHeader()
+    {
+        $this->client->get('http://test.com/3s');
+
+        $response = $this->client->get('http://test.com/3s');
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_HIT,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        $response = $this->client->get('http://test.com/3s', [
+            'headers' => [
+                'Cache-Control' => 'min-fresh=1',
+            ]
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_HIT,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        $response = $this->client->get('http://test.com/3s', [
+            'headers' => [
+                'Cache-Control' => 'min-fresh=10',
+            ]
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_MISS,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+    }
+
     public function testPragmaNoCacheHeader()
     {
         $this->client->get('http://test.com/2s');
