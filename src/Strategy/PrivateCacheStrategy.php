@@ -125,12 +125,17 @@ class PrivateCacheStrategy implements CacheStrategyInterface
      */
     public function fetch(RequestInterface $request)
     {
+        /** @var int|null $maxAge */
+        $maxAge = null;
+
         if ($request->hasHeader('Cache-Control')) {
             $reqCacheControl = new KeyValueHttpHeader($request->getHeader('Cache-Control'));
             if ($reqCacheControl->has('no-cache')) {
                 // Can't return cache
                 return null;
             }
+
+            $maxAge = $reqCacheControl->get('max-age');
         } elseif ($request->hasHeader('Pragma')) {
             $pragma = new KeyValueHttpHeader($request->getHeader('Pragma'));
             if ($pragma->has('no-cache')) {
@@ -139,7 +144,15 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             }
         }
 
-        return $this->storage->fetch($this->getCacheKey($request));
+        $cache = $this->storage->fetch($this->getCacheKey($request));
+        if ($cache !== null && $maxAge !== null) {
+            if ($cache->getAge() > $maxAge) {
+                // Cache entry is too old for the request requirements!
+                return null;
+            }
+        }
+
+        return $cache;
     }
 
     /**

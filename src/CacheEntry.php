@@ -35,6 +35,11 @@ class CacheEntry
     protected $staleWhileRevalidateTo;
 
     /**
+     * @var \DateTime
+     */
+    protected $dateCreated;
+
+    /**
      * Cached timestamp of staleAt variable.
      *
      * @var int
@@ -53,6 +58,7 @@ class CacheEntry
         \DateTime $staleIfErrorTo = null,
         \DateTime $staleWhileRevalidateTo = null
     ) {
+        $this->dateCreated = new \DateTime();
         $this->response = $response;
         $this->staleAt = $staleAt;
 
@@ -156,6 +162,14 @@ class CacheEntry
 
         // Don't return 0, it's reserved for infinite TTL
         return $ttl !== 0 ? (int) $ttl : -1;
+    }
+
+    /**
+     * @return int Age in seconds
+     */
+    public function getAge()
+    {
+        return time() - $this->dateCreated->getTimestamp();
     }
 
     public function __sleep()

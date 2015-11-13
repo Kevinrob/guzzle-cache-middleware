@@ -25,6 +25,11 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
                         (new Response())
                             ->withAddedHeader('Cache-Control', 'max-age=2')
                     );
+                case '/3s':
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader('Cache-Control', 'max-age=3')
+                    );
             }
 
             throw new \InvalidArgumentException();
@@ -59,6 +64,23 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
         $response = $this->client->get('http://test.com/2s', [
             'headers' => [
                 'Cache-Control' => 'no-cache',
+            ]
+        ]);
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+    }
+
+    public function testMaxAgeHeader()
+    {
+        $this->client->get('http://test.com/3s');
+
+        $response = $this->client->get('http://test.com/3s');
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+
+        sleep(2);
+
+        $response = $this->client->get('http://test.com/3s', [
+            'headers' => [
+                'Cache-Control' => 'max-age=1',
             ]
         ]);
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));

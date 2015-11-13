@@ -50,16 +50,16 @@ class KeyValueHttpHeader
 
     /**
      * @param string $key
-     *
+     * @param string $default the value to return if don't exist
      * @return string
      */
-    public function get($key)
+    public function get($key, $default = '')
     {
         if ($this->has($key)) {
             return $this->values[$key];
         }
 
-        return '';
+        return $default;
     }
 
     /**
