@@ -84,7 +84,8 @@ class CacheEntry
      */
     public function getResponse()
     {
-        return $this->response;
+        return $this->response
+            ->withHeader('Age', $this->getAge());
     }
 
     /**
