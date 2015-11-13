@@ -69,6 +69,12 @@ class PrivateCacheStrategy implements CacheStrategyInterface
         }
 
         $cacheControl = new KeyValueHttpHeader($response->getHeader('Cache-Control'));
+        $varyHeader = new KeyValueHttpHeader($response->getHeader('Vary'));
+
+        if ($varyHeader->has('*')) {
+            // This will never match with a request
+            return;
+        }
 
         if ($cacheControl->has('no-store')) {
             // No store allowed (maybe some sensitives data...)
