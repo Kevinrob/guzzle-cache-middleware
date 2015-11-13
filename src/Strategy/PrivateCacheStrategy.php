@@ -57,11 +57,11 @@ class PrivateCacheStrategy implements CacheStrategyInterface
     }
 
     /**
+     * @param RequestInterface $request
      * @param ResponseInterface $response
-     *
      * @return CacheEntry|null entry to save, null if can't cache it
      */
-    protected function getCacheObject(ResponseInterface $response)
+    protected function getCacheObject(RequestInterface $request, ResponseInterface $response)
     {
         if (!isset($this->statusAccepted[$response->getStatusCode()])) {
             // Don't cache it
@@ -83,7 +83,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         if ($cacheControl->has('no-cache')) {
             // Stale response see RFC7234 section 5.2.1.4
-            $entry = new CacheEntry($response, new \DateTime('-1 seconds'));
+            $entry = new CacheEntry($request, $response, new \DateTime('-1 seconds'));
 
             return $entry->hasValidationInformation() ? $entry : null;
         }
@@ -91,6 +91,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
         foreach ($this->ageKey as $key) {
             if ($cacheControl->has($key)) {
                 return new CacheEntry(
+                    $request,
                     $response,
                     new \DateTime('+'.(int) $cacheControl->get($key).'seconds')
                 );
@@ -101,13 +102,14 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             $expireAt = \DateTime::createFromFormat(\DateTime::RFC1123, $response->getHeaderLine('Expires'));
             if ($expireAt !== false) {
                 return new CacheEntry(
+                    $request,
                     $response,
                     $expireAt
                 );
             }
         }
 
-        return new CacheEntry($response, new \DateTime('-1 seconds'));
+        return new CacheEntry($request, $response, new \DateTime('-1 seconds'));
     }
 
     /**
@@ -151,9 +153,15 @@ class PrivateCacheStrategy implements CacheStrategyInterface
         }
 
         $cache = $this->storage->fetch($this->getCacheKey($request));
-        if ($cache !== null && $maxAge !== null) {
-            if ($cache->getAge() > $maxAge) {
-                // Cache entry is too old for the request requirements!
+        if ($cache !== null) {
+            if ($maxAge !== null) {
+                if ($cache->getAge() > $maxAge) {
+                    // Cache entry is too old for the request requirements!
+                    return null;
+                }
+            }
+
+            if (!$cache->isVaryEquals($request)) {
                 return null;
             }
         }
@@ -175,7 +183,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             return false;
         }
 
-        $cacheObject = $this->getCacheObject($response);
+        $cacheObject = $this->getCacheObject($request, $response);
         if ($cacheObject !== null) {
             return $this->storage->save(
                 $this->getCacheKey($request),

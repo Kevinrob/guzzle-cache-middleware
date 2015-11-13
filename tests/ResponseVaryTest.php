@@ -26,6 +26,12 @@ class ResponseVaryTest extends \PHPUnit_Framework_TestCase
                             ->withAddedHeader('Cache-Control', 'max-age=2')
                             ->withAddedHeader('Vary', '*')
                     );
+                case '/vary-my-header':
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader('Cache-Control', 'max-age=2')
+                            ->withAddedHeader('Vary', 'My-Header, Absent-Header')
+                    );
             }
 
             throw new \InvalidArgumentException();
@@ -43,6 +49,45 @@ class ResponseVaryTest extends \PHPUnit_Framework_TestCase
         $this->client->get('http://test.com/vary-all');
 
         $response = $this->client->get('http://test.com/vary-all');
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_MISS,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+    }
+
+    public function testVaryHeader()
+    {
+        $this->client->get('http://test.com/vary-my-header', [
+            'headers' => [
+                'My-Header' => 'hello',
+            ],
+        ]);
+
+        // Same vary headers
+        $response = $this->client->get('http://test.com/vary-my-header', [
+            'headers' => [
+                'My-Header' => 'hello',
+            ],
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_HIT,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        // Add a previously absent header
+        $response = $this->client->get('http://test.com/vary-my-header', [
+            'headers' => [
+                'My-Header' => 'hello',
+                'Absent-Header' => 'present',
+            ],
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_MISS,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        // Without any headers
+        $response = $this->client->get('http://test.com/vary-my-header');
         $this->assertEquals(
             CacheMiddleware::HEADER_CACHE_MISS,
             $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)

@@ -4,6 +4,7 @@ namespace Kevinrob\GuzzleCache\Strategy;
 
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -29,13 +30,13 @@ class PublicCacheStrategy extends PrivateCacheStrategy
     /**
      * {@inheritdoc}
      */
-    protected function getCacheObject(ResponseInterface $response)
+    protected function getCacheObject(RequestInterface $request, ResponseInterface $response)
     {
         $cacheControl = new KeyValueHttpHeader($response->getHeader('Cache-Control'));
         if ($cacheControl->has('private')) {
             return;
         }
 
-        return parent::getCacheObject($response);
+        return parent::getCacheObject($request, $response);
     }
 }

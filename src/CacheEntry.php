@@ -2,10 +2,16 @@
 
 namespace Kevinrob\GuzzleCache;
 
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class CacheEntry
 {
+    /**
+     * @var RequestInterface
+     */
+    protected $request;
+
     /**
      * @var ResponseInterface
      */
@@ -47,18 +53,22 @@ class CacheEntry
     private $timestampStale;
 
     /**
+     * @param RequestInterface $request
      * @param ResponseInterface $response
-     * @param \DateTime         $staleAt
-     * @param \DateTime|null    $staleIfErrorTo         if null, detected with the headers (RFC 5861)
-     * @param \DateTime|null    $staleWhileRevalidateTo
+     * @param \DateTime $staleAt
+     * @param \DateTime|null $staleIfErrorTo if null, detected with the headers (RFC 5861)
+     * @param \DateTime|null $staleWhileRevalidateTo
      */
     public function __construct(
+        RequestInterface $request,
         ResponseInterface $response,
         \DateTime $staleAt,
         \DateTime $staleIfErrorTo = null,
         \DateTime $staleWhileRevalidateTo = null
     ) {
         $this->dateCreated = new \DateTime();
+
+        $this->request = $request;
         $this->response = $response;
         $this->staleAt = $staleAt;
 
@@ -86,6 +96,35 @@ class CacheEntry
     {
         return $this->response
             ->withHeader('Age', $this->getAge());
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @return bool
+     */
+    public function isVaryEquals(RequestInterface $request)
+    {
+        if ($this->response->hasHeader('Vary')) {
+            $varyHeaders = new KeyValueHttpHeader($this->response->getHeader('Vary'));
+
+            foreach ($varyHeaders as $key => $value) {
+                if (!$this->request->hasHeader($key)
+                    && !$request->hasHeader($key)
+                ) {
+                    // Absent from both
+                    continue;
+                } elseif ($this->request->getHeaderLine($key)
+                    == $request->getHeaderLine($key)
+                ) {
+                    // Same content
+                    continue;
+                }
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
