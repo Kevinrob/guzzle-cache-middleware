@@ -128,7 +128,9 @@ class CacheMiddleware
             if ($cacheEntry instanceof CacheEntry) {
                 if ($cacheEntry->isFresh()) {
                     // Cache HIT!
-                    return new FulfilledPromise($cacheEntry->getResponse()->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT));
+                    return new FulfilledPromise(
+                        $cacheEntry->getResponse()->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT)
+                    );
                 } elseif ($cacheEntry->hasValidationInformation()) {
                     // Re-validation header
                     $request = static::getRequestWithReValidationHeader($request, $cacheEntry);
