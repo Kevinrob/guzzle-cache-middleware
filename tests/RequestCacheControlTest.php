@@ -30,6 +30,11 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
                         (new Response())
                             ->withAddedHeader('Cache-Control', 'max-age=3')
                     );
+                case '/only-if-cached':
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader('Cache-Control', 'max-age=3')
+                    );
             }
 
             throw new \InvalidArgumentException();
@@ -84,6 +89,27 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
             ]
         ]);
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+    }
+
+    public function testOnlyIfCachedHeader()
+    {
+        $this->client->get('http://test.com/3s');
+        $response = $this->client->get('http://test.com/3s', [
+            'headers' => [
+                'Cache-Control' => 'only-if-cached',
+            ]
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_HIT,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        $this->setExpectedException('GuzzleHttp\Exception\ServerException', 'Server error: 504');
+        $this->client->get('http://test.com/only-if-cached', [
+            'headers' => [
+                'Cache-Control' => 'only-if-cached',
+            ]
+        ]);
     }
 
     public function testPragmaNoCacheHeader()

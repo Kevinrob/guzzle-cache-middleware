@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\Strategy\CacheStrategyInterface;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Psr\Http\Message\RequestInterface;
@@ -123,6 +124,9 @@ class CacheMiddleware
                 return $handler($request->withoutHeader(self::HEADER_RE_VALIDATION), $options);
             }
 
+            $onlyFromCache = (new KeyValueHttpHeader($request->getHeader('Cache-Control')))
+                ->has('only-if-cached');
+
             // If cache => return new FulfilledPromise(...) with response
             $cacheEntry = $this->cacheStorage->fetch($request);
             if ($cacheEntry instanceof CacheEntry) {
@@ -131,7 +135,7 @@ class CacheMiddleware
                     return new FulfilledPromise(
                         $cacheEntry->getResponse()->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT)
                     );
-                } elseif ($cacheEntry->hasValidationInformation()) {
+                } elseif ($cacheEntry->hasValidationInformation() && !$onlyFromCache) {
                     // Re-validation header
                     $request = static::getRequestWithReValidationHeader($request, $cacheEntry);
 
@@ -146,6 +150,13 @@ class CacheMiddleware
                 }
             } else {
                 $cacheEntry = null;
+            }
+
+            if ($cacheEntry === null && $onlyFromCache) {
+                // Explicit asking of a cached response => 504
+                return new FulfilledPromise(
+                    new Response(504)
+                );
             }
 
             /** @var Promise $promise */
