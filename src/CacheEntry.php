@@ -105,6 +105,10 @@ class CacheEntry
     public function isVaryEquals(RequestInterface $request)
     {
         if ($this->response->hasHeader('Vary')) {
+            if ($this->request === null) {
+                return false;
+            }
+
             $varyHeaders = new KeyValueHttpHeader($this->response->getHeader('Vary'));
 
             foreach ($varyHeaders as $key => $value) {
