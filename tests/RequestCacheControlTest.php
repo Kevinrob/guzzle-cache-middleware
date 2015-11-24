@@ -109,7 +109,7 @@ class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
             $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
         );
 
-        $this->setExpectedException('GuzzleHttp\Exception\ServerException', 'Server error: 504');
+        $this->setExpectedException('GuzzleHttp\Exception\ServerException', '504');
         $this->client->get('http://test.com/only-if-cached', [
             'headers' => [
                 'Cache-Control' => 'only-if-cached',
