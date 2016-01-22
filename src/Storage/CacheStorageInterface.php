@@ -20,4 +20,13 @@ interface CacheStorageInterface
      * @return bool
      */
     public function save($key, CacheEntry $data);
+
+    /**
+     * Invalidates the Cache entry with the given key.
+     *
+     * @param string
+     *
+     * @return bool
+     */
+    public function delete($key);
 }

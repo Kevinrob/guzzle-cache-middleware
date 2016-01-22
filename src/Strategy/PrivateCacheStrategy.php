@@ -193,4 +193,11 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         return false;
     }
+
+    public function invalidate(RequestInterface $request)
+    {
+        return $this->storage->delete(
+            $this->getCacheKey($request)
+        );
+    }
 }
