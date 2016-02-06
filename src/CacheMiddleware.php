@@ -197,10 +197,7 @@ class CacheMiddleware
                         $response = $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }
 
-                    // Add to the cache
-                    $this->cacheStorage->cache($request, $response);
-
-                    return $response;
+                    return self::addToCache($this->cacheStorage, $request, $response);
                 },
                 function (\Exception $ex) use ($cacheEntry) {
                     if ($ex instanceof TransferException) {
@@ -214,6 +211,29 @@ class CacheMiddleware
                 }
             );
         };
+    }
+
+    /**
+     * @param CacheStrategyInterface $cache
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
+    protected static function addToCache(
+        CacheStrategyInterface $cache,
+        RequestInterface $request,
+        ResponseInterface $response
+    ) {
+        // If the body is not seekable, we have to replace it by a seekable one
+        if (!$response->getBody()->isSeekable()) {
+            $response = $response->withBody(
+                \GuzzleHttp\Psr7\stream_for($response->getBody()->getContents())
+            );
+        }
+
+        $cache->cache($request, $response);
+
+        return $response;
     }
 
     /**
@@ -242,7 +262,7 @@ class CacheMiddleware
                         $response = $response->withBody($cacheEntry->getResponse()->getBody());
                     }
 
-                    $cacheStorage->cache($request, $response);
+                    self::addToCache($cacheStorage, $request, $response);
                 });
 
             return true;
