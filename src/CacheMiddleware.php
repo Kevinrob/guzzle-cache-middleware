@@ -135,6 +135,11 @@ class CacheMiddleware
             // If cache => return new FulfilledPromise(...) with response
             $cacheEntry = $this->cacheStorage->fetch($request);
             if ($cacheEntry instanceof CacheEntry) {
+                $body = $cacheEntry->getResponse()->getBody();
+                if ($body->tell() > 0) {
+                    $body->rewind();
+                }
+
                 if ($cacheEntry->isFresh()
                     && ($minFreshCache === null || $cacheEntry->getStaleAge() + (int)$minFreshCache <= 0)
                 ) {
