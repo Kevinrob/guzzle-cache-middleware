@@ -79,10 +79,10 @@ class BaseTest extends \PHPUnit_Framework_TestCase
     {
         $response = $this->client->get('/no-seek');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
-        $this->assertEquals('I am not seekable!', (string)$response->getBody());
+        $this->assertEquals('I am not seekable!', $response->getBody()->getContents());
 
         $response = $this->client->get('/no-seek');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
-        $this->assertEquals('I am not seekable!', (string)$response->getBody());
+        $this->assertEquals('I am not seekable!', $response->getBody()->getContents());
     }
 }
