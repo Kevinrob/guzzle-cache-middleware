@@ -198,6 +198,10 @@ class CacheMiddleware
                             ->withStatus($cacheEntry->getResponse()->getStatusCode())
                             ->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT);
                         $response = $response->withBody($cacheEntry->getResponse()->getBody());
+
+                        if ($cacheEntry->getResponse()->getHeader('Link')) {
+                            $response = $response->withHeader('Link', $cacheEntry->getResponse()->getHeader('Link'));
+                        }
                     } else {
                         $response = $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }
@@ -265,6 +269,10 @@ class CacheMiddleware
                         /** @var ResponseInterface $response */
                         $response = $response->withStatus($cacheEntry->getResponse()->getStatusCode());
                         $response = $response->withBody($cacheEntry->getResponse()->getBody());
+
+                        if ($cacheEntry->getResponse()->getHeader('Link')) {
+                            $response = $response->withHeader('Link', $cacheEntry->getResponse()->getHeader('Link'));
+                        }
                     }
 
                     self::addToCache($cacheStorage, $request, $response);
