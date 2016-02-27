@@ -202,7 +202,7 @@ class CacheMiddleware
                         // Merge headers of the "304 Not Modified" and the cache entry
                         foreach ($cacheEntry->getResponse()->getHeaders() as $headerName => $headerValue) {
                             if (!$response->hasHeader($headerName)) {
-                                $response->withHeader($headerName, $headerValue);
+                                $response = $response->withHeader($headerName, $headerValue);
                             }
                         }
                     } else {
@@ -276,7 +276,7 @@ class CacheMiddleware
                         // Merge headers of the "304 Not Modified" and the cache entry
                         foreach ($cacheEntry->getResponse()->getHeaders() as $headerName => $headerValue) {
                             if (!$response->hasHeader($headerName)) {
-                                $response->withHeader($headerName, $headerValue);
+                                $response = $response->withHeader($headerName, $headerValue);
                             }
                         }
                     }
