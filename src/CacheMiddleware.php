@@ -199,8 +199,11 @@ class CacheMiddleware
                             ->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT);
                         $response = $response->withBody($cacheEntry->getResponse()->getBody());
 
-                        if ($cacheEntry->getResponse()->getHeader('Link')) {
-                            $response = $response->withHeader('Link', $cacheEntry->getResponse()->getHeader('Link'));
+                        // Merge headers of the "304 Not Modified" and the cache entry
+                        foreach ($cacheEntry->getResponse()->getHeaders() as $headerName => $headerValue) {
+                            if (!$response->getHeader($headerName)) {
+                                $response->withHeader($headerName, $headerValue);
+                            }
                         }
                     } else {
                         $response = $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
@@ -270,8 +273,11 @@ class CacheMiddleware
                         $response = $response->withStatus($cacheEntry->getResponse()->getStatusCode());
                         $response = $response->withBody($cacheEntry->getResponse()->getBody());
 
-                        if ($cacheEntry->getResponse()->getHeader('Link')) {
-                            $response = $response->withHeader('Link', $cacheEntry->getResponse()->getHeader('Link'));
+                        // Merge headers of the "304 Not Modified" and the cache entry
+                        foreach ($cacheEntry->getResponse()->getHeaders() as $headerName => $headerValue) {
+                            if (!$response->getHeader($headerName)) {
+                                $response->withHeader($headerName, $headerValue);
+                            }
                         }
                     }
 
