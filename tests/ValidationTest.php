@@ -33,12 +33,17 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
             switch ($request->getUri()->getPath()) {
                 case '/etag':
                     if ($request->getHeaderLine('If-None-Match') == 'MyBeautifulHash') {
-                        return new FulfilledPromise(new Response(304));
+                        return new FulfilledPromise(
+                            (new Response(304))
+                                ->withHeader('X-Replaced', '2')
+                        );
                     }
 
                     return new FulfilledPromise(
                         (new Response())
                             ->withHeader('Etag', 'MyBeautifulHash')
+                            ->withHeader('X-Base-Info', '1')
+                            ->withHeader('X-Replaced', '1')
                     );
                 case '/etag-changed':
                     if ($request->getHeaderLine('If-None-Match') == 'MyBeautifulHash') {
@@ -83,12 +88,16 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
 
     public function testEtagHeader()
     {
-        $this->client->get('http://test.com/etag');
+        $response = $this->client->get('http://test.com/etag');
+        $this->assertEquals('1', $response->getHeaderLine('X-Base-Info'));
+        $this->assertEquals('1', $response->getHeaderLine('X-Replaced'));
 
         sleep(1);
 
         $response = $this->client->get('http://test.com/etag');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+        $this->assertEquals('1', $response->getHeaderLine('X-Base-Info'));
+        $this->assertEquals('2', $response->getHeaderLine('X-Replaced'));
     }
 
     public function testEtagChangeHeader()
