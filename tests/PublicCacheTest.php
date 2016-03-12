@@ -2,6 +2,7 @@
 
 namespace Kevinrob\GuzzleCache;
 
+use Cache\Adapter\PHPArray\ArrayCachePool;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\ChainCache;
@@ -14,6 +15,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
+use Kevinrob\GuzzleCache\Storage\Psr6CacheStorage;
 use Kevinrob\GuzzleCache\Strategy\PublicCacheStrategy;
 use League\Flysystem\Adapter\Local;
 use Psr\Http\Message\RequestInterface;
@@ -93,6 +95,7 @@ class PublicCacheTest extends \PHPUnit_Framework_TestCase
             new DoctrineCacheStorage(new FilesystemCache($TMP_DIR)),
             new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)),
             new FlysystemStorage(new Local($TMP_DIR)),
+            new Psr6CacheStorage(new ArrayCachePool()),
         ];
 
         $request = new Request('GET', 'test.local');
