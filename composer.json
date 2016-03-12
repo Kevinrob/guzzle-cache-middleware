@@ -2,7 +2,7 @@
   "name": "kevinrob/guzzle-cache-middleware",
   "type": "library",
   "description": "A HTTP/1.1 Cache for Guzzle 6. It's a simple Middleware to be added in the HandlerStack. (RFC 7234)",
-  "keywords": ["guzzle", "guzzle6", "cache", "http", "http 1.1", "psr7", "handler", "middleware", "cache-control", "rfc7234", "performance", "php", "promise", "expiration", "validation", "Etag"],
+  "keywords": ["guzzle", "guzzle6", "cache", "http", "http 1.1", "psr6", "psr7", "handler", "middleware", "cache-control", "rfc7234", "performance", "php", "promise", "expiration", "validation", "Etag", "flysystem", "doctrine"],
   "homepage": "https://github.com/Kevinrob/guzzle-cache-middleware",
   "license": "MIT",
   "authors": [
