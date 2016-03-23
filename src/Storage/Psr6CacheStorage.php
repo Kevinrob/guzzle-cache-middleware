@@ -64,7 +64,14 @@ class Psr6CacheStorage implements CacheStorageInterface
         $this->lastItem = null;
 
         $item->set($data);
-        $item->expiresAfter($data->getTTL());
+
+        $ttl = $data->getTTL();
+        if ($ttl === 0) {
+            // No expiration
+            $item->expiresAfter(null);
+        } else {
+            $item->expiresAfter($ttl);
+        }
 
         return $this->cachePool->save($item);
     }
