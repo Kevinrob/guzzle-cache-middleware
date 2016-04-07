@@ -155,6 +155,10 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         $cache = $this->storage->fetch($this->getCacheKey($request));
         if ($cache !== null) {
+            if ((string)$cache->getOriginalRequest()->getUri() !== (string)$request->getUri()) {
+                return null;
+            }
+
             if ($maxAge !== null) {
                 if ($cache->getAge() > $maxAge) {
                     // Cache entry is too old for the request requirements!

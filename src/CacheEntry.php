@@ -99,6 +99,14 @@ class CacheEntry
     }
 
     /**
+     * @return RequestInterface
+     */
+    public function getOriginalRequest()
+    {
+        return $this->request;
+    }
+
+    /**
      * @param RequestInterface $request
      * @return bool
      */
