@@ -32,7 +32,8 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
 
     protected function getCacheKey(RequestInterface $request)
     {
-        return sha1(
+        return hash(
+            'sha256',
             'greedy'.$request->getMethod().$request->getUri()
         );
     }

@@ -119,7 +119,8 @@ class PrivateCacheStrategy implements CacheStrategyInterface
      */
     protected function getCacheKey(RequestInterface $request)
     {
-        return sha1(
+        return hash(
+            'sha256',
             $request->getMethod().$request->getUri()
         );
     }
