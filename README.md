@@ -110,7 +110,7 @@ $stack->push(
 // Public caching
 $stack->push(
   new CacheMiddleware(
-    new PrivateCacheStrategy(
+    new PublicCacheStrategy(
       new DoctrineCacheStorage(
         new PredisCache(
           new Predis\Client('tcp://10.0.0.1:6379')
