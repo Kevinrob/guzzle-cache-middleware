@@ -44,6 +44,8 @@ $stack->push(new CacheMiddleware(), 'cache');
 $client = new Client(['handler' => $stack]);
 ```
 
+# Examples
+## Doctrine/Cache
 You can use a cache from `Doctrine/Cache`:
 ```php
 [...]
@@ -86,6 +88,28 @@ $stack->push(new CacheMiddleware(
 ), 'cache');
 ```
 
+## Flysystem
+```php
+[...]
+use League\Flysystem\Adapter\Local;
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\FilesystemStorage;
+
+[...]
+
+$stack->push(
+  new CacheMiddleware(
+    new PrivateCacheStrategy(
+      new FilesystemStorage(
+        new Local('/path/to/cache')
+      )
+    )
+  ), 
+  'cache'
+);
+```
+
+## Public and shared
 It's possible to add a public shared cache to the stack:
 ```php
 [...]
