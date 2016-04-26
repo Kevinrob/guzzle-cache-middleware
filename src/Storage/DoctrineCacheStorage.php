@@ -57,4 +57,9 @@ class DoctrineCacheStorage implements CacheStorageInterface
 
         return false;
     }
+
+    public function delete($key)
+    {
+        return $this->cache->delete($key);
+    }
 }
