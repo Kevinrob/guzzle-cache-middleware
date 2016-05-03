@@ -24,4 +24,12 @@ interface CacheStrategyInterface
      * @return bool true if success
      */
     public function cache(RequestInterface $request, ResponseInterface $response);
+
+    /**
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     *
+     * @return bool true if success
+     */
+    public function update(RequestInterface $request, ResponseInterface $response);
 }

@@ -191,6 +191,8 @@ class CacheMiddleware
                         }
                     }
 
+                    $update = false;
+
                     if ($response->getStatusCode() == 304 && $cacheEntry instanceof CacheEntry) {
                         // Not modified => cache entry is re-validate
                         /** @var ResponseInterface $response */
@@ -205,11 +207,13 @@ class CacheMiddleware
                                 $response = $response->withHeader($headerName, $headerValue);
                             }
                         }
+
+                        $update = true;
                     } else {
                         $response = $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }
 
-                    return self::addToCache($this->cacheStorage, $request, $response);
+                    return self::addToCache($this->cacheStorage, $request, $response, $update);
                 },
                 function (\Exception $ex) use ($cacheEntry) {
                     if ($ex instanceof TransferException) {
@@ -229,12 +233,14 @@ class CacheMiddleware
      * @param CacheStrategyInterface $cache
      * @param RequestInterface $request
      * @param ResponseInterface $response
+     * @param bool $update cache
      * @return ResponseInterface
      */
     protected static function addToCache(
         CacheStrategyInterface $cache,
         RequestInterface $request,
-        ResponseInterface $response
+        ResponseInterface $response,
+        $update = false
     ) {
         // If the body is not seekable, we have to replace it by a seekable one
         if (!$response->getBody()->isSeekable()) {
@@ -243,7 +249,11 @@ class CacheMiddleware
             );
         }
 
-        $cache->cache($request, $response);
+        if ($update) {
+            $cache->update($request, $response);
+        } else {
+            $cache->cache($request, $response);
+        }
 
         return $response;
     }
@@ -267,6 +277,8 @@ class CacheMiddleware
             $this->waitingRevalidate[] = $this->client
                 ->sendAsync($request)
                 ->then(function (ResponseInterface $response) use ($request, &$cacheStorage, $cacheEntry) {
+                    $update = false;
+
                     if ($response->getStatusCode() == 304) {
                         // Not modified => cache entry is re-validate
                         /** @var ResponseInterface $response */
@@ -279,9 +291,11 @@ class CacheMiddleware
                                 $response = $response->withHeader($headerName, $headerValue);
                             }
                         }
+
+                        $update = true;
                     }
 
-                    self::addToCache($cacheStorage, $request, $response);
+                    self::addToCache($cacheStorage, $request, $response, $update);
                 });
 
             return true;
