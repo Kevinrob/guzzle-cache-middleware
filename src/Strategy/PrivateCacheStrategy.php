@@ -198,4 +198,15 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         return false;
     }
+
+    /**
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     *
+     * @return bool true if success
+     */
+    public function update(RequestInterface $request, ResponseInterface $response)
+    {
+        return $this->cache($request, $response);
+    }
 }
