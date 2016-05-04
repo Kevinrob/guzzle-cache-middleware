@@ -13,6 +13,7 @@ A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Mid
 - Assured compatibility with PSR-7
 
 ## Storage interfaces build-in
+- [Laravel cache](https://laravel.com/docs/5.2/cache)
 - [Doctrine cache](https://github.com/doctrine/cache)
 - [Flysystem](https://github.com/thephpleague/flysystem)
 - [PSR6](https://github.com/php-fig/cache)
@@ -45,6 +46,28 @@ $client = new Client(['handler' => $stack]);
 ```
 
 # Examples
+## Laravel cache
+You can use a cache with Laravel, e.g. Redis, Memcache etc.:
+```php
+[...]
+use Illuminate\Support\Facades\Cache;
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\LaravelCacheStorage;
+
+[...]
+
+$stack->push(
+  new CacheMiddleware(
+    new PrivateCacheStrategy(
+      new LaravelCacheStorage(
+        Cache::store('redis')
+      )
+    )
+  ),
+  'cache'
+);
+```
+
 ## Doctrine/Cache
 You can use a cache from `Doctrine/Cache`:
 ```php
