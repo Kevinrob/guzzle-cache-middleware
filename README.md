@@ -14,7 +14,7 @@ A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Mid
 
 ## Storage interfaces build-in
 - [Doctrine cache](https://github.com/doctrine/cache)
-- [Laravel cache](https://laravel.com/docs/5.2/cache)
+- [Laravel cache](https://laravel.com/docs/5.2/cache) (WIP)
 - [Flysystem](https://github.com/thephpleague/flysystem)
 - [PSR6](https://github.com/php-fig/cache)
 
@@ -90,7 +90,7 @@ $stack->push(new CacheMiddleware(
 ), 'cache');
 ```
 
-## Laravel cache
+## Laravel cache (WIP)
 You can use a cache with Laravel, e.g. Redis, Memcache etc.:
 ```php
 [...]
