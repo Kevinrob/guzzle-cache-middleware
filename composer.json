@@ -21,7 +21,8 @@
     "doctrine/cache": "^1.0",
     "league/flysystem": "^1.0",
     "psr/cache": "^1.0",
-    "cache/array-adapter": "^0.4"
+    "cache/array-adapter": "^0.4",
+    "illuminate/cache": "^5.0"
   },
   "autoload": {
     "psr-4": {
@@ -34,6 +35,7 @@
     "guzzlehttp/guzzle": "For using this library. It was created for Guzzle6. (but you can use it with any PSR-7 HTTP Client)",
     "doctrine/cache": "This library have a lot of ready-to-use cache storage (to be use with Kevinrob\\GuzzleCache\\Storage\\DoctrineCacheStorage)",
     "league/flysystem": "To be use with Kevinrob\\GuzzleCache\\Storage\\FlysystemStorage",
-    "psr/cache": "To be use with Kevinrob\\GuzzleCache\\Storage\\Psr6CacheStorage"
+    "psr/cache": "To be use with Kevinrob\\GuzzleCache\\Storage\\Psr6CacheStorage",
+    "illuminate/cache": "To be use with Kevinrob\\GuzzleCache\\Storage\\LaravelCacheStorage"
   }
 }
