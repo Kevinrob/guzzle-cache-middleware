@@ -83,7 +83,9 @@ class CacheEntry
         }
 
         if ($staleWhileRevalidateTo === null && $values->has('stale-while-revalidate')) {
-            $this->staleWhileRevalidateTo = new \DateTime('+'.$values->get('stale-while-revalidate').'seconds');
+            $this->staleWhileRevalidateTo = new \DateTime(
+                '@'.($this->staleAt->getTimestamp() + (int) $values->get('stale-while-revalidate'))
+            );
         } else {
             $this->staleWhileRevalidateTo = $staleWhileRevalidateTo;
         }
