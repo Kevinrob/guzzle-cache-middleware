@@ -140,6 +140,7 @@ It's possible to add a public shared cache to the stack:
 use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\Common\Cache\PredisCache;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
+use Kevinrob\GuzzleCache\Strategy\PublicCacheStrategy;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 
 [...]
