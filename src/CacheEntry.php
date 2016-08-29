@@ -18,7 +18,7 @@ class CacheEntry
     protected $response;
 
     /**
-     * This field is only use for serialize.
+     * This field is only used for serialize.
      * Response::body is a stream and can't be serialized.
      *
      * @var string

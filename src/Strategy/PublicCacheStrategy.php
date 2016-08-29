@@ -8,8 +8,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * This strategy represent a "public" or "shared" HTTP client.
- * You can share the storage between application.
+ * This strategy represents a "public" or "shared" HTTP client.
+ * You can share the storage between applications.
  *
  * For example, a response with cache-control header "private, max-age=60"
  * will be NOT cached by this strategy.
