@@ -10,7 +10,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * This strategy represent a "private" HTTP client.
+ * This strategy represents a "private" HTTP client.
  * Pay attention to share storage between application with caution!
  *
  * For example, a response with cache-control header "private, max-age=60"

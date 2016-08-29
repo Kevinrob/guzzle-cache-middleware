@@ -8,7 +8,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * This strategy represent a "greedy" HTTP client.
+ * This strategy represents a "greedy" HTTP client.
  *
  * It can be used to cache responses in spite of any cache related response headers,
  * but it SHOULDN'T be used unless absolutely necessary, e.g. when accessing
