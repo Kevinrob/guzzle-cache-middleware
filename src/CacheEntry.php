@@ -50,7 +50,7 @@ class CacheEntry
      *
      * @var int
      */
-    private $timestampStale;
+    protected $timestampStale;
 
     /**
      * @param RequestInterface $request
