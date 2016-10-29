@@ -51,9 +51,25 @@ class PrivateCacheStrategy implements CacheStrategyInterface
         'max-age',
     ];
 
-    public function __construct(CacheStorageInterface $cache = null)
+    /**
+     * Prefix for cache key (Usable when the application is being run in shared environment)
+     *
+     * @var string
+     */
+    protected $cachePrefix;
+
+    /**
+     * To be used in case there is no caching information present on the response (Defaults to no cache)
+     *
+     * @var int
+     */
+    protected $defaultCacheSeconds;
+
+    public function __construct(CacheStorageInterface $cache = null, $cachePrefix = '', $defaultCacheSeconds = 0)
     {
         $this->storage = $cache !== null ? $cache : new VolatileRuntimeStorage();
+        $this->cachePrefix = $cachePrefix;
+        $this->defaultCacheSeconds = $defaultCacheSeconds;
     }
 
     /**
@@ -109,7 +125,13 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             }
         }
 
-        return new CacheEntry($request, $response, new \DateTime('-1 seconds'));
+        // No cache if not required
+        if (empty($this->defaultCacheSeconds)) {
+            return new CacheEntry($request, $response, new \DateTime('-1 seconds'));
+        }
+
+
+        return new CacheEntry($request, $response, new \DateTime($this->defaultCacheSeconds . ' seconds'));
     }
 
     /**
@@ -119,10 +141,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
      */
     protected function getCacheKey(RequestInterface $request)
     {
-        return hash(
-            'sha256',
-            $request->getMethod().$request->getUri()
-        );
+        return $this->cachePrefix . hash('sha256', $request->getMethod().$request->getUri());
     }
 
     /**
