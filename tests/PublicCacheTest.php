@@ -13,6 +13,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Kevinrob\GuzzleCache\Storage\CompressedDoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
 use Kevinrob\GuzzleCache\Storage\Psr6CacheStorage;
@@ -96,6 +97,7 @@ class PublicCacheTest extends \PHPUnit_Framework_TestCase
             new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)),
             new FlysystemStorage(new Local($TMP_DIR)),
             new Psr6CacheStorage(new ArrayCachePool()),
+            new CompressedDoctrineCacheStorage(new ArrayCache()),
         ];
 
         $request = new Request('GET', 'test.local');
