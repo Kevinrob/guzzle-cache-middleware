@@ -101,6 +101,14 @@ class CacheEntry
     }
 
     /**
+     * @return ResponseInterface
+     */
+    public function getOriginalResponse()
+    {
+        return $this->response;
+    }
+
+    /**
      * @return RequestInterface
      */
     public function getOriginalRequest()
