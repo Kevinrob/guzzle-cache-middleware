@@ -203,7 +203,7 @@ class CacheMiddleware
 
                         // Merge headers of the "304 Not Modified" and the cache entry
                         foreach ($cacheEntry->getOriginalResponse()->getHeaders() as $headerName => $headerValue) {
-                            if (!$response->hasHeader($headerName) and $headerName !== self::HEADER_CACHE_INFO) {
+                            if (!$response->hasHeader($headerName) && $headerName !== self::HEADER_CACHE_INFO) {
                                 $response = $response->withHeader($headerName, $headerValue);
                             }
                         }
