@@ -219,7 +219,9 @@ class PrivateCacheStrategy implements CacheStrategyInterface
                 $cacheObject
             );
 
-            if ($varyHeaders = $cacheObject->getVaryHeaders()) {
+            $varyHeaders = $cacheObject->getVaryHeaders();
+
+            if (!$varyHeaders->isEmpty()) {
                 // also store the cache against the vary headers based key
                 $success = $this->storage->save(
                     $this->getCacheKey($request, $varyHeaders),
