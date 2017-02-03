@@ -51,6 +51,10 @@ class ResponseCacheControlTest extends \PHPUnit_Framework_TestCase
                             ->withAddedHeader('Cache-Control', 'public')
                             ->withAddedHeader('Expires', gmdate('D, d M Y H:i:s T', time() + 2))
                     );
+              case '/no-headers':
+                    return new FulfilledPromise(
+                      (new Response())
+                    );
             }
 
             throw new \InvalidArgumentException();
@@ -117,4 +121,21 @@ class ResponseCacheControlTest extends \PHPUnit_Framework_TestCase
         $response = $this->client->get('http://test.com/2s-expires');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
+
+    /**
+     * Test responses with no caching headers.
+     *
+     * When neither a Cache-Control or Expires header is set, caching behaviour
+     * is undefined as per section 13.4 in RFC2616. The current behaviour is to
+     * not cache those requests.
+     *
+     * @see https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html
+     */
+    public function testWithMissingCacheHeaders()
+    {
+        $this->client->get('http://test.com/no-headers');
+        $response = $this->client->get('http://test.com/no-headers');
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+    }
+
 }
