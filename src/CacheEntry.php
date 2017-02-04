@@ -127,9 +127,7 @@ class CacheEntry
                 return false;
             }
 
-            $varyHeaders = new KeyValueHttpHeader($this->response->getHeader('Vary'));
-
-            foreach ($varyHeaders as $key => $value) {
+            foreach ($this->getVaryHeaders() as $key => $value) {
                 if (!$this->request->hasHeader($key)
                     && !$request->hasHeader($key)
                 ) {
@@ -147,6 +145,16 @@ class CacheEntry
         }
 
         return true;
+    }
+
+    /**
+     * Get the vary headers that should be honoured by the cache.
+     *
+     * @return KeyValueHttpHeader
+     */
+    public function getVaryHeaders()
+    {
+        return new KeyValueHttpHeader($this->response->getHeader('Vary'));
     }
 
     /**

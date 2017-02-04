@@ -113,16 +113,28 @@ class PrivateCacheStrategy implements CacheStrategyInterface
     }
 
     /**
-     * @param RequestInterface $request
+     * Generate a key for the response cache.
+     *
+     * @param RequestInterface   $request
+     * @param KeyValueHttpHeader $varyHeaders The vary headers which should be honoured by the cache (optional)
      *
      * @return string
      */
-    protected function getCacheKey(RequestInterface $request)
+    protected function getCacheKey(RequestInterface $request, KeyValueHttpHeader $varyHeaders = null)
     {
-        return hash(
-            'sha256',
-            $request->getMethod().$request->getUri()
-        );
+        if (!$varyHeaders) {
+            return hash('sha256', $request->getMethod().$request->getUri());
+        }
+
+        $cacheHeaders = [];
+
+        foreach ($varyHeaders as $key => $value) {
+            if ($request->hasHeader($key)) {
+                $cacheHeaders[$key] = $request->getHeader($key);
+            }
+        }
+
+        return hash('sha256', $request->getMethod().$request->getUri().json_encode($cacheHeaders));
     }
 
     /**
@@ -155,6 +167,17 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         $cache = $this->storage->fetch($this->getCacheKey($request));
         if ($cache !== null) {
+            $varyHeaders = $cache->getVaryHeaders();
+
+            // vary headers exist from a previous response, check if we have a cache that matches those headers
+            if (!$varyHeaders->isEmpty()) {
+                $cache = $this->storage->fetch($this->getCacheKey($request, $varyHeaders));
+
+                if (!$cache) {
+                    return null;
+                }
+            }
+
             if ((string)$cache->getOriginalRequest()->getUri() !== (string)$request->getUri()) {
                 return null;
             }
@@ -190,10 +213,23 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         $cacheObject = $this->getCacheObject($request, $response);
         if ($cacheObject !== null) {
-            return $this->storage->save(
+            // store the cache against the URI-only key
+            $success = $this->storage->save(
                 $this->getCacheKey($request),
                 $cacheObject
             );
+
+            $varyHeaders = $cacheObject->getVaryHeaders();
+
+            if (!$varyHeaders->isEmpty()) {
+                // also store the cache against the vary headers based key
+                $success = $this->storage->save(
+                    $this->getCacheKey($request, $varyHeaders),
+                    $cacheObject
+                );
+            }
+
+            return $success;
         }
 
         return false;
