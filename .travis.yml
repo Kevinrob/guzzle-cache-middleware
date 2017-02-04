@@ -19,6 +19,3 @@ script:
 cache:
   directories:
   - vendor
-
-script:
-  - vendor/bin/phpunit
