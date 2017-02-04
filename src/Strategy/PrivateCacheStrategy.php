@@ -116,7 +116,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
      * Generate a key for the response cache.
      *
      * @param RequestInterface   $request
-     * @param KeyValueHttpHeader $varyHeaders The vary headers which should be honoured by the cache (optional)
+     * @param null|KeyValueHttpHeader $varyHeaders The vary headers which should be honoured by the cache (optional)
      *
      * @return string
      */
