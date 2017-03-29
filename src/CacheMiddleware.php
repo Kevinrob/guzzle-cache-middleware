@@ -6,12 +6,12 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\Strategy\CacheStrategyInterface;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use function GuzzleHttp\Promise\rejection_for;
 
 /**
  * Class CacheMiddleware.
@@ -224,7 +224,7 @@ class CacheMiddleware
                         }
                     }
 
-                    return rejection_for($reason);
+                    return new RejectedPromise($reason);
                 }
             );
         };
