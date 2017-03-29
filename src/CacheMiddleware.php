@@ -11,6 +11,7 @@ use Kevinrob\GuzzleCache\Strategy\CacheStrategyInterface;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use function GuzzleHttp\Promise\rejection_for;
 
 /**
  * Class CacheMiddleware.
@@ -215,15 +216,15 @@ class CacheMiddleware
 
                     return self::addToCache($this->cacheStorage, $request, $response, $update);
                 },
-                function (\Exception $ex) use ($cacheEntry) {
-                    if ($ex instanceof TransferException) {
+                function ($reason) use ($cacheEntry) {
+                    if ($reason instanceof TransferException) {
                         $response = static::getStaleResponse($cacheEntry);
                         if ($response instanceof ResponseInterface) {
                             return $response;
                         }
                     }
 
-                    throw $ex;
+                    return rejection_for($reason);
                 }
             );
         };
