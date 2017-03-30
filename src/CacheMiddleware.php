@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\Strategy\CacheStrategyInterface;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
@@ -215,15 +216,15 @@ class CacheMiddleware
 
                     return self::addToCache($this->cacheStorage, $request, $response, $update);
                 },
-                function (\Exception $ex) use ($cacheEntry) {
-                    if ($ex instanceof TransferException) {
+                function ($reason) use ($cacheEntry) {
+                    if ($reason instanceof TransferException) {
                         $response = static::getStaleResponse($cacheEntry);
                         if ($response instanceof ResponseInterface) {
                             return $response;
                         }
                     }
 
-                    throw $ex;
+                    return new RejectedPromise($reason);
                 }
             );
         };
