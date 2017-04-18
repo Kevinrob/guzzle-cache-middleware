@@ -43,7 +43,7 @@ class LaravelCacheStorage implements CacheStorageInterface
     public function save($key, CacheEntry $data)
     {
         try {
-            // getTTL returns minutes, Laravel needs seconds
+            // getTTL returns seconds, Laravel needs minutes
             $lifeTime = $data->getTTL() / 60;
             if ($lifeTime === 0) {
                 return $this->cache->forever(
