@@ -170,3 +170,28 @@ $stack->push(
   'shared-cache'
 );
 ```
+
+## Greedy caching
+In some cases servers might send insufficient or no at all caching headers.
+Using the greedy caching strategy allows defining an expiry TTL on your own while
+disregarding any possibly present caching headers:
+```php
+[...]
+use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
+use Doctrine\Common\Cache\FilesystemCache;
+
+[...]
+// Greedy caching
+$stack->push(
+  new CacheMiddleware(
+    new GreedyCacheStrategy(
+      new DoctrineCacheStorage(
+        new FilesystemCache('/tmp/')
+      ),
+      1800 // the TTL in seconds
+    )
+  ), 
+  'greedy-cache'
+);
+```
