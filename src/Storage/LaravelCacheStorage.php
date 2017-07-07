@@ -47,7 +47,7 @@ class LaravelCacheStorage implements CacheStorageInterface
             $lifeTime = $data->getTTL() / 60;
             if ($lifeTime === 0) {
                 return $this->cache->forever(
-                    $key, 
+                    $key,
                     serialize($data)
                 );
             } else if ($lifeTime > 0) {
