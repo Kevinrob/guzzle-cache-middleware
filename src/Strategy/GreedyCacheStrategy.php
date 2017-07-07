@@ -33,7 +33,6 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
     {
         $this->ttl = $ttl;
         $this->varyHeaders = $varyHeaders;
-
         parent::__construct($cache);
     }
 
@@ -45,8 +44,8 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
                 'greedy'.$request->getMethod().$request->getUri()
             );
         }
-        $cacheHeaders = [];
 
+        $cacheHeaders = [];
         foreach ($varyHeaders as $key => $value) {
             if ($request->hasHeader($key)) {
                 $cacheHeaders[$key] = $request->getHeader($key);
@@ -70,9 +69,8 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
         $response = $response->withAddedHeader('Warning', $warningMessage);
 
         if ($cacheObject = $this->getCacheObject($request, $response)) {
-            $varyHeaders = $this->varyHeaders;
             return $this->storage->save(
-                $this->getCacheKey($request, $varyHeaders),
+                $this->getCacheKey($request, $this->varyHeaders),
                 $cacheObject
             );
         }
@@ -86,9 +84,8 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
             // Don't cache it
             return null;
         }
-        $varyHeader = $this->varyHeaders;
 
-        if (null !== $varyHeader && $varyHeader->has('*')) {
+        if (null !== $this->varyHeaders && $this->varyHeaders->has('*')) {
             // This will never match with a request
             return;
         }
