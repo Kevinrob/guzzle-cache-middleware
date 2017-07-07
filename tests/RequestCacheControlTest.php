@@ -1,11 +1,12 @@
 <?php
 
-namespace Kevinrob\GuzzleCache;
+namespace Kevinrob\GuzzleCache\Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Response;
+use Kevinrob\GuzzleCache\CacheMiddleware;
 use Psr\Http\Message\RequestInterface;
 
 class RequestCacheControlTest extends \PHPUnit_Framework_TestCase

@@ -6,9 +6,10 @@
  * Date: 19.07.2015
  * Time: 16:21.
  */
-namespace Kevinrob\GuzzleCache;
+namespace Kevinrob\GuzzleCache\Tests;
 
 use GuzzleHttp\Psr7\Response;
+use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 
 class KeyValueHttpHeaderTest extends \PHPUnit_Framework_TestCase
 {

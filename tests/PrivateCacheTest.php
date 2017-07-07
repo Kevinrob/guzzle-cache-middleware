@@ -1,6 +1,6 @@
 <?php
 
-namespace Kevinrob\GuzzleCache;
+namespace Kevinrob\GuzzleCache\Tests;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Doctrine\Common\Cache\ArrayCache;

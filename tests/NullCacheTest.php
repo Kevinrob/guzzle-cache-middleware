@@ -1,12 +1,13 @@
 <?php
 
-namespace Kevinrob\GuzzleCache;
+namespace Kevinrob\GuzzleCache\Tests;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\Strategy\NullCacheStrategy;
 use PHPUnit\Framework\TestCase;
 
