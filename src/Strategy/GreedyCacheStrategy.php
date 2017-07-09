@@ -24,18 +24,37 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
      */
     protected $ttl;
 
-    public function __construct(CacheStorageInterface $cache = null, $ttl)
+    /**
+     * @var KeyValueHttpHeader
+     */
+    private $varyHeaders;
+
+    public function __construct(CacheStorageInterface $cache = null, $ttl, KeyValueHttpHeader $varyHeaders = null)
     {
         $this->ttl = $ttl;
-
+        $this->varyHeaders = $varyHeaders;
         parent::__construct($cache);
     }
 
     protected function getCacheKey(RequestInterface $request, KeyValueHttpHeader $varyHeaders = null)
     {
+        if (null === $varyHeaders || $varyHeaders->isEmpty()) {
+            return hash(
+                'sha256',
+                'greedy'.$request->getMethod().$request->getUri()
+            );
+        }
+
+        $cacheHeaders = [];
+        foreach ($varyHeaders as $key => $value) {
+            if ($request->hasHeader($key)) {
+                $cacheHeaders[$key] = $request->getHeader($key);
+            }
+        }
+
         return hash(
             'sha256',
-            'greedy'.$request->getMethod().$request->getUri()
+            'greedy'.$request->getMethod().$request->getUri().json_encode($cacheHeaders)
         );
     }
 
@@ -51,7 +70,7 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
 
         if ($cacheObject = $this->getCacheObject($request, $response)) {
             return $this->storage->save(
-                $this->getCacheKey($request),
+                $this->getCacheKey($request, $this->varyHeaders),
                 $cacheObject
             );
         }
@@ -66,11 +85,18 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
             return null;
         }
 
+        if (null !== $this->varyHeaders && $this->varyHeaders->has('*')) {
+            // This will never match with a request
+            return;
+        }
+
+
         return new CacheEntry($request, $response, new \DateTime(sprintf('+%d seconds', $this->ttl)));
     }
 
     public function fetch(RequestInterface $request)
     {
-        return $this->storage->fetch($this->getCacheKey($request));
+        $cache = $this->storage->fetch($this->getCacheKey($request, $this->varyHeaders));
+        return $cache;
     }
 }

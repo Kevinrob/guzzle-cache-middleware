@@ -177,6 +177,7 @@ Using the greedy caching strategy allows defining an expiry TTL on your own whil
 disregarding any possibly present caching headers:
 ```php
 [...]
+use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Doctrine\Common\Cache\FilesystemCache;
@@ -189,7 +190,8 @@ $stack->push(
       new DoctrineCacheStorage(
         new FilesystemCache('/tmp/')
       ),
-      1800 // the TTL in seconds
+      1800, // the TTL in seconds
+      new KeyValueHttpHeader(['Authorization']) // Optionnal - specify the headers that can change the cache key
     )
   ), 
   'greedy-cache'
