@@ -17,6 +17,7 @@ A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Mid
 - [Laravel cache](https://laravel.com/docs/5.2/cache)
 - [Flysystem](https://github.com/thephpleague/flysystem)
 - [PSR6](https://github.com/php-fig/cache)
+- [WordPress Object Cache](https://codex.wordpress.org/Class_Reference/WP_Object_Cache)
 
 ## Installation
 
@@ -129,6 +130,24 @@ $stack->push(
       )
     )
   ), 
+  'cache'
+);
+```
+
+## WordPress Object Cache
+```php
+[...]
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\WordPressObjectCacheStorage;
+
+[...]
+
+$stack->push(
+  new CacheMiddleware(
+    new PrivateCacheStrategy(
+      new WordPressObjectCacheStorage()
+    )
+  ),
   'cache'
 );
 ```
