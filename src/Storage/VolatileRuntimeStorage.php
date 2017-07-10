@@ -41,5 +41,4 @@ class VolatileRuntimeStorage implements CacheStorageInterface
 
         return true;
     }
-
 }
