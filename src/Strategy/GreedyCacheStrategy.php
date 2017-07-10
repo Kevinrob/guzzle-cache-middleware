@@ -90,7 +90,7 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
             return;
         }
 
-
+        $response = $response->withoutHeader('Etag')->withoutHeader('Last-Modified');
         return new CacheEntry($request, $response, new \DateTime(sprintf('+%d seconds', $this->ttl)));
     }
 

@@ -47,6 +47,11 @@ class GreedyCacheTest extends \PHPUnit_Framework_TestCase
                         (new Response())
                             ->withStatus(206)
                     );
+                case '/with-etag':
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader('Etag', 'the-etag')
+                    );
             }
 
             throw new \InvalidArgumentException();
@@ -134,6 +139,7 @@ class GreedyCacheTest extends \PHPUnit_Framework_TestCase
             [new Request('GET', '/no-store')],
             [new Request('GET', '/no-cache')],
             [new Request('GET', '/pragma')],
+            [new Request('GET', '/with-etag')],
         ];
     }
 
