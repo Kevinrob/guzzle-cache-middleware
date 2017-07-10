@@ -216,3 +216,71 @@ $stack->push(
   'greedy-cache'
 );
 ```
+
+## Delegate caching
+Because your client may call different apps, on different domains, you may need to define which strategy is suitable to your requests.
+
+To solve this, all you have to do is to define a default cache strategy, and override it by implementing your own Request Matchers.
+
+Here's an example:
+```php
+namespace App\RequestMatcher;
+
+use Kevinrob\GuzzleCache\Strategy\Delegate\RequestMatcherInterface;
+use Psr\Http\Message\RequestInterface;
+
+class ExampleOrgRequestMatcher implements RequestMatcherInterface
+{
+
+    /**
+     * @inheritDoc
+     */
+    public function matches(RequestInterface $request)
+    {
+        return false !== strpos($request->getUri()->getHost(), 'example.org');
+    }
+}
+```
+
+```php
+namespace App\RequestMatcher;
+
+use Kevinrob\GuzzleCache\Strategy\Delegate\RequestMatcherInterface;
+use Psr\Http\Message\RequestInterface;
+
+class TwitterRequestMatcher implements RequestMatcherInterface
+{
+
+    /**
+     * @inheritDoc
+     */
+    public function matches(RequestInterface $request)
+    {
+        return false !== strpos($request->getUri()->getHost(), 'twitter.com');
+    }
+}
+```
+
+```php
+require_once __DIR__ . '/vendor/autoload.php';
+
+use App\RequestMatcher\ExampleOrgRequestMatcher;
+use App\RequestMatcher\TwitterRequestMatcher;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use Kevinrob\GuzzleCache\CacheMiddleware;
+use Kevinrob\GuzzleCache\Strategy;
+
+$strategy = new Strategy\Delegate\DelegatingCacheStrategy($defaultStrategy = new Strategy\NullCacheStrategy());
+$strategy->registerRequestMatcher(new ExampleOrgRequestMatcher(), new Strategy\PublicCacheStrategy());
+$strategy->registerRequestMatcher(new TwitterRequestMatcher(), new Strategy\PrivateCacheStrategy());
+
+$stack = HandlerStack::create();
+$stack->push(new CacheMiddleware($strategy));
+$guzzle = new Client(['handler' => $stack]);
+```
+
+With this example:
+* All requests to `example.org` will be handled by `PublicCacheStrategy`
+* All requests to `twitter.com` will be handled by `PrivateCacheStrategy`
+* All other requests won't be cached.

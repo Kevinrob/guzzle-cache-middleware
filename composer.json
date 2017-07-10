@@ -26,10 +26,13 @@
   },
   "autoload": {
     "psr-4": {
-      "Kevinrob\\GuzzleCache\\": ["src/", "tests/"]
+      "Kevinrob\\GuzzleCache\\": "src/"
     }
   },
   "autoload-dev": {
+    "psr-4": {
+      "Kevinrob\\GuzzleCache\\Tests\\": "tests/"
+    }
   },
   "suggest": {
     "guzzlehttp/guzzle": "For using this library. It was created for Guzzle6. (but you can use it with any PSR-7 HTTP Client)",

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kevinrob\GuzzleCache;
+namespace Kevinrob\GuzzleCache\Tests;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Doctrine\Common\Cache\ArrayCache;
@@ -13,6 +13,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\Storage\CompressedDoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
