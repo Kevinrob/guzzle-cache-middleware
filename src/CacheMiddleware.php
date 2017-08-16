@@ -218,7 +218,7 @@ class CacheMiddleware
                         $response = $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }
 
-                    return self::addToCache($this->cacheStorage, $request, $response, $update);
+                    return static::addToCache($this->cacheStorage, $request, $response, $update);
                 },
                 function ($reason) use ($cacheEntry) {
                     if ($reason instanceof TransferException) {
@@ -300,7 +300,7 @@ class CacheMiddleware
                         $update = true;
                     }
 
-                    self::addToCache($cacheStorage, $request, $response, $update);
+                    static::addToCache($cacheStorage, $request, $response, $update);
                 });
 
             return true;
