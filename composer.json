@@ -21,7 +21,7 @@
     "doctrine/cache": "^1.0",
     "league/flysystem": "^1.0",
     "psr/cache": "^1.0",
-    "cache/array-adapter": "^0.4",
+    "cache/array-adapter": "^0.4 || ^0.5 || ^1.0",
     "illuminate/cache": "^5.0"
   },
   "autoload": {
