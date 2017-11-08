@@ -18,6 +18,7 @@ use Kevinrob\GuzzleCache\Storage\CompressedDoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
 use Kevinrob\GuzzleCache\Storage\Psr6CacheStorage;
+use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Kevinrob\GuzzleCache\Strategy\PublicCacheStrategy;
 use League\Flysystem\Adapter\Local;
 use Psr\Http\Message\RequestInterface;
@@ -99,6 +100,7 @@ class PublicCacheTest extends \PHPUnit_Framework_TestCase
             new FlysystemStorage(new Local($TMP_DIR)),
             new Psr6CacheStorage(new ArrayCachePool()),
             new CompressedDoctrineCacheStorage(new ArrayCache()),
+            new VolatileRuntimeStorage(),
         ];
 
         $request = new Request('GET', 'test.local');
