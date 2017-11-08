@@ -32,4 +32,11 @@ interface CacheStrategyInterface
      * @return bool true if success
      */
     public function update(RequestInterface $request, ResponseInterface $response);
+
+    /**
+     * @param RequestInterface $request
+     *
+     * @return bool
+     */
+    public function delete(RequestInterface $request);
 }
