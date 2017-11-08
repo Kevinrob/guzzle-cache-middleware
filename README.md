@@ -287,3 +287,7 @@ With this example:
 
 ## Drupal
 See [Guzzle Cache](https://www.drupal.org/project/guzzle_cache) module.
+
+# Links that talk about the project
+- [Speeding Up APIs/Apps/Smart Toasters with HTTP Response Caching](https://blog.apisyouwonthate.com/speeding-up-apis-apps-smart-toasters-with-http-response-caching-a67becf829c6)
+- [Caching HTTP-Requests with Guzzle 6 and PSR-6](http://a.kabachnik.info/caching-http-requests-with-guzzle-6-and-psr-6.html)
