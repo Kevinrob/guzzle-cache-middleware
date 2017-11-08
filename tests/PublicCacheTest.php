@@ -108,6 +108,12 @@ class PublicCacheTest extends \PHPUnit_Framework_TestCase
             ],
             'Test content'
         );
+        $response2 = new Response(
+            200, [
+            'Cache-Control' => 'max-age=90',
+        ],
+            'Test new content'
+        );
 
         /** @var CacheProvider $cacheProvider */
         foreach ($cacheProviders as $cacheProvider) {
@@ -120,11 +126,23 @@ class PublicCacheTest extends \PHPUnit_Framework_TestCase
             $entry = $cache->fetch($request);
 
             $this->assertNotNull($entry);
-
             $this->assertEquals(
                 (string) $response->getBody(),
                 (string) $entry->getResponse()->getBody()
             );
+
+            $cache->update($request, $response2);
+            $entry = $cache->fetch($request);
+
+            $this->assertNotNull($entry);
+            $this->assertEquals(
+                (string) $response2->getBody(),
+                (string) $entry->getResponse()->getBody()
+            );
+
+            $cache->delete($request);
+            $entry = $cache->fetch($request);
+            $this->assertNull($entry);
         }
 
         $this->rrmdir($TMP_DIR);
