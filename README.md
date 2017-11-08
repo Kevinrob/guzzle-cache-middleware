@@ -284,3 +284,6 @@ With this example:
 * All requests to `example.org` will be handled by `PublicCacheStrategy`
 * All requests to `twitter.com` will be handled by `PrivateCacheStrategy`
 * All other requests won't be cached.
+
+## Drupal
+See [Guzzle Cache](https://www.drupal.org/project/guzzle_cache) module.
