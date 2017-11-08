@@ -245,4 +245,12 @@ class PrivateCacheStrategy implements CacheStrategyInterface
     {
         return $this->cache($request, $response);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(RequestInterface $request)
+    {
+        return $this->storage->delete($this->getCacheKey($request));
+    }
 }

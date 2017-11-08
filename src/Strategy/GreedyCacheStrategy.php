@@ -99,4 +99,12 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
         $cache = $this->storage->fetch($this->getCacheKey($request, $this->varyHeaders));
         return $cache;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(RequestInterface $request)
+    {
+        return $this->storage->delete($this->getCacheKey($request));
+    }
 }

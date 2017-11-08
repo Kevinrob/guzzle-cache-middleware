@@ -57,4 +57,18 @@ class CompressedDoctrineCacheStorage implements CacheStorageInterface
 
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete($key)
+    {
+        try {
+            return $this->cache->delete($key);
+        } catch (\Exception $ignored) {
+            // Don't fail if we can't delete it
+        }
+
+        return false;
+    }
 }

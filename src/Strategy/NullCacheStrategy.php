@@ -32,4 +32,12 @@ class NullCacheStrategy implements CacheStrategyInterface
     {
         return true;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(RequestInterface $request)
+    {
+        return true;
+    }
 }
