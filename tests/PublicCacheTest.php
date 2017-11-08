@@ -125,24 +125,26 @@ class PublicCacheTest extends \PHPUnit_Framework_TestCase
             $cache->cache($request, $response);
             $entry = $cache->fetch($request);
 
-            $this->assertNotNull($entry);
+            $this->assertNotNull($entry, get_class($cacheProvider));
             $this->assertEquals(
                 (string) $response->getBody(),
-                (string) $entry->getResponse()->getBody()
+                (string) $entry->getResponse()->getBody(),
+                get_class($cacheProvider)
             );
 
             $cache->update($request, $response2);
             $entry = $cache->fetch($request);
 
-            $this->assertNotNull($entry);
+            $this->assertNotNull($entry, get_class($cacheProvider));
             $this->assertEquals(
                 (string) $response2->getBody(),
-                (string) $entry->getResponse()->getBody()
+                (string) $entry->getResponse()->getBody(),
+                get_class($cacheProvider)
             );
 
             $cache->delete($request);
             $entry = $cache->fetch($request);
-            $this->assertNull($entry);
+            $this->assertNull($entry, get_class($cacheProvider));
         }
 
         $this->rrmdir($TMP_DIR);
