@@ -41,4 +41,20 @@ class VolatileRuntimeStorage implements CacheStorageInterface
 
         return true;
     }
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function delete($key)
+    {
+        if (true === array_key_exists($key, $this->cache)) {
+            unset($this->cache[$key]);
+
+            return true;
+        }
+
+        return false;
+    }
 }
