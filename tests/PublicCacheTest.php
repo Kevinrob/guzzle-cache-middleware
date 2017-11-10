@@ -3,6 +3,7 @@
 namespace Kevinrob\GuzzleCache\Tests;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
+use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\ChainCache;
@@ -100,7 +101,7 @@ class PublicCacheTest extends \PHPUnit_Framework_TestCase
             new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)),
             new FlysystemStorage(new Local($TMP_DIR)),
             new Psr6CacheStorage(new ArrayCachePool()),
-            new Psr16CacheStorage(new ArrayCachePool()),
+            new Psr16CacheStorage(new SimpleCacheBridge(new ArrayCachePool())),
             new CompressedDoctrineCacheStorage(new ArrayCache()),
             new VolatileRuntimeStorage(),
         ];
