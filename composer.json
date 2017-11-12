@@ -23,7 +23,7 @@
     "psr/cache": "^1.0",
     "cache/array-adapter": "^0.4 || ^0.5 || ^1.0",
     "illuminate/cache": "^5.0",
-    "cache/simple-cache-bridge": "^1.0"
+    "cache/simple-cache-bridge": "^0.1 || ^1.0"
   },
   "autoload": {
     "psr-4": {
