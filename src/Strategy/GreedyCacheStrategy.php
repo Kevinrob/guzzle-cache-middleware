@@ -96,7 +96,9 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
 
         $ttl = $this->defaultTtl;
         if ($request->hasHeader(self::HEADER_TTL)) {
-            $ttl = $request->getHeader(self::HEADER_TTL);
+            $ttlHeaderValues = $request->getHeader(self::HEADER_TTL);
+            $ttl = (int)reset($ttlHeaderValues);
+            unset($ttlHeaderValues);
         }
 
         return new CacheEntry($request->withoutHeader(self::HEADER_TTL), $response, new \DateTime(sprintf('+%d seconds', $ttl)));
