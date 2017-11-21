@@ -19,19 +19,21 @@ use Psr\Http\Message\ResponseInterface;
  */
 class GreedyCacheStrategy extends PrivateCacheStrategy
 {
+    const HEADER_TTL = 'X-Kevinrob-GuzzleCache-TTL';
+
     /**
      * @var int
      */
-    protected $ttl;
+    protected $defaultTtl;
 
     /**
      * @var KeyValueHttpHeader
      */
     private $varyHeaders;
 
-    public function __construct(CacheStorageInterface $cache = null, $ttl, KeyValueHttpHeader $varyHeaders = null)
+    public function __construct(CacheStorageInterface $cache = null, $defaultTtl, KeyValueHttpHeader $varyHeaders = null)
     {
-        $this->ttl = $ttl;
+        $this->defaultTtl = $defaultTtl;
         $this->varyHeaders = $varyHeaders;
         parent::__construct($cache);
     }
@@ -91,7 +93,14 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
         }
 
         $response = $response->withoutHeader('Etag')->withoutHeader('Last-Modified');
-        return new CacheEntry($request, $response, new \DateTime(sprintf('+%d seconds', $this->ttl)));
+
+        $ttl = $this->defaultTtl;
+        if ($request->hasHeader(self::HEADER_TTL)) {
+            $ttlHeaderValues = $request->getHeader(self::HEADER_TTL);
+            $ttl = (int)reset($ttlHeaderValues);
+        }
+
+        return new CacheEntry($request->withoutHeader(self::HEADER_TTL), $response, new \DateTime(sprintf('+%d seconds', $ttl)));
     }
 
     public function fetch(RequestInterface $request)
