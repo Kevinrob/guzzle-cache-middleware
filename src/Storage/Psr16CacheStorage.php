@@ -35,7 +35,7 @@ class Psr16CacheStorage implements CacheStorageInterface
      */
     public function save($key, CacheEntry $data)
     {
-        $this->cache->set($key, $data);
+        $this->cache->set($key, $data, $data->getTTL());
     }
 
     /**
