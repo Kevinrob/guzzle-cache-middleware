@@ -35,11 +35,11 @@ class Psr16CacheStorage implements CacheStorageInterface
      */
     public function save($key, CacheEntry $data)
     {
-      $ttl = $data->getTTL();
-      if ($ttl === 0) {
+        $ttl = $data->getTTL();
+        if ($ttl === 0) {
         return $this->cache->set($key, $data);
-      }
-      return $this->cache->set($key, $data, $data->getTTL());
+        }
+        return $this->cache->set($key, $data, $data->getTTL());
     }
 
     /**
