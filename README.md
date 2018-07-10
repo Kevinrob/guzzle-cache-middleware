@@ -11,7 +11,7 @@ A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Mid
 - Performance and transparency
 - Assured compatibility with PSR-7
 
-## Storage interfaces build-in
+## Built-in storage interfaces
 - [Doctrine cache](https://github.com/doctrine/cache)
 - [Laravel cache](https://laravel.com/docs/5.2/cache)
 - [Flysystem](https://github.com/thephpleague/flysystem)
@@ -22,7 +22,7 @@ A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Mid
 
 `composer require kevinrob/guzzle-cache-middleware`
 
-or add it the your `composer.json` and make a `composer update kevinrob/guzzle-cache-middleware`.
+or add it the your `composer.json` and run `composer update kevinrob/guzzle-cache-middleware`.
 
 # Why?
 Performance. It's very common to do some HTTP calls to an API for rendering a page and it takes times to do it.
@@ -68,7 +68,7 @@ $stack->push(
 );
 ```
 
-You can use `ChainCache` for using multiple `CacheProvider`. With that provider, you have to sort the different cache from the faster to the slower. Like that, you can have a very fast cache.
+You can use `ChainCache` for using multiple `CacheProvider` instances. With that provider, you have to sort the different caches from the faster to the slower. Like that, you can have a very fast cache.
 ```php
 [...]
 use Doctrine\Common\Cache\ChainCache;
@@ -190,7 +190,7 @@ $stack->push(
 ```
 
 ## Greedy caching
-In some cases servers might send insufficient or no at all caching headers.
+In some cases servers might send insufficient or no caching headers at all.
 Using the greedy caching strategy allows defining an expiry TTL on your own while
 disregarding any possibly present caching headers:
 ```php
