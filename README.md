@@ -45,6 +45,43 @@ $stack->push(new CacheMiddleware(), 'cache');
 $client = new Client(['handler' => $stack]);
 ```
 
+# Caching strategies
+
+## Public and private 
+Theses two strategies automatically respects `Cache-Control` headers containing:
+* `no-cache`, `no-store`: response won't be cached
+* `max-age`: response will be cached for the corresponding time
+It will also honor the `Expires` header will the corresponding TTL. 
+
+The `PublicCacheStrategy` won't cache responses with `Cache-Control` header containing `private`.
+
+## Greedy 
+In some cases servers might send insufficient or no caching headers at all.
+Using the greedy caching strategy allows defining an expiry TTL on your own while
+disregarding any possibly present caching headers:
+```php
+[...]
+use Kevinrob\GuzzleCache\KeyValueHttpHeader;
+use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
+use Doctrine\Common\Cache\FilesystemCache;
+
+[...]
+// Greedy caching
+$stack->push(
+  new CacheMiddleware(
+    new GreedyCacheStrategy(
+      new DoctrineCacheStorage(
+        new FilesystemCache('/tmp/')
+      ),
+      1800, // the TTL in seconds
+      new KeyValueHttpHeader(['Authorization']) // Optionnal - specify the headers that can change the cache key
+    )
+  ), 
+  'greedy-cache'
+);
+```
+
 # Examples
 
 ## Doctrine/Cache
@@ -186,33 +223,6 @@ $stack->push(
     )
   ), 
   'shared-cache'
-);
-```
-
-## Greedy caching
-In some cases servers might send insufficient or no caching headers at all.
-Using the greedy caching strategy allows defining an expiry TTL on your own while
-disregarding any possibly present caching headers:
-```php
-[...]
-use Kevinrob\GuzzleCache\KeyValueHttpHeader;
-use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
-use Doctrine\Common\Cache\FilesystemCache;
-
-[...]
-// Greedy caching
-$stack->push(
-  new CacheMiddleware(
-    new GreedyCacheStrategy(
-      new DoctrineCacheStorage(
-        new FilesystemCache('/tmp/')
-      ),
-      1800, // the TTL in seconds
-      new KeyValueHttpHeader(['Authorization']) // Optionnal - specify the headers that can change the cache key
-    )
-  ), 
-  'greedy-cache'
 );
 ```
 
