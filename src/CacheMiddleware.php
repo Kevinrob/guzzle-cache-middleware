@@ -19,6 +19,7 @@ use Psr\Http\Message\ResponseInterface;
 class CacheMiddleware
 {
     const HEADER_RE_VALIDATION = 'X-Kevinrob-GuzzleCache-ReValidation';
+    const HEADER_INVALIDATION = 'X-Kevinrob-GuzzleCache-Invalidation';
     const HEADER_CACHE_INFO = 'X-Kevinrob-Cache';
     const HEADER_CACHE_HIT = 'HIT';
     const HEADER_CACHE_MISS = 'MISS';
@@ -117,7 +118,7 @@ class CacheMiddleware
                 return $handler($request, $options)->then(
                     function (ResponseInterface $response) use ($request) {
                         // Invalidate cache after a call of non-safe method on the same URI
-                        $this->cacheStorage->delete($request);
+                        $response = $this->invalidateCache($request, $response);
 
                         return $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }
@@ -363,5 +364,19 @@ class CacheMiddleware
     public static function getMiddleware(CacheStrategyInterface $cacheStorage = null)
     {
         return new self($cacheStorage);
+    }
+
+    /**
+     * @param RequestInterface $request
+     *
+     * @param ResponseInterface $response
+     *
+     * @return ResponseInterface
+     */
+    private function invalidateCache(RequestInterface $request, ResponseInterface $response)
+    {
+        $this->cacheStorage->delete($request);
+
+        return $response->withHeader(self::HEADER_INVALIDATION, true);
     }
 }
