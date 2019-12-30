@@ -43,7 +43,7 @@ class LaravelCacheStorage implements CacheStorageInterface
     public function save($key, CacheEntry $data)
     {
         try {
-            if (app()->version() < '5.8.0') {
+            if (version_compare(app()->version(), '5.8.0') < 0) {
                 // getTTL returns seconds, Laravel needs minutes before v5.8
                 $lifeTime = $data->getTTL() / 60;
             } else {
