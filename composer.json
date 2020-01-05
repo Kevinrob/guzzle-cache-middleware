@@ -42,5 +42,8 @@
     "psr/cache": "To be used with Kevinrob\\GuzzleCache\\Storage\\Psr6CacheStorage",
     "psr/simple-cache": "To be used with Kevinrob\\GuzzleCache\\Storage\\Psr16CacheStorage",
     "laravel/framework": "To be used with Kevinrob\\GuzzleCache\\Storage\\LaravelCacheStorage"
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit"
   }
 }
