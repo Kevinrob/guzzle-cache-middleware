@@ -5,8 +5,16 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: ['5.6', '7.0', '7.1', '7.2', '7.3', '7.4']
     steps:
     - uses: actions/checkout@v1
+    
+    - name: Install PHP
+      uses: shivammathur/setup-php@1.7.0
+      with:
+        php-version: ${{ matrix.php-versions }}
 
     - name: Validate composer.json and composer.lock
       run: composer validate
