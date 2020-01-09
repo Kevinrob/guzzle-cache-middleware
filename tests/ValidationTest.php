@@ -8,6 +8,7 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use Psr\Http\Message\RequestInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,7 +16,7 @@ use Psr\Http\Message\RequestInterface;
  * Date: 30.06.2015
  * Time: 12:58.
  */
-class ValidationTest extends \PHPUnit_Framework_TestCase
+class ValidationTest extends TestCase
 {
     /**
      * @var Client
@@ -27,7 +28,7 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
      */
     protected $cache;
 
-    public function setUp()
+    protected function setUp()
     {
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {

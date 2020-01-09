@@ -9,15 +9,16 @@ use GuzzleHttp\Psr7\NoSeekStream;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use Psr\Http\Message\RequestInterface;
+use PHPUnit\Framework\TestCase;
 
-class BaseTest extends \PHPUnit_Framework_TestCase
+class BaseTest extends TestCase
 {
     /**
      * @var Client
      */
     protected $client;
 
-    public function setUp()
+    protected function setUp()
     {
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {

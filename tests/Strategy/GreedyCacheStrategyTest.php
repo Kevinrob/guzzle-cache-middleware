@@ -10,15 +10,16 @@ use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Psr\Http\Message\RequestInterface;
+use PHPUnit\Framework\TestCase;
 
-class GreedyCacheStrategyTest extends \PHPUnit_Framework_TestCase
+class GreedyCacheStrategyTest extends TestCase
 {
     /**
      * @var Client
      */
     protected $client;
 
-    public function setUp()
+    protected function setUp()
     {
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {

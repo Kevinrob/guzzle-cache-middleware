@@ -12,8 +12,9 @@ use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Psr\Http\Message\RequestInterface;
+use PHPUnit\Framework\TestCase;
 
-class GreedyCacheTest extends \PHPUnit_Framework_TestCase
+class GreedyCacheTest extends TestCase
 {
     /**
      * @var Client

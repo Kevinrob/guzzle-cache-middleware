@@ -24,15 +24,16 @@ use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Kevinrob\GuzzleCache\Strategy\PublicCacheStrategy;
 use League\Flysystem\Adapter\Local;
 use Psr\Http\Message\RequestInterface;
+use PHPUnit\Framework\TestCase;
 
-class PublicCacheTest extends \PHPUnit_Framework_TestCase
+class PublicCacheTest extends TestCase
 {
     /**
      * @var Client
      */
     protected $client;
 
-    public function setUp()
+    protected function setUp()
     {
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {
