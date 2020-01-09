@@ -8,15 +8,16 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use Psr\Http\Message\RequestInterface;
+use PHPUnit\Framework\TestCase;
 
-class RequestCacheControlTest extends \PHPUnit_Framework_TestCase
+class RequestCacheControlTest extends TestCase
 {
     /**
      * @var Client
      */
     protected $client;
 
-    public function setUp()
+    protected function setUp()
     {
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {

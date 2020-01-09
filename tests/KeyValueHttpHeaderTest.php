@@ -10,8 +10,9 @@ namespace Kevinrob\GuzzleCache\Tests;
 
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
+use PHPUnit\Framework\TestCase;
 
-class KeyValueHttpHeaderTest extends \PHPUnit_Framework_TestCase
+class KeyValueHttpHeaderTest extends TestCase
 {
     public function testBase()
     {

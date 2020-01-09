@@ -7,15 +7,16 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\CacheMiddleware;
+use PHPUnit\Framework\TestCase;
 
-class InvalidateCacheTest extends \PHPUnit_Framework_TestCase
+class InvalidateCacheTest extends TestCase
 {
     /**
      * @var Client
      */
     protected $client;
 
-    public function setUp()
+    protected function setUp()
     {
         // Create default HandlerStack
         $stack = HandlerStack::create(function () {

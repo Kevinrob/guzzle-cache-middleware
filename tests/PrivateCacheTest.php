@@ -19,8 +19,9 @@ use Kevinrob\GuzzleCache\Storage\Psr16CacheStorage;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use League\Flysystem\Adapter\Local;
+use PHPUnit\Framework\TestCase;
 
-class PrivateCacheTest extends \PHPUnit_Framework_TestCase
+class PrivateCacheTest extends TestCase
 {
     public function testCacheProvider()
     {
