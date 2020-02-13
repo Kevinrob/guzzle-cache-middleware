@@ -221,6 +221,12 @@ class CacheEntry
     }
 
     /**
+     * Time in seconds how long the entry should be kept in the cache
+     *
+     * This is not the TTL that a response is still fresh from the HTTP point
+     * of view, but an upper bound on how long it is necessary and reasonable to
+     * keep the response in a cache.
+     *
      * @return int TTL in seconds (0 = infinite)
      */
     public function getTTL()
@@ -244,7 +250,7 @@ class CacheEntry
 
         // Keep it until it become stale
         $ttl = max($ttl, $this->staleAt->getTimestamp() - time());
-        
+
         // Don't return 0, it's reserved for infinite TTL
         return $ttl !== 0 ? (int) $ttl : -1;
     }
