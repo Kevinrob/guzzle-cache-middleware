@@ -223,9 +223,9 @@ class CacheEntry
     /**
      * Time in seconds how long the entry should be kept in the cache
      *
-     * This is not the TTL that a response is still fresh from the HTTP point
-     * of view, but an upper bound on how long it is necessary and reasonable to
-     * keep the response in a cache.
+     * This will not give the time (in seconds) that the response will still be fresh for
+     * from the HTTP point of view, but an upper bound on how long it is necessary and
+     * reasonable to keep the response in a cache (to re-use it or re-validate it later on).
      *
      * @return int TTL in seconds (0 = infinite)
      */
