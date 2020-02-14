@@ -4,6 +4,9 @@
          colors="true"
          bootstrap="./vendor/autoload.php"
 >
+  <php>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
+  </php>
 
   <testsuites>
     <testsuite name="Project Test Suite">
