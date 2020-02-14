@@ -26,8 +26,8 @@ class CacheEntryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->request = $this->createMock(RequestInterface::class);
-        $this->response = $this->createMock(ResponseInterface::class);
+        $this->request = $this->getMockBuilder(RequestInterface::class)->getMock();
+        $this->response = $this->getMockBuilder(ResponseInterface::class)->getMock();
         $this->response->method('getHeader')->will($this->returnCallback(function ($header) {
             if (isset($this->responseHeaders[$header])) {
                 return $this->responseHeaders[$header];
