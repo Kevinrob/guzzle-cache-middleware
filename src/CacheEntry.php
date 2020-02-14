@@ -221,6 +221,12 @@ class CacheEntry
     }
 
     /**
+     * Time in seconds how long the entry should be kept in the cache
+     *
+     * This will not give the time (in seconds) that the response will still be fresh for
+     * from the HTTP point of view, but an upper bound on how long it is necessary and
+     * reasonable to keep the response in a cache (to re-use it or re-validate it later on).
+     *
      * @return int TTL in seconds (0 = infinite)
      */
     public function getTTL()
@@ -230,13 +236,20 @@ class CacheEntry
             return 0;
         }
 
+        $ttl = 0;
+
+        // Keep it when stale if error
         if ($this->staleIfErrorTo !== null) {
-            // Keep it when stale if error
-            $ttl = $this->staleIfErrorTo->getTimestamp() - time();
-        } else {
-            // Keep it until it become stale
-            $ttl = $this->staleAt->getTimestamp() - time();
+            $ttl = max($ttl, $this->staleIfErrorTo->getTimestamp() - time());
         }
+
+        // Keep it when stale-while-revalidate
+        if ($this->staleWhileRevalidateTo !== null) {
+            $ttl = max($ttl, $this->staleWhileRevalidateTo->getTimestamp() - time());
+        }
+
+        // Keep it until it become stale
+        $ttl = max($ttl, $this->staleAt->getTimestamp() - time());
 
         // Don't return 0, it's reserved for infinite TTL
         return $ttl !== 0 ? (int) $ttl : -1;
