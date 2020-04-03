@@ -209,7 +209,7 @@ $stack->push(
         new FilesystemCache('/tmp/')
       ),
       1800, // the TTL in seconds
-      new KeyValueHttpHeader(['Authorization']) // Optionnal - specify the headers that can change the cache key
+      new KeyValueHttpHeader(['Authorization']) // Optional - specify the headers that can change the cache key
     )
   ), 
   'greedy-cache'
