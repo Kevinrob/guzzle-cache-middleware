@@ -30,7 +30,7 @@ class ResponseCacheControlTest extends TestCase
                 case '/2s-complex':
                     return new FulfilledPromise(
                         (new Response())
-                            ->withAddedHeader('Cache-Control', 'invalid-token="yes", max-age=2, stale-while-revalidate=60')
+                            ->withAddedHeader('Cache-Control', 'invalid-token="yes", max-age=2, stale-while-revalidate=3')
                     );
                 case '/no-store':
                     return new FulfilledPromise(
@@ -90,6 +90,11 @@ class ResponseCacheControlTest extends TestCase
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
         sleep(3);
+
+        $response = $this->client->get('http://test.com/2s-complex');
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_STALE, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+
+        sleep(5);
 
         $response = $this->client->get('http://test.com/2s-complex');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
