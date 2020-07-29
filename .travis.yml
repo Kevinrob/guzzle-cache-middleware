@@ -18,7 +18,7 @@ jobs:
   fast_finish: true
 
 install:
-  - composer install -n
+  - travis_retry composer install -n
 
 script:
   - vendor/bin/phpunit
