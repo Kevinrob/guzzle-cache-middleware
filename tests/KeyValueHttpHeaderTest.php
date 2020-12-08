@@ -39,7 +39,7 @@ class KeyValueHttpHeaderTest extends TestCase
         $this->assertTrue($values->has('with-comma'));
         $this->assertTrue($values->has('yeah'));
 
-        $this->assertEquals(120, $values->get('max-age'));
+        $this->assertSame('120', $values->get('max-age'));
         $this->assertEquals(60, $values->get('stale-while-revalidate'));
         $this->assertEquals(0, $values->get('zero'));
         $this->assertEquals('', $values->get('nothing'));

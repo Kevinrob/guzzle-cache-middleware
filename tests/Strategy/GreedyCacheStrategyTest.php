@@ -1,6 +1,6 @@
 <?php
 
-namespace Kevinrob\GuzzleCache\Strategy;
+namespace Kevinrob\GuzzleCache\Tests\Strategy;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -8,6 +8,7 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\CacheMiddleware;
+use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Psr\Http\Message\RequestInterface;
 use PHPUnit\Framework\TestCase;
