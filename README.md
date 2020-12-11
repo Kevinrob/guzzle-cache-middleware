@@ -1,7 +1,7 @@
 # guzzle-cache-middleware
 
-[![Latest Stable Version](https://poser.pugx.org/kevinrob/guzzle-cache-middleware/v/stable)](https://packagist.org/packages/kevinrob/guzzle-cache-middleware) [![Total Downloads](https://poser.pugx.org/kevinrob/guzzle-cache-middleware/downloads)](https://packagist.org/packages/kevinrob/guzzle-cache-middleware) [![License](https://poser.pugx.org/kevinrob/guzzle-cache-middleware/license)](https://packagist.org/packages/kevinrob/guzzle-cache-middleware)  
-[![Build Status](https://travis-ci.org/Kevinrob/guzzle-cache-middleware.svg?branch=master)](https://travis-ci.org/Kevinrob/guzzle-cache-middleware) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802/mini.png)](https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802) [![Code Coverage](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master)  
+[![Latest Stable Version](https://poser.pugx.org/kevinrob/guzzle-cache-middleware/v/stable)](https://packagist.org/packages/kevinrob/guzzle-cache-middleware) [![Total Downloads](https://poser.pugx.org/kevinrob/guzzle-cache-middleware/downloads)](https://packagist.org/packages/kevinrob/guzzle-cache-middleware) [![License](https://poser.pugx.org/kevinrob/guzzle-cache-middleware/license)](https://packagist.org/packages/kevinrob/guzzle-cache-middleware)
+![Tests](https://github.com/Kevinrob/guzzle-cache-middleware/workflows/Tests/badge.svg) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802/mini.png)](https://insight.sensiolabs.com/projects/077ec9d6-9362-43be-83c9-cf1db2c9c802) [![Code Coverage](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master)
 
 
 A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Middleware to be added in the HandlerStack.
@@ -63,7 +63,7 @@ $stack->push(
         new FilesystemCache('/tmp/')
       )
     )
-  ), 
+  ),
   'cache'
 );
 ```
@@ -128,7 +128,7 @@ $stack->push(
         new Local('/path/to/cache')
       )
     )
-  ), 
+  ),
   'cache'
 );
 ```
@@ -170,7 +170,7 @@ $stack->push(
         new FilesystemCache('/tmp/')
       )
     )
-  ), 
+  ),
   'private-cache'
 );
 
@@ -184,7 +184,7 @@ $stack->push(
         )
       )
     )
-  ), 
+  ),
   'shared-cache'
 );
 ```
@@ -211,7 +211,7 @@ $stack->push(
       1800, // the TTL in seconds
       new KeyValueHttpHeader(['Authorization']) // Optional - specify the headers that can change the cache key
     )
-  ), 
+  ),
   'greedy-cache'
 );
 ```
