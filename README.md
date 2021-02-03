@@ -113,6 +113,9 @@ $stack->push(
 ```
 
 ## Flysystem
+
+for Flysystem 2 change `FlysystemStorage` to `Flysystem2Storage`
+
 ```php
 [...]
 use League\Flysystem\Adapter\Local;
