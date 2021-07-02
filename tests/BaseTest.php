@@ -25,14 +25,14 @@ class BaseTest extends TestCase
             if ($request->getUri()->getPath() === '/no-seek') {
                 return new FulfilledPromise(
                     (new Response())
-                        ->withBody(new NoSeekStream(\GuzzleHttp\Psr7\stream_for('I am not seekable!')))
+                        ->withBody(new NoSeekStream(\GuzzleHttp\Psr7\Utils::streamFor('I am not seekable!')))
                         ->withHeader('Expires', gmdate('D, d M Y H:i:s T', time() + 120))
                 );
             }
 
             return new FulfilledPromise(
                 (new Response())
-                    ->withBody(\GuzzleHttp\Psr7\stream_for('Hello world!'))
+                    ->withBody(\GuzzleHttp\Psr7\Utils::streamFor('Hello world!'))
                     ->withHeader('Expires', gmdate('D, d M Y H:i:s T', time() + 120))
             );
         });

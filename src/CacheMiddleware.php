@@ -255,7 +255,7 @@ class CacheMiddleware
         // If the body is not seekable, we have to replace it by a seekable one
         if (!$response->getBody()->isSeekable()) {
             $response = $response->withBody(
-                \GuzzleHttp\Psr7\stream_for($response->getBody()->getContents())
+                \GuzzleHttp\Psr7\Utils::streamFor($response->getBody()->getContents())
             );
         }
 
