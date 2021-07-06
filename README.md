@@ -114,7 +114,7 @@ $stack->push(
 
 ## Flysystem
 
-for Flysystem 1
+For Flysystem 1
 
 ```php
 [...]
@@ -136,7 +136,7 @@ $stack->push(
 );
 ```
 
-for Flysystem 2
+For Flysystem 2
 
 ```php
 [...]
