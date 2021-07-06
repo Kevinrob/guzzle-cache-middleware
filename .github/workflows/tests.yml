@@ -22,7 +22,7 @@ jobs:
       run: composer validate
 
     - name: Install dependencies
-      run: composer update --prefer-dist --no-progress --no-suggest ${{ matrix.composer-options }}
+      run: composer update --prefer-dist --no-progress ${{ matrix.composer-options }}
 
     - name: Run test suite
       run: composer run-script test
