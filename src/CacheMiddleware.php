@@ -153,25 +153,36 @@ class CacheMiddleware
                     return new FulfilledPromise(
                         $cacheEntry->getResponse()->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT)
                     );
-                } elseif ($staleResponse
-                    || ($maxStaleCache !== null && $cacheEntry->getStaleAge() <= $maxStaleCache)
-                ) {
-                    // Staled cache!
+                } elseif ($staleResponse || ($maxStaleCache !== null && $cacheEntry->getStaleAge() <= $maxStaleCache)) {
+                    /*
+                     * Client is willing to accept a response that has exceeded its freshness lifetime,
+                     * possibly by not more than $maxStaleCache (https://tools.ietf.org/html/rfc7234#section-5.2.1.2).
+                     *
+                     * Return the cached, stale response.
+                     */
                     return new FulfilledPromise(
                         $cacheEntry->getResponse()->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_HIT)
+                    );
+                } elseif ($cacheEntry->staleWhileValidate() && ($maxStaleCache === null || $cacheEntry->getStaleAge() <= $maxStaleCache)) {
+                    /*
+                     * The cached response indicated that it may be served stale while background revalidation (or fetch)
+                     * occurs, and the client did not limit maximum staleness. (https://tools.ietf.org/html/rfc5861#section-3)
+                     *
+                     * Return the cached, stale response; initiate deferred revalidation/re-fetch.
+                     */
+                    static::addReValidationRequest(
+                        static::getRequestWithReValidationHeader($request, $cacheEntry),
+                        $this->cacheStorage,
+                        $cacheEntry
+                    );
+
+                    return new FulfilledPromise(
+                        $cacheEntry->getResponse()
+                            ->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_STALE)
                     );
                 } elseif ($cacheEntry->hasValidationInformation() && !$onlyFromCache) {
                     // Re-validation header
                     $request = static::getRequestWithReValidationHeader($request, $cacheEntry);
-
-                    if ($cacheEntry->staleWhileValidate()) {
-                        static::addReValidationRequest($request, $this->cacheStorage, $cacheEntry);
-
-                        return new FulfilledPromise(
-                            $cacheEntry->getResponse()
-                                ->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_STALE)
-                        );
-                    }
                 }
             } else {
                 $cacheEntry = null;
