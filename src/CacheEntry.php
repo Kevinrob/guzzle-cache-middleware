@@ -280,7 +280,7 @@ class CacheEntry
         if ($this->response !== null) {
             $this->response = $this->response
                 ->withBody(
-                    \GuzzleHttp\Psr7\stream_for($this->responseBody)
+                    \GuzzleHttp\Psr7\Utils::streamFor($this->responseBody)
                 );
         }
     }
