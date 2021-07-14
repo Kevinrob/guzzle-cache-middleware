@@ -18,11 +18,13 @@ use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\Storage\CompressedDoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
+use Kevinrob\GuzzleCache\Storage\Flysystem2Storage;
 use Kevinrob\GuzzleCache\Storage\Psr6CacheStorage;
 use Kevinrob\GuzzleCache\Storage\Psr16CacheStorage;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Kevinrob\GuzzleCache\Strategy\PublicCacheStrategy;
 use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use Psr\Http\Message\RequestInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -101,6 +103,7 @@ class PublicCacheTest extends TestCase
             new DoctrineCacheStorage(new FilesystemCache($TMP_DIR)),
             new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)),
             new FlysystemStorage(new Local($TMP_DIR)),
+            new Flysystem2Storage(new LocalFilesystemAdapter($TMP_DIR)),
             new Psr6CacheStorage(new ArrayCachePool()),
             new Psr16CacheStorage(new SimpleCacheBridge(new ArrayCachePool())),
             new CompressedDoctrineCacheStorage(new ArrayCache()),
