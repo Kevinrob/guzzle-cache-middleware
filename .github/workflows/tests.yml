@@ -8,9 +8,10 @@ jobs:
     strategy:
       matrix:
         php-versions: ['5.6', '7.0', '7.1', '7.2', '7.3', '7.4']
+        flysystem-constraints: ['^1', '^2']
     steps:
     - uses: actions/checkout@v2
-    
+
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
@@ -22,6 +23,9 @@ jobs:
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
+
+    - name: Change Flysystem major version
+      run: composer require league/flysystem:${{ matrix.flysystem-constraints }}
 
     - name: Run test suite
       run: composer run-script test

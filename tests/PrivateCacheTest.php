@@ -34,8 +34,9 @@ class PrivateCacheTest extends TestCase
             new DoctrineCacheStorage(new ChainCache([new ArrayCache()])),
             new DoctrineCacheStorage(new FilesystemCache($TMP_DIR)),
             new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)),
-            new FlysystemStorage(new Local($TMP_DIR)),
-            new Flysystem2Storage(new LocalFilesystemAdapter($TMP_DIR)),
+            class_exists(LocalFilesystemAdapter::class)
+                ? new Flysystem2Storage(new LocalFilesystemAdapter($TMP_DIR))
+                : new FlysystemStorage(new Local($TMP_DIR)),
             new Psr6CacheStorage(new ArrayCachePool()),
             new Psr16CacheStorage(new SimpleCacheBridge(new ArrayCachePool())),
             new CompressedDoctrineCacheStorage(new ArrayCache()),
