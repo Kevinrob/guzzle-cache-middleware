@@ -40,15 +40,6 @@ class CacheEntryTest extends \PHPUnit_Framework_TestCase
         }));
     }
 
-    public function testTtlForValidateableResponseShouldBeInfinite()
-    {
-        $this->setResponseHeader('Etag', 'some-etag');
-        $cacheEntry = new CacheEntry($this->request, $this->response, $this->makeDateTimeOffset());
-
-        // getTTL() will return 0 to indicate "infinite"
-        $this->assertEquals(0, $cacheEntry->getTTL());
-    }
-
     public function testTtlForSimpleExpiration()
     {
         $cacheEntry = new CacheEntry($this->request, $this->response, $this->makeDateTimeOffset(10));

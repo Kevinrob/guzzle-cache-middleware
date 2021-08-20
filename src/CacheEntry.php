@@ -231,10 +231,6 @@ class CacheEntry
      */
     public function getTTL()
     {
-        if ($this->hasValidationInformation()) {
-            // No TTL if we have a way to re-validate the cache
-            return 0;
-        }
 
         $ttl = 0;
 
