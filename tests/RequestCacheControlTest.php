@@ -17,7 +17,7 @@ class RequestCacheControlTest extends TestCase
      */
     protected $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {
@@ -111,7 +111,7 @@ class RequestCacheControlTest extends TestCase
             $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
         );
 
-        $this->setExpectedException('GuzzleHttp\Exception\ServerException', '504');
+        $this->expectException('GuzzleHttp\Exception\ServerException', '504');
         $this->client->get('http://test.com/only-if-cached', [
             'headers' => [
                 'Cache-Control' => 'only-if-cached',

@@ -3,13 +3,14 @@
 namespace Kevinrob\GuzzleCache\Tests;
 
 use Kevinrob\GuzzleCache\CacheEntry;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * @group time-sensitive
  */
-class CacheEntryTest extends \PHPUnit_Framework_TestCase
+class CacheEntryTest extends TestCase
 {
     /**
      * @var RequestInterface
@@ -23,7 +24,7 @@ class CacheEntryTest extends \PHPUnit_Framework_TestCase
 
     private $responseHeaders = [];
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->request = $this->getMockBuilder(RequestInterface::class)->getMock();

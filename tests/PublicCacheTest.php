@@ -33,7 +33,7 @@ class PublicCacheTest extends TestCase
      */
     protected $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {

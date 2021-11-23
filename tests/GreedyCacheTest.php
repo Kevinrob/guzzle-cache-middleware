@@ -21,7 +21,7 @@ class GreedyCacheTest extends TestCase
      */
     private $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {
             switch ($request->getUri()->getPath()) {

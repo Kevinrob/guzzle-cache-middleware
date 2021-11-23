@@ -28,7 +28,7 @@ class HeaderExpireTest extends TestCase
      */
     protected $sendError = false;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {

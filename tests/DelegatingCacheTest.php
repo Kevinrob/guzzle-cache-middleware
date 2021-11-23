@@ -28,7 +28,7 @@ class DelegatingCacheTest extends TestCase
      */
     protected $stack;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // Create default HandlerStack
         $this->stack = HandlerStack::create(function (RequestInterface $request, array $options) {
