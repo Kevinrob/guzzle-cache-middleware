@@ -4,7 +4,7 @@
 ![Tests](https://github.com/Kevinrob/guzzle-cache-middleware/workflows/Tests/badge.svg) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master) [![Code Coverage](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master)
 
 
-A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6. It's a simple Middleware to be added in the HandlerStack.
+A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6+. It's a simple Middleware to be added in the HandlerStack.
 
 ## Goals
 - RFC 7234 compliance
@@ -28,7 +28,7 @@ or add it the your `composer.json` and run `composer update kevinrob/guzzle-cach
 Performance. It's very common to do some HTTP calls to an API for rendering a page and it takes times to do it.
 
 # How?
-With a simple Middleware added at the top of the `HandlerStack` of Guzzle6.
+With a simple Middleware added at the top of the `HandlerStack` of Guzzle.
 
 ```php
 use GuzzleHttp\Client;
