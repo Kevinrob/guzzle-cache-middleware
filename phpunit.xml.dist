@@ -1,31 +1,27 @@
+<?xml version="1.0"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="./vendor/autoload.php"
->
+         bootstrap="./vendor/autoload.php">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <report>
+      <clover outputFile="coverage.xml"/>
+    </report>
+  </coverage>
   <php>
-    <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0" />
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="max[self]=0"/>
   </php>
-
   <testsuites>
     <testsuite name="Project Test Suite">
       <directory>tests</directory>
     </testsuite>
   </testsuites>
-
-  <filter>
-    <whitelist processUncoveredFilesFromWhitelist="true">
-      <directory suffix=".php">src</directory>
-    </whitelist>
-  </filter>
-
-  <logging>
-    <log type="coverage-clover" target="coverage.xml"/>
-  </logging>
-
+  <logging/>
   <listeners>
     <listener class="\Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
   </listeners>
-
 </phpunit>

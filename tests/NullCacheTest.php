@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class NullCacheTest extends TestCase
 {
-
     public function testCacheIsNeverHit()
     {
         $stack = HandlerStack::create(new MockHandler([
@@ -33,5 +32,4 @@ class NullCacheTest extends TestCase
 
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
-
 }
