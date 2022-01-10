@@ -75,8 +75,8 @@ class KeyValueHttpHeader implements \Iterator
      * @link http://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      * @since 5.0.0
-     * #[\ReturnTypeWillChange]
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         return current($this->values);
@@ -98,8 +98,9 @@ class KeyValueHttpHeader implements \Iterator
      * @link http://php.net/manual/en/iterator.key.php
      * @return mixed scalar on success, or null on failure.
      * @since 5.0.0
-     * #[\ReturnTypeWillChange]
+     *
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return key($this->values);
