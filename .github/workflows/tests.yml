@@ -7,10 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['5.6', '7.0', '7.1', '7.2', '7.3', '7.4']
+        php-versions: ['5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1']
+        dependencies:
+          - "lowest"
+          - "highest"
     steps:
     - uses: actions/checkout@v2
-    
+
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
@@ -20,8 +23,10 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: composer validate
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+    - name: "Composer install ${{ matrix.dependencies }} dependencies"
+      uses: "ramsey/composer-install@v1"
+      with:
+        dependency-versions: "${{ matrix.dependencies }}"
 
     - name: Run test suite
       run: composer run-script test
