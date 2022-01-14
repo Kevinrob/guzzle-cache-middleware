@@ -5,12 +5,12 @@ namespace Kevinrob\GuzzleCache\Tests;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\FilesystemCache;
 use Doctrine\Common\Cache\PhpFileCache;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Kevinrob\GuzzleCache\Storage\CompressedDoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
@@ -23,22 +23,14 @@ use PHPUnit\Framework\TestCase;
 
 class PrivateCacheTest extends TestCase
 {
-    public function testCacheProvider()
+    /**
+     * @param CacheStorageInterface $cacheProvider
+     * @param $TMP_DIR
+     * @return void
+     * @dataProvider cacheProvider
+     */
+    public function testCacheProvider(CacheStorageInterface $cacheProvider, $TMP_DIR = null)
     {
-        $TMP_DIR = __DIR__.'/tmp/';
-
-        $cacheProviders = [
-            new DoctrineCacheStorage(new ArrayCache()),
-            new DoctrineCacheStorage(new ChainCache([new ArrayCache()])),
-            new DoctrineCacheStorage(new FilesystemCache($TMP_DIR)),
-            new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)),
-            new FlysystemStorage(new Local($TMP_DIR)),
-            new Psr6CacheStorage(new ArrayCachePool()),
-            new Psr16CacheStorage(new SimpleCacheBridge(new ArrayCachePool())),
-            new CompressedDoctrineCacheStorage(new ArrayCache()),
-            new VolatileRuntimeStorage(),
-        ];
-
         $request = new Request('GET', 'test.local');
         $response = new Response(
             200, [
@@ -53,39 +45,56 @@ class PrivateCacheTest extends TestCase
             'Test new content'
         );
 
-        /** @var CacheProvider $cacheProvider */
-        foreach ($cacheProviders as $cacheProvider) {
+        if ($TMP_DIR !== null) {
             $this->rrmdir($TMP_DIR);
-
-            $cache = new PrivateCacheStrategy(
-                $cacheProvider
-            );
-            $cache->cache($request, $response);
-            $entry = $cache->fetch($request);
-
-            $this->assertNotNull($entry, get_class($cacheProvider));
-            $this->assertEquals(
-                (string) $response->getBody(),
-                (string) $entry->getResponse()->getBody(),
-                get_class($cacheProvider)
-            );
-
-            $cache->update($request, $response2);
-            $entry = $cache->fetch($request);
-
-            $this->assertNotNull($entry, get_class($cacheProvider));
-            $this->assertEquals(
-                (string) $response2->getBody(),
-                (string) $entry->getResponse()->getBody(),
-                get_class($cacheProvider)
-            );
-
-            $cache->delete($request);
-            $entry = $cache->fetch($request);
-            $this->assertNull($entry, get_class($cacheProvider));
         }
 
-        $this->rrmdir($TMP_DIR);
+        $cache = new PrivateCacheStrategy(
+            $cacheProvider
+        );
+        $cache->cache($request, $response);
+        $entry = $cache->fetch($request);
+
+        $this->assertNotNull($entry, get_class($cacheProvider));
+        $this->assertEquals(
+            (string) $response->getBody(),
+            (string) $entry->getResponse()->getBody(),
+            get_class($cacheProvider)
+        );
+
+        $cache->update($request, $response2);
+        $entry = $cache->fetch($request);
+
+        $this->assertNotNull($entry, get_class($cacheProvider));
+        $this->assertEquals(
+            (string) $response2->getBody(),
+            (string) $entry->getResponse()->getBody(),
+            get_class($cacheProvider)
+        );
+
+        $cache->delete($request);
+        $entry = $cache->fetch($request);
+        $this->assertNull($entry, get_class($cacheProvider));
+
+        if ($TMP_DIR !== null) {
+            $this->rrmdir($TMP_DIR);
+        }
+    }
+
+    public function cacheProvider()
+    {
+        $TMP_DIR = __DIR__.'/tmp/';
+        return [
+            'doctrine.arraycache' => [ new DoctrineCacheStorage(new ArrayCache()) ],
+            'doctrine.chaincache' => [ new DoctrineCacheStorage(new ChainCache([new ArrayCache()])) ],
+            'doctrine.filesystem' => [ new DoctrineCacheStorage(new FilesystemCache($TMP_DIR)), $TMP_DIR ],
+            'doctrine.phpfile' => [ new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)), $TMP_DIR ],
+            'flysystem' => [ new FlysystemStorage(new Local($TMP_DIR)), $TMP_DIR ],
+            'psr6' => [ new Psr6CacheStorage(new ArrayCachePool()) ],
+            'psr16' => [ new Psr16CacheStorage(new SimpleCacheBridge(new ArrayCachePool())) ],
+            'compressedDoctrineStorage' => [ new CompressedDoctrineCacheStorage(new ArrayCache()) ],
+            'volatileruntimeStorage' => [ new VolatileRuntimeStorage() ]
+        ];
     }
 
     /**
