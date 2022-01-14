@@ -113,6 +113,9 @@ $stack->push(
 ```
 
 ## Flysystem
+
+For Flysystem 1
+
 ```php
 [...]
 use League\Flysystem\Adapter\Local;
@@ -126,6 +129,28 @@ $stack->push(
     new PrivateCacheStrategy(
       new FlysystemStorage(
         new Local('/path/to/cache')
+      )
+    )
+  ),
+  'cache'
+);
+```
+
+For Flysystem 2
+
+```php
+[...]
+use League\Flysystem\Local\LocalFilesystemAdapter;
+use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\Flysystem2Storage;
+
+[...]
+
+$stack->push(
+  new CacheMiddleware(
+    new PrivateCacheStrategy(
+      new Flysystem2Storage(
+        new LocalFilesystemAdapter('/path/to/cache')
       )
     )
   ),
