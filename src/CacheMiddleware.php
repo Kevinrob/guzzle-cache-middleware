@@ -49,6 +49,13 @@ class CacheMiddleware
      */
     protected $httpMethods = ['GET' => true];
 
+    /** 
+     * List of unsafe methods, 
+     * 
+     * @var array
+     */
+    protected $unsafeMethods = ['POST', 'DELETE', 'PUT'];
+
     /**
      * @param CacheStrategyInterface|null $cacheStrategy
      */
@@ -113,12 +120,15 @@ class CacheMiddleware
     {
         return function (RequestInterface $request, array $options) use (&$handler) {
             if (!isset($this->httpMethods[strtoupper($request->getMethod())])) {
-                // No caching for this method allowed
+            // No caching for this method allowed
 
-                return $handler($request, $options)->then(
-                    function (ResponseInterface $response) use ($request) {
-                        // Invalidate cache after a call of non-safe method on the same URI
-                        $response = $this->invalidateCache($request, $response);
+            
+            return $handler($request, $options)->then(
+                function (ResponseInterface $response) use ($request) {
+                        if (in_array($request->getMethod(), $this->unsafeMethods)) {
+                            // Invalidate cache after a call of non-safe method on the same URI
+                            $response = $this->invalidateCache($request, $response);
+                        }
 
                         return $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }

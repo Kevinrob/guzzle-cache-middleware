@@ -26,7 +26,6 @@ class InvalidateCacheTest extends TestCase
 
     protected function setUp(): void
     {
-        // Create default HandlerStack
         $stack = HandlerStack::create(function () {
             return new FulfilledPromise(new Response(200, [
                 'Cache-Control' => 'private, max-age=300'
@@ -37,47 +36,63 @@ class InvalidateCacheTest extends TestCase
             new Psr6CacheStorage(new ArrayCachePool()),
         ));
 
-        // Add this middleware to the top with `push`
         $stack->push($this->middelware, 'cache');
 
-        // Initialize the client with the handler option
         $this->client = new Client(['handler' => $stack]);
     }
 
-    public function testInvalidationCacheIfNotValidHttpMethod()
-    {
-        $response = $this->client->get('anything');
-        $this->assertSame('', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
-
-        $response = $this->client->post('anything');
-        $this->assertSame('1', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
-
-        $response = $this->client->put('anything');
-        $this->assertSame('1', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
-
-        $response = $this->client->delete('anything');
-        $this->assertSame('1', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
-
-        $response = $this->client->patch('anything');
-        $this->assertSame('1', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
-    }
-
-    public function testItInvalidatesForAllHttpMethods()
+    /**
+     * @dataProvider unsafeMethods
+     */
+    public function testItInvalidatesForUnsafeHttpMethods($unsafeMethod)
     {
         $this->middelware->setHttpMethods([
             'GET' => true,
-            'POST' => true,
+            'HEAD' => true,
         ]);
 
-        $this->client->get('anything');
-        $this->client->post('anything');
+        $this->client->get('resource');
+        $this->client->head('resource');
 
-        $response = $this->client->delete('anything');
+        $response = $this->client->{$unsafeMethod}('resource');
         $this->assertSame('1', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
 
-        $response = $this->client->get('anything');
+        $response = $this->client->get('resource');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine('X-Kevinrob-Cache'));
-        $response = $this->client->post('anything');
+
+        $response = $this->client->head('resource');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine('X-Kevinrob-Cache'));
+    }
+
+    /**
+     * @dataProvider safeMethods
+     */
+    public function testItDoesInvalidatesForSafeHttpMethods($safeMethod)
+    {
+        $this->client->get('resource');
+
+        $response = $this->client->{$safeMethod}('resource');
+        $this->assertSame('', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
+
+        $response = $this->client->get('resource');
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine('X-Kevinrob-Cache'));
+    }
+
+    public function unsafeMethods()
+    {
+        return [
+            'delete' => ['delete'],
+            'put' => ['put'],
+            'post' => ['post'],
+        ];
+    }
+
+    public function safemethods()
+    {
+        return [
+            'options' => ['options'],
+            'trace' => ['trace'],
+            'head' => ['head'],
+        ];
     }
 }
