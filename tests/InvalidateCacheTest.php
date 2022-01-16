@@ -67,7 +67,7 @@ class InvalidateCacheTest extends TestCase
     /**
      * @dataProvider safeMethods
      */
-    public function testItDoesInvalidatesForSafeHttpMethods($safeMethod)
+    public function testItDoesNotInvalidateForSafeHttpMethods($safeMethod)
     {
         $this->client->get('resource');
 
