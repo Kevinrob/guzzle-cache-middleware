@@ -377,6 +377,10 @@ class CacheMiddleware
     {
         $this->cacheStorage->delete($request);
 
+        foreach (array_diff(array_keys($this->httpMethods), [$request->getMethod()]) as $method) {
+            $this->cacheStorage->delete($request->withMethod($method));
+        }
+
         return $response->withHeader(self::HEADER_INVALIDATION, true);
     }
 }
