@@ -122,16 +122,16 @@ class CacheMiddleware
             if (!isset($this->httpMethods[strtoupper($request->getMethod())])) {
                 // No caching for this method allowed
 
-                return $handler($request, $options)->then(
+                return $handler($request, $options)->then(  
                     function (ResponseInterface $response) use ($request) {
-                            if (in_array($request->getMethod(), $this->unsafeMethods)) {
-                                // Invalidate cache after a call of non-safe method on the same URI
-                                $response = $this->invalidateCache($request, $response);
-                            }
-
-                            return $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
+                        if (in_array($request->getMethod(), $this->unsafeMethods)) {
+                            // Invalidate cache after a call of non-safe method on the same URI
+                            $response = $this->invalidateCache($request, $response);
                         }
-                    );
+
+                        return $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
+                    }
+                );
             }
 
             if ($request->hasHeader(self::HEADER_RE_VALIDATION)) {
