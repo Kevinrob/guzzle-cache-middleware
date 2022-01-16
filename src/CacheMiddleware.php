@@ -50,11 +50,13 @@ class CacheMiddleware
     protected $httpMethods = ['GET' => true];
 
     /** 
-     * List of unsafe methods, 
+     * List of safe methods
+     * 
+     * https://datatracker.ietf.org/doc/html/rfc7231#section-4.2.1
      * 
      * @var array
      */
-    protected $unsafeMethods = ['POST', 'DELETE', 'PUT'];
+    protected $safeMethods = ['GET', 'HEAD', 'OPTIONS', 'TRACE'];
 
     /**
      * @param CacheStrategyInterface|null $cacheStrategy
@@ -103,19 +105,6 @@ class CacheMiddleware
         return $this->httpMethods;
     }
 
-    /** 
-     * @param array $unsafeMethods
-     */
-    public function setUnsafeMethods(array $unsafeMethods)
-    {
-        $this->unsafeMethods = $unsafeMethods;
-    }
-
-    public function getUnsafeMethods()
-    {
-        return $this->unsafeMethods;
-    }
-
     /**
      * Will be called at the end of the script.
      */
@@ -137,7 +126,7 @@ class CacheMiddleware
 
                 return $handler($request, $options)->then(  
                     function (ResponseInterface $response) use ($request) {
-                        if (in_array($request->getMethod(), $this->unsafeMethods)) {
+                        if (!in_array($request->getMethod(), $this->safeMethods)) {
                             // Invalidate cache after a call of non-safe method on the same URI
                             $response = $this->invalidateCache($request, $response);
                         }

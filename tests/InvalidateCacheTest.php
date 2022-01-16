@@ -78,19 +78,6 @@ class InvalidateCacheTest extends TestCase
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine('X-Kevinrob-Cache'));
     }
 
-    public function testItAllowsConfiguringUnsafeMethods()
-    {
-        $this->middelware->setUnsafeMethods(['HEAD']);
-
-        $this->client->get('resource');
-
-        $response = $this->client->head('resource');
-        $this->assertSame('1', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
-
-        $response = $this->client->get('resource');
-        $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine('X-Kevinrob-Cache'));
-    }
-
     public function unsafeMethods()
     {
         return [
@@ -103,6 +90,7 @@ class InvalidateCacheTest extends TestCase
     public function safemethods()
     {
         return [
+            'get' => ['get'],
             'options' => ['options'],
             'trace' => ['trace'],
             'head' => ['head'],
