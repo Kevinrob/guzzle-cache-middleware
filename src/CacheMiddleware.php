@@ -103,6 +103,19 @@ class CacheMiddleware
         return $this->httpMethods;
     }
 
+    /** 
+     * @param array $unsafeMethods
+     */
+    public function setUnsafeMethods(array $unsafeMethods)
+    {
+        $this->unsafeMethods = $unsafeMethods;
+    }
+
+    public function getUnsafeMethods()
+    {
+        return $this->unsafeMethods;
+    }
+
     /**
      * Will be called at the end of the script.
      */
