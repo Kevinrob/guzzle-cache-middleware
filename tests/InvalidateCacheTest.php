@@ -22,7 +22,7 @@ class InvalidateCacheTest extends TestCase
     /**
      * @var CacheMiddleware
      */
-    protected $middelware;
+    protected $middleware;
 
     protected function setUp(): void
     {
@@ -32,11 +32,11 @@ class InvalidateCacheTest extends TestCase
             ]));
         });
 
-        $this->middelware = new CacheMiddleware(new PrivateCacheStrategy(
+        $this->middleware = new CacheMiddleware(new PrivateCacheStrategy(
             new Psr6CacheStorage(new ArrayCachePool()),
         ));
 
-        $stack->push($this->middelware, 'cache');
+        $stack->push($this->middleware, 'cache');
 
         $this->client = new Client(['handler' => $stack]);
     }
@@ -46,7 +46,7 @@ class InvalidateCacheTest extends TestCase
      */
     public function testItInvalidatesForUnsafeHttpMethods($unsafeMethod)
     {
-        $this->middelware->setHttpMethods([
+        $this->middleware->setHttpMethods([
             'GET' => true,
             'HEAD' => true,
         ]);

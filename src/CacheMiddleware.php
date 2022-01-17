@@ -56,7 +56,7 @@ class CacheMiddleware
      * 
      * @var array
      */
-    protected $safeMethods = ['GET', 'HEAD', 'OPTIONS', 'TRACE'];
+    protected $safeMethods = ['GET' => true, 'HEAD' => true, 'OPTIONS' => true, 'TRACE' => true];
 
     /**
      * @param CacheStrategyInterface|null $cacheStrategy
@@ -126,7 +126,7 @@ class CacheMiddleware
 
                 return $handler($request, $options)->then(  
                     function (ResponseInterface $response) use ($request) {
-                        if (!in_array($request->getMethod(), $this->safeMethods)) {
+                        if (!isset($this->safeMethods[$request->getMethod()])) {
                             // Invalidate cache after a call of non-safe method on the same URI
                             $response = $this->invalidateCache($request, $response);
                         }
@@ -386,9 +386,7 @@ class CacheMiddleware
      */
     private function invalidateCache(RequestInterface $request, ResponseInterface $response)
     {
-        $this->cacheStorage->delete($request);
-
-        foreach (array_diff(array_keys($this->httpMethods), [$request->getMethod()]) as $method) {
+        foreach (array_keys($this->httpMethods) as $method) {
             $this->cacheStorage->delete($request->withMethod($method));
         }
 
