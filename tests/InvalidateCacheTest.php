@@ -33,7 +33,7 @@ class InvalidateCacheTest extends TestCase
         });
 
         $this->middleware = new CacheMiddleware(new PrivateCacheStrategy(
-            new Psr6CacheStorage(new ArrayCachePool()),
+            new Psr6CacheStorage(new ArrayCachePool())
         ));
 
         $stack->push($this->middleware, 'cache');
