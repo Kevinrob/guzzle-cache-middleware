@@ -124,7 +124,7 @@ class CacheMiddleware
             if (!isset($this->httpMethods[strtoupper($request->getMethod())])) {
                 // No caching for this method allowed
 
-                return $handler($request, $options)->then(  
+                return $handler($request, $options)->then(
                     function (ResponseInterface $response) use ($request) {
                         if (!isset($this->safeMethods[$request->getMethod()])) {
                             // Invalidate cache after a call of non-safe method on the same URI
