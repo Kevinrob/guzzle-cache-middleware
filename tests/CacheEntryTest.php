@@ -2,6 +2,8 @@
 
 namespace Kevinrob\GuzzleCache\Tests;
 
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\CacheEntry;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
@@ -79,6 +81,34 @@ class CacheEntryTest extends TestCase
         $cacheEntry = new CacheEntry($this->request, $this->response, $this->makeDateTimeOffset(10));
 
         $this->assertEquals(70, $cacheEntry->getTTL());
+    }
+
+    public function testCacheEntryShouldBeSerializableWithIgBinaryWithoutWarning()
+    {
+        $request = new Request(
+            'GET',
+            'test.local',
+            [],
+            'Sample body' // Always include a body in the request to be sure there is a stream in it
+        );
+        $response = new Response(
+            200, [
+            'Cache-Control' => 'max-age=60',
+        ],
+            'Test content'
+        );
+        $cacheEntry = new CacheEntry($request, $response, $this->makeDateTimeOffset(10));
+
+        if(extension_loaded('igbinary')) {
+            /**
+             * @var CacheEntry $cacheEntryPostDeserialization
+             */
+            $cacheEntryPostDeserialization = igbinary_unserialize(igbinary_serialize($cacheEntry));
+            $this->assertEquals((string)$cacheEntry->getOriginalRequest()->getBody(), (string)$cacheEntryPostDeserialization->getOriginalRequest()->getBody());
+            $this->assertEquals((string)$cacheEntry->getOriginalResponse()->getBody(), (string)$cacheEntryPostDeserialization->getOriginalResponse()->getBody());
+        } else {
+            $this->addWarning('Extension igbinary not loaded, not asserting serialization.');
+        }
     }
 
     private function setResponseHeader($name, $value)

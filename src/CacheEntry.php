@@ -260,17 +260,43 @@ class CacheEntry
     {
         // Stream/Resource can't be serialized... So we copy the content into an implementation of `Psr\Http\Message\StreamInterface`
         if ($this->response !== null) {
-            $body = (string)$this->response->getBody();
+            $responseBody = (string)$this->response->getBody();
             $this->response = $this->response->withBody(
                 new PumpStream(
-                    new BodyStore($body),
+                    new BodyStore($responseBody),
                     [
-                        'size' => mb_strlen($body)
+                        'size' => mb_strlen($responseBody),
                     ]
                 )
             );
         }
 
+        $requestBody = (string)$this->request->getBody();
+        $this->request = $this->request->withBody(
+            new PumpStream(
+                new BodyStore($requestBody),
+                [
+                    'size' => mb_strlen($requestBody)
+                ]
+            )
+        );
+
         return array_keys(get_object_vars($this));
     }
+
+    public function __wakeup()
+    {
+        // We re-create the stream of the response
+        if ($this->response !== null) {
+            $this->response = $this->response
+                ->withBody(
+                    \GuzzleHttp\Psr7\Utils::streamFor((string) $this->response->getBody())
+                );
+        }
+        $this->request = $this->request
+            ->withBody(
+                \GuzzleHttp\Psr7\Utils::streamFor((string) $this->request->getBody())
+            );
+    }
+
 }
