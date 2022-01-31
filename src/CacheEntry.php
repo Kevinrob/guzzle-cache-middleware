@@ -2,6 +2,7 @@
 
 namespace Kevinrob\GuzzleCache;
 
+use GuzzleHttp\Psr7\PumpStream;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -16,14 +17,6 @@ class CacheEntry
      * @var ResponseInterface
      */
     protected $response;
-
-    /**
-     * This field is only used for serialize.
-     * Response::body is a stream and can't be serialized.
-     *
-     * @var string
-     */
-    protected $responseBody;
 
     /**
      * @var \DateTime
@@ -265,11 +258,28 @@ class CacheEntry
 
     public function __sleep()
     {
-        // Stream/Resource can't be serialized... So we copy the content
+        // Stream/Resource can't be serialized... So we copy the content into an implementation of `Psr\Http\Message\StreamInterface`
         if ($this->response !== null) {
-            $this->responseBody = (string) $this->response->getBody();
-            $this->response->getBody()->rewind();
+            $responseBody = (string)$this->response->getBody();
+            $this->response = $this->response->withBody(
+                new PumpStream(
+                    new BodyStore($responseBody),
+                    [
+                        'size' => mb_strlen($responseBody),
+                    ]
+                )
+            );
         }
+
+        $requestBody = (string)$this->request->getBody();
+        $this->request = $this->request->withBody(
+            new PumpStream(
+                new BodyStore($requestBody),
+                [
+                    'size' => mb_strlen($requestBody)
+                ]
+            )
+        );
 
         return array_keys(get_object_vars($this));
     }
@@ -280,8 +290,13 @@ class CacheEntry
         if ($this->response !== null) {
             $this->response = $this->response
                 ->withBody(
-                    \GuzzleHttp\Psr7\Utils::streamFor($this->responseBody)
+                    \GuzzleHttp\Psr7\Utils::streamFor((string) $this->response->getBody())
                 );
         }
+        $this->request = $this->request
+            ->withBody(
+                \GuzzleHttp\Psr7\Utils::streamFor((string) $this->request->getBody())
+            );
     }
+
 }
