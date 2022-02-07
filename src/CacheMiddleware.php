@@ -49,6 +49,15 @@ class CacheMiddleware
      */
     protected $httpMethods = ['GET' => true];
 
+    /** 
+     * List of safe methods
+     * 
+     * https://datatracker.ietf.org/doc/html/rfc7231#section-4.2.1
+     * 
+     * @var array
+     */
+    protected $safeMethods = ['GET' => true, 'HEAD' => true, 'OPTIONS' => true, 'TRACE' => true];
+
     /**
      * @param CacheStrategyInterface|null $cacheStrategy
      */
@@ -117,8 +126,10 @@ class CacheMiddleware
 
                 return $handler($request, $options)->then(
                     function (ResponseInterface $response) use ($request) {
-                        // Invalidate cache after a call of non-safe method on the same URI
-                        $response = $this->invalidateCache($request, $response);
+                        if (!isset($this->safeMethods[$request->getMethod()])) {
+                            // Invalidate cache after a call of non-safe method on the same URI
+                            $response = $this->invalidateCache($request, $response);
+                        }
 
                         return $response->withHeader(self::HEADER_CACHE_INFO, self::HEADER_CACHE_MISS);
                     }
@@ -375,7 +386,9 @@ class CacheMiddleware
      */
     private function invalidateCache(RequestInterface $request, ResponseInterface $response)
     {
-        $this->cacheStorage->delete($request);
+        foreach (array_keys($this->httpMethods) as $method) {
+            $this->cacheStorage->delete($request->withMethod($method));
+        }
 
         return $response->withHeader(self::HEADER_INVALIDATION, true);
     }
