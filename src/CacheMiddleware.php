@@ -49,11 +49,11 @@ class CacheMiddleware
      */
     protected $httpMethods = ['GET' => true];
 
-    /** 
+    /**
      * List of safe methods
-     * 
+     *
      * https://datatracker.ietf.org/doc/html/rfc7231#section-4.2.1
-     * 
+     *
      * @var array
      */
     protected $safeMethods = ['GET' => true, 'HEAD' => true, 'OPTIONS' => true, 'TRACE' => true];
@@ -263,10 +263,12 @@ class CacheMiddleware
         ResponseInterface $response,
         $update = false
     ) {
+        $body = $response->getBody();
+
         // If the body is not seekable, we have to replace it by a seekable one
-        if (!$response->getBody()->isSeekable()) {
+        if (!$body->isSeekable()) {
             $response = $response->withBody(
-                \GuzzleHttp\Psr7\Utils::streamFor($response->getBody()->getContents())
+                \GuzzleHttp\Psr7\Utils::streamFor($body->getContents())
             );
         }
 
@@ -274,6 +276,11 @@ class CacheMiddleware
             $cache->update($request, $response);
         } else {
             $cache->cache($request, $response);
+        }
+
+        // always rewind back to the start otherwise other middlewares may get empty "content"
+        if ($body->isSeekable()) {
+            $response->getBody()->rewind();
         }
 
         return $response;
