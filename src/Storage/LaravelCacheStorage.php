@@ -23,18 +23,22 @@ class LaravelCacheStorage implements CacheStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function fetch($key)
+    public function fetch($key): ?CacheEntry
     {
         try {
-            $cache = unserialize($this->cache->get($key));
+            $cacheEntry = $this->cache->get($key);
+            if ($cacheEntry === null) {
+                return null;
+            }
+            $cache = unserialize($cacheEntry, ['allowed_classes' => true]);
             if ($cache instanceof CacheEntry) {
                 return $cache;
             }
         } catch (\Exception $ignored) {
-            return;
+            return null;
         }
 
-        return;
+        return null;
     }
 
     /**
@@ -70,7 +74,7 @@ class LaravelCacheStorage implements CacheStorageInterface
     {
         return $this->cache->forget($key);
     }
-    
+
     protected function getLifeTime(CacheEntry $data)
     {
         $version = app()->version();
