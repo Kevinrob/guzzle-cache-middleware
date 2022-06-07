@@ -111,6 +111,29 @@ class CacheEntryTest extends TestCase
         }
     }
 
+    public function testSerializationShouldNotMutateCacheEntry()
+    {
+        $request = new Request(
+            'GET',
+            'test.local',
+            [],
+            'Sample body' // Always include a body in the request to be sure there is a stream in it
+        );
+        $response = new Response(
+            200, [
+            'Cache-Control' => 'max-age=60',
+        ],
+            'Test content'
+        );
+        $cacheEntry = new CacheEntry($request, $response, $this->makeDateTimeOffset(10));
+
+        $originalCacheEntry = clone $cacheEntry;
+
+        serialize($cacheEntry);
+
+        $this->assertEquals($cacheEntry, $originalCacheEntry);
+    }
+
     private function setResponseHeader($name, $value)
     {
         $this->responseHeaders[$name] = [$value];
