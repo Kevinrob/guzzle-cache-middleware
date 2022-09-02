@@ -51,7 +51,7 @@
   },
   "config": {
     "allow-plugins": {
-      "kylekatarnls/update-helper": true,
+      "kylekatarnls/update-helper": true
     }
   }
 }
