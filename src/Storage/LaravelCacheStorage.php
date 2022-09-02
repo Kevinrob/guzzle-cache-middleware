@@ -26,7 +26,7 @@ class LaravelCacheStorage implements CacheStorageInterface
     public function fetch($key)
     {
         try {
-            $cache = unserialize($this->cache->get($key));
+            $cache = unserialize($this->cache->get($key) ?? '');
             if ($cache instanceof CacheEntry) {
                 return $cache;
             }
