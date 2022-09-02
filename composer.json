@@ -48,7 +48,7 @@
   },
   "scripts": {
     "test": "vendor/bin/phpunit"
-  }
+  },
   "config": {
     "allow-plugins": {
       "kylekatarnls/update-helper": true,
