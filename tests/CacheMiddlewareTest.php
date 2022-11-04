@@ -2,9 +2,11 @@
 
 namespace Kevinrob\GuzzleCache\Tests;
 
+use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Utils;
+use Kevinrob\GuzzleCache\CacheEntry;
 use Kevinrob\GuzzleCache\CacheMiddleware as BaseCacheMiddleware;
 use Kevinrob\GuzzleCache\Storage\Psr6CacheStorage;
 use Kevinrob\GuzzleCache\Strategy\CacheStrategyInterface;
@@ -34,6 +36,27 @@ class CacheMiddlewareTest extends TestCase
         );
 
         $this->assertEquals('seekable stream', $response->getBody()->getContents());
+    }
+
+    public function testStaleOnRejected()
+    {
+        $request = new Request('GET', '/uri');
+        $response = (new Response())->withHeader('Cache-Control', 'stale-if-error=120');
+        $strategy = $this->createStub(CacheStrategyInterface::class);
+        $strategy->method('fetch')->willReturn(new CacheEntry(
+            $request,
+            $response,
+            new \DateTime('-1 second')
+        ));
+        $handler = function () {
+            return new RejectedPromise(new \RuntimeException('Unexpected error'));
+        };
+        $middleware = new CacheMiddleware($strategy);
+
+        $result = ($middleware($handler)($request, []))->wait();
+
+        $this->assertInstanceOf(ResponseInterface::class, $result);
+        $this->assertEquals(CacheMiddleware::HEADER_CACHE_STALE, $result->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
     }
 }
 
