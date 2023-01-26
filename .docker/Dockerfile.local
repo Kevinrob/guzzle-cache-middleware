@@ -1,0 +1,11 @@
+FROM php:8.1-cli-alpine
+ENV XDG_CACHE_HOME=/tmp/.cache
+ENV COMPOSER_CACHE_DIR=${XDG_CACHE_HOME}/composer
+# posible could install cache directory here
+RUN  --mount=type=bind,from=mlocati/php-extension-installer:1.5,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
+      install-php-extensions zip xdebug-stable
+RUN addgroup -S app && adduser -S app -G app
+RUN mkdir -p /app && chown -R app /app && mkdir -p /tmp && chown -R app /tmp
+COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
+USER app
+WORKDIR /app
