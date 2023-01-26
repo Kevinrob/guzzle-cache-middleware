@@ -43,7 +43,7 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
         if (null === $varyHeaders || $varyHeaders->isEmpty()) {
             return hash(
                 'sha256',
-                'greedy'.$request->getMethod().$request->getUri()
+                'greedy'.$request->getMethod().$request->getUri().$request->getBody()
             );
         }
 
@@ -56,7 +56,7 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
 
         return hash(
             'sha256',
-            'greedy'.$request->getMethod().$request->getUri().json_encode($cacheHeaders)
+            'greedy'.$request->getMethod().$request->getUri().json_encode($cacheHeaders).$request->getBody()
         );
     }
 

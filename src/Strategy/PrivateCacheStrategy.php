@@ -123,7 +123,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
     protected function getCacheKey(RequestInterface $request, KeyValueHttpHeader $varyHeaders = null)
     {
         if (!$varyHeaders) {
-            return hash('sha256', $request->getMethod().$request->getUri());
+            return hash('sha256', $request->getMethod().$request->getUri().(string)$request->getBody());
         }
 
         $cacheHeaders = [];
@@ -134,7 +134,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             }
         }
 
-        return hash('sha256', $request->getMethod().$request->getUri().json_encode($cacheHeaders));
+        return hash('sha256', $request->getMethod().$request->getUri().json_encode($cacheHeaders).(string)$request->getBody());
     }
 
     /**
