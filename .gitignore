@@ -4,3 +4,4 @@ composer.phar
 *.iml
 .idea/
 coverage.xml
+.phpunit.result.cache
