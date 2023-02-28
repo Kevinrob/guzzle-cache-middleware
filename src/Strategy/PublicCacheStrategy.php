@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
  * This strategy represents a "public" or "shared" HTTP client.
  * You can share the storage between applications.
  *
- * For example, a response with cache-control header "private, max-age=60"
+ * For example, a response with cache-control header "public, max-age=60"
  * will be NOT cached by this strategy.
  *
  * The rules applied are from RFC 7234.
