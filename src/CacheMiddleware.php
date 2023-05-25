@@ -7,7 +7,6 @@ use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\RejectedPromise;
-use GuzzleHttp\Promise\Utils;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\Strategy\CacheStrategyInterface;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
@@ -111,7 +110,7 @@ class CacheMiddleware
      */
     public function purgeReValidation()
     {
-        \GuzzleHttp\Promise\Utils::inspect_all($this->waitingRevalidate);
+        \GuzzleHttp\Promise\Utils::inspectAll($this->waitingRevalidate);
     }
 
     /**
