@@ -110,7 +110,7 @@ class CacheMiddleware
      */
     public function purgeReValidation()
     {
-        \GuzzleHttp\Promise\inspect_all($this->waitingRevalidate);
+        \GuzzleHttp\Promise\Utils::inspectAll($this->waitingRevalidate);
     }
 
     /**
