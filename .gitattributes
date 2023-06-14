@@ -6,3 +6,4 @@
 /tests export-ignore
 /.docker export-ignore
 /docker-compose.yaml export-ignore
+/Makefile export-ignore
