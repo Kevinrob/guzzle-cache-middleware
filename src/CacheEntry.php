@@ -272,13 +272,18 @@ class CacheEntry implements \Serializable
 
     public function __unserialize(array $data): void
     {
-        $this->request = self::restoreStreamBody($data['request']);
-        $this->response = $data['response'] !== null ? self::restoreStreamBody($data['response']) : null;
-        $this->staleAt = $data['staleAt'];
-        $this->staleIfErrorTo = $data['staleIfErrorTo'];
-        $this->staleWhileRevalidateTo = $data['staleWhileRevalidateTo'];
-        $this->dateCreated = $data['dateCreated'];
-        $this->timestampStale = $data['timestampStale'];
+        $prefix = '';
+        if (isset($data["\0*\0request"])) {
+            // We are unserializing a cache entry which was serialized with a version < 4.1.1
+            $prefix = "\0*\0";
+        }
+        $this->request = self::restoreStreamBody($data[$prefix.'request']);
+        $this->response = $data[$prefix.'response'] !== null ? self::restoreStreamBody($data[$prefix.'response']) : null;
+        $this->staleAt = $data[$prefix.'staleAt'];
+        $this->staleIfErrorTo = $data[$prefix.'staleIfErrorTo'];
+        $this->staleWhileRevalidateTo = $data[$prefix.'staleWhileRevalidateTo'];
+        $this->dateCreated = $data[$prefix.'dateCreated'];
+        $this->timestampStale = $data[$prefix.'timestampStale'];
     }
 
     /**
