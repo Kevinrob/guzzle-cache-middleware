@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  cli:
+    build:
+      dockerfile: .docker/Dockerfile.local
+      context: .
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - ~/.composer/cache/:/tmp/cache/
+      - ./.docker/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini:ro
