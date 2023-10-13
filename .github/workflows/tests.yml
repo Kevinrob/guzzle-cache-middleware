@@ -18,7 +18,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
-        extensions: mbstring, dom
+        extensions: mbstring, dom, igbinary
 
     - name: Validate composer.json and composer.lock
       run: composer validate
