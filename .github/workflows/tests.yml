@@ -12,7 +12,7 @@ jobs:
           - "lowest"
           - "highest"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
@@ -24,7 +24,7 @@ jobs:
       run: composer validate
 
     - name: "Composer install ${{ matrix.dependencies }} dependencies"
-      uses: "ramsey/composer-install@v1"
+      uses: ramsey/composer-install@v2
       with:
         dependency-versions: "${{ matrix.dependencies }}"
 
