@@ -27,6 +27,8 @@ jobs:
       uses: ramsey/composer-install@v2
       with:
         dependency-versions: "${{ matrix.dependencies }}"
+      env:
+        COMPOSERPROCESSTIMEOUT: 6000 
 
     - name: Run test suite
       run: composer run-script test
