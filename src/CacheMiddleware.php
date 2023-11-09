@@ -237,11 +237,9 @@ class CacheMiddleware
                     return static::addToCache($this->cacheStorage, $request, $response, $update);
                 },
                 function ($reason) use ($cacheEntry) {
-                    if ($reason instanceof TransferException) {
-                        $response = static::getStaleResponse($cacheEntry);
-                        if ($response instanceof ResponseInterface) {
-                            return $response;
-                        }
+                    $response = static::getStaleResponse($cacheEntry);
+                    if ($response instanceof ResponseInterface) {
+                        return $response;
                     }
 
                     return new RejectedPromise($reason);
