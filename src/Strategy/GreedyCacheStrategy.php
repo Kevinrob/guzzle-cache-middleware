@@ -95,12 +95,12 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
         $response = $response->withoutHeader('Etag')->withoutHeader('Last-Modified');
 
         $ttl = $this->defaultTtl;
-        if ($request->hasHeader(self::HEADER_TTL)) {
-            $ttlHeaderValues = $request->getHeader(self::HEADER_TTL);
+        if ($request->hasHeader(static::HEADER_TTL)) {
+            $ttlHeaderValues = $request->getHeader(static::HEADER_TTL);
             $ttl = (int)reset($ttlHeaderValues);
         }
 
-        return new CacheEntry($request->withoutHeader(self::HEADER_TTL), $response, new \DateTime(sprintf('+%d seconds', $ttl)));
+        return new CacheEntry($request->withoutHeader(static::HEADER_TTL), $response, new \DateTime(sprintf('+%d seconds', $ttl)));
     }
 
     public function fetch(RequestInterface $request)
