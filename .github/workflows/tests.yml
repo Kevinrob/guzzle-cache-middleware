@@ -11,6 +11,7 @@ jobs:
         dependencies:
           - "lowest"
           - "highest"
+      fail-fast: false
     steps:
     - uses: actions/checkout@v4
 
