@@ -31,14 +31,14 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
      */
     private $varyHeaders;
 
-    public function __construct(CacheStorageInterface $cache = null, $defaultTtl, KeyValueHttpHeader $varyHeaders = null)
+    public function __construct(?CacheStorageInterface $cache = null, $defaultTtl, ?KeyValueHttpHeader $varyHeaders = null)
     {
         $this->defaultTtl = $defaultTtl;
         $this->varyHeaders = $varyHeaders;
         parent::__construct($cache);
     }
 
-    protected function getCacheKey(RequestInterface $request, KeyValueHttpHeader $varyHeaders = null)
+    protected function getCacheKey(RequestInterface $request, ?KeyValueHttpHeader $varyHeaders = null)
     {
         if (null === $varyHeaders || $varyHeaders->isEmpty()) {
             return hash(
