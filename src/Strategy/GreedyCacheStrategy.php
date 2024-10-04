@@ -31,8 +31,11 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
      */
     private $varyHeaders;
 
-    public function __construct(?CacheStorageInterface $cache = null, $defaultTtl, ?KeyValueHttpHeader $varyHeaders = null)
-    {
+    public function __construct(
+        ?CacheStorageInterface $cache = null,
+        $defaultTtl = 60,
+        ?KeyValueHttpHeader $varyHeaders = null,
+    ) {
         $this->defaultTtl = $defaultTtl;
         $this->varyHeaders = $varyHeaders;
         parent::__construct($cache);
