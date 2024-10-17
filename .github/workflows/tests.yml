@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['8.1', '8.2', '8.3']
+        php-versions: ['8.1', '8.2', '8.3', '8.4']
         dependencies:
           - "lowest"
           - "highest"
@@ -29,7 +29,7 @@ jobs:
       with:
         dependency-versions: "${{ matrix.dependencies }}"
       env:
-        COMPOSER_PROCESS_TIMEOUT: 6000 
+        COMPOSER_PROCESS_TIMEOUT: 6000
 
     - name: Run test suite
       run: composer run-script test

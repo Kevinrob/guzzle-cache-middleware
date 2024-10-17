@@ -61,7 +61,7 @@ class CacheMiddleware
     /**
      * @param CacheStrategyInterface|null $cacheStrategy
      */
-    public function __construct(CacheStrategyInterface $cacheStrategy = null)
+    public function __construct(?CacheStrategyInterface $cacheStrategy = null)
     {
         $this->cacheStorage = $cacheStrategy !== null ? $cacheStrategy : new PrivateCacheStrategy();
 
@@ -335,7 +335,7 @@ class CacheMiddleware
      *
      * @return null|ResponseInterface
      */
-    protected static function getStaleResponse(CacheEntry $cacheEntry = null)
+    protected static function getStaleResponse(?CacheEntry $cacheEntry = null)
     {
         // Return staled cache entry if we can
         if ($cacheEntry instanceof CacheEntry && $cacheEntry->serveStaleIfError()) {
@@ -352,7 +352,7 @@ class CacheMiddleware
      *
      * @return RequestInterface
      */
-    protected static function getRequestWithReValidationHeader(RequestInterface $request, CacheEntry $cacheEntry)
+    protected static function getRequestWithReValidationHeader(RequestInterface $request, ?CacheEntry $cacheEntry)
     {
         if ($cacheEntry->getResponse()->hasHeader('Last-Modified')) {
             $request = $request->withHeader(
@@ -377,7 +377,7 @@ class CacheMiddleware
      *
      * @deprecated Use constructor => `new CacheMiddleware()`
      */
-    public static function getMiddleware(CacheStrategyInterface $cacheStorage = null)
+    public static function getMiddleware(?CacheStrategyInterface $cacheStorage = null)
     {
         return new self($cacheStorage);
     }
