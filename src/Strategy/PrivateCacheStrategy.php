@@ -251,6 +251,13 @@ class PrivateCacheStrategy implements CacheStrategyInterface
      */
     public function delete(RequestInterface $request)
     {
+        $cache = $this->storage->fetch($this->getCacheKey($request));
+
+        if ($cache !==  null && !$cache->getVaryHeaders()->isEmpty()) {
+            $varyHeaders = $cache->getVaryHeaders();
+            $this->storage->delete($this->getCacheKey($request, $varyHeaders));
+        }
         return $this->storage->delete($this->getCacheKey($request));
+
     }
 }
