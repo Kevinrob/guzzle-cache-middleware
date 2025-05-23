@@ -26,17 +26,22 @@ class FlysystemStorage implements CacheStorageInterface
     public function fetch($key)
     {
         if ($this->filesystem->fileExists($key)) {
-            // The file exist, read it!
-            $data = @unserialize(
-                $this->filesystem->read($key)
-            );
+            try {
+                // The file exist, read it!
+                $data = @unserialize(
+                    $this->filesystem->read($key)
+                );
 
-            if ($data instanceof CacheEntry) {
-                return $data;
+                if ($data instanceof CacheEntry) {
+                    return $data;
+                }
+            } catch (FilesystemException $e) {
+                // In case of error, act as if the file didn't exist
+                return null;
             }
         }
 
-        return;
+        return null;
     }
 
     /**
@@ -61,7 +66,7 @@ class FlysystemStorage implements CacheStorageInterface
             $this->filesystem->delete($key);
             return true;
         } catch (FilesystemException $ex) {
-            return true;
+            return false;
         }
     }
 }
