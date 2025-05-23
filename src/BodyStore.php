@@ -19,7 +19,7 @@ class BodyStore
     public function __construct(string $body)
     {
         $this->body = $body;
-        $this->toRead = mb_strlen($this->body);
+        $this->toRead = strlen($this->body);
     }
 
     /**
@@ -34,7 +34,7 @@ class BodyStore
 
         $length = min($length, $this->toRead);
 
-        $body = mb_substr(
+        $body = substr(
             $this->body,
             $this->read,
             $length
