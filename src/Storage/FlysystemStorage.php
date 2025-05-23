@@ -58,8 +58,7 @@ class FlysystemStorage implements CacheStorageInterface
     public function delete($key)
     {
         try {
-            $this->filesystem->delete($key);
-            return true;
+            return $this->filesystem->delete($key);
         } catch (FilesystemException $ex) {
             return true;
         }
