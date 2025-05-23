@@ -18,7 +18,7 @@ use Kevinrob\GuzzleCache\Storage\Psr6CacheStorage;
 use Kevinrob\GuzzleCache\Storage\Psr16CacheStorage;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 
 class PrivateCacheTest extends TestCase
@@ -89,7 +89,7 @@ class PrivateCacheTest extends TestCase
             'doctrine.chaincache' => [ new DoctrineCacheStorage(new ChainCache([new ArrayCache()])) ],
             'doctrine.filesystem' => [ new DoctrineCacheStorage(new FilesystemCache($TMP_DIR)), $TMP_DIR ],
             'doctrine.phpfile' => [ new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)), $TMP_DIR ],
-            'flysystem' => [ new FlysystemStorage(new Local($TMP_DIR)), $TMP_DIR ],
+            'flysystem' => [ new FlysystemStorage(new LocalFilesystemAdapter($TMP_DIR)), $TMP_DIR ],
             'psr6' => [ new Psr6CacheStorage(new ArrayCachePool()) ],
             'psr16' => [ new Psr16CacheStorage(new SimpleCacheBridge(new ArrayCachePool())) ],
             'compressedDoctrineStorage' => [ new CompressedDoctrineCacheStorage(new ArrayCache()) ],

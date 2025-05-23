@@ -7,26 +7,29 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['7.2', '7.3', '7.4', '8.0', '8.1']
+        php-versions: ['8.1', '8.2', '8.3', '8.4']
         dependencies:
           - "lowest"
           - "highest"
+      fail-fast: false
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
-        extensions: mbstring, dom
+        extensions: mbstring, dom, igbinary
 
     - name: Validate composer.json and composer.lock
       run: composer validate
 
     - name: "Composer install ${{ matrix.dependencies }} dependencies"
-      uses: "ramsey/composer-install@v1"
+      uses: ramsey/composer-install@v2
       with:
         dependency-versions: "${{ matrix.dependencies }}"
+      env:
+        COMPOSER_PROCESS_TIMEOUT: 6000
 
     - name: Run test suite
       run: composer run-script test

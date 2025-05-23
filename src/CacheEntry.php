@@ -57,8 +57,8 @@ class CacheEntry implements \Serializable
         RequestInterface $request,
         ResponseInterface $response,
         \DateTime $staleAt,
-        \DateTime $staleIfErrorTo = null,
-        \DateTime $staleWhileRevalidateTo = null
+        ?\DateTime $staleIfErrorTo = null,
+        ?\DateTime $staleWhileRevalidateTo = null
     ) {
         $this->dateCreated = new \DateTime();
 
@@ -302,7 +302,7 @@ class CacheEntry implements \Serializable
             new PumpStream(
                 new BodyStore($bodyString),
                 [
-                    'size' => mb_strlen($bodyString),
+                    'size' => strlen($bodyString),
                 ]
             )
         );

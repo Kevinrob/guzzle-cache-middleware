@@ -115,7 +115,7 @@ $stack->push(
 ## Flysystem
 ```php
 [...]
-use League\Flysystem\Adapter\Local;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
 
@@ -125,7 +125,7 @@ $stack->push(
   new CacheMiddleware(
     new PrivateCacheStrategy(
       new FlysystemStorage(
-        new Local('/path/to/cache')
+        new LocalFilesystemAdapter('/path/to/cache')
       )
     )
   ),
@@ -288,8 +288,11 @@ With this example:
 See [Guzzle Cache](https://www.drupal.org/project/guzzle_cache) module.
 
 # Links that talk about the project
-- [Speeding Up APIs/Apps/Smart Toasters with HTTP Response Caching](https://apisyouwonthate.com/blog/speeding-up-apis-apps-smart-toasters-with-http-response-caching)
 - [Caching HTTP-Requests with Guzzle 6 and PSR-6](http://a.kabachnik.info/caching-http-requests-with-guzzle-6-and-psr-6.html)
+
+# Buy me a coffee
+If you like this project, you can [buy me a coffee](https://buymeacoffee.com/kevinrob)! (or a beer 😉)  
+[<img src="bmc_qr.png" width="200">](https://buymeacoffee.com/kevinrob)
 
 # Development
 
