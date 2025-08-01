@@ -12,10 +12,10 @@ A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6+. It's a simple Mi
 - Assured compatibility with PSR-7
 
 ## Built-in storage interfaces
-- [Doctrine cache](https://github.com/doctrine/cache)
 - [Laravel cache](https://laravel.com/docs/5.2/cache)
 - [Flysystem](https://github.com/thephpleague/flysystem)
 - [PSR6](https://github.com/php-fig/cache)
+- [PSR16](https://github.com/php-fig/simple-cache)
 - [WordPress Object Cache](https://codex.wordpress.org/Class_Reference/WP_Object_Cache)
 
 ## Installation
@@ -46,49 +46,6 @@ $client = new Client(['handler' => $stack]);
 ```
 
 # Examples
-
-## Doctrine/Cache
-You can use a cache from `Doctrine/Cache`:
-```php
-[...]
-use Doctrine\Common\Cache\FilesystemCache;
-use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
-
-[...]
-$stack->push(
-  new CacheMiddleware(
-    new PrivateCacheStrategy(
-      new DoctrineCacheStorage(
-        new FilesystemCache('/tmp/')
-      )
-    )
-  ),
-  'cache'
-);
-```
-
-You can use `ChainCache` for using multiple `CacheProvider` instances. With that provider, you have to sort the different caches from the faster to the slower. Like that, you can have a very fast cache.
-```php
-[...]
-use Doctrine\Common\Cache\ChainCache;
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\FilesystemCache;
-use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
-
-[...]
-$stack->push(new CacheMiddleware(
-  new PrivateCacheStrategy(
-    new DoctrineCacheStorage(
-      new ChainCache([
-        new ArrayCache(),
-        new FilesystemCache('/tmp/'),
-      ])
-    )
-  )
-), 'cache');
-```
 
 ## Laravel cache
 You can use a cache with Laravel, e.g. Redis, Memcache etc.:
@@ -155,19 +112,20 @@ $stack->push(
 It's possible to add a public shared cache to the stack:
 ```php
 [...]
-use Doctrine\Common\Cache\FilesystemCache;
-use Doctrine\Common\Cache\PredisCache;
+use Cache\Adapter\PHPArray\ArrayCachePool;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Kevinrob\GuzzleCache\Strategy\PublicCacheStrategy;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
+use Kevinrob\GuzzleCache\Storage\Psr6CacheStorage;
+use League\Flysystem\Local\LocalFilesystemAdapter;
+use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
 
 [...]
 // Private caching
 $stack->push(
   new CacheMiddleware(
     new PrivateCacheStrategy(
-      new DoctrineCacheStorage(
-        new FilesystemCache('/tmp/')
+      new FlysystemStorage(
+        new LocalFilesystemAdapter('/tmp/')
       )
     )
   ),
@@ -178,10 +136,8 @@ $stack->push(
 $stack->push(
   new CacheMiddleware(
     new PublicCacheStrategy(
-      new DoctrineCacheStorage(
-        new PredisCache(
-          new Predis\Client('tcp://10.0.0.1:6379')
-        )
+      new Psr6CacheStorage(
+        new ArrayCachePool()
       )
     )
   ),
@@ -197,16 +153,16 @@ disregarding any possibly present caching headers:
 [...]
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
-use Doctrine\Common\Cache\FilesystemCache;
+use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 
 [...]
 // Greedy caching
 $stack->push(
   new CacheMiddleware(
     new GreedyCacheStrategy(
-      new DoctrineCacheStorage(
-        new FilesystemCache('/tmp/')
+      new FlysystemStorage(
+        new LocalFilesystemAdapter('/tmp/')
       ),
       1800, // the TTL in seconds
       new KeyValueHttpHeader(['Authorization']) // Optional - specify the headers that can change the cache key
