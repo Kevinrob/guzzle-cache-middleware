@@ -4,19 +4,12 @@ namespace Kevinrob\GuzzleCache\Tests;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Cache\ChainCache;
-use Doctrine\Common\Cache\FilesystemCache;
-use Doctrine\Common\Cache\PhpFileCache;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\CacheMiddleware;
-use Kevinrob\GuzzleCache\Storage\CompressedDoctrineCacheStorage;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
 use Kevinrob\GuzzleCache\Storage\Psr6CacheStorage;
 use Kevinrob\GuzzleCache\Storage\Psr16CacheStorage;
@@ -96,14 +89,9 @@ class PublicCacheTest extends TestCase
         $TMP_DIR = __DIR__.'/tmp/';
 
         $cacheProviders = [
-            new DoctrineCacheStorage(new ArrayCache()),
-            new DoctrineCacheStorage(new ChainCache([new ArrayCache()])),
-            new DoctrineCacheStorage(new FilesystemCache($TMP_DIR)),
-            new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)),
             new FlysystemStorage(new LocalFilesystemAdapter($TMP_DIR)),
             new Psr6CacheStorage(new ArrayCachePool()),
             new Psr16CacheStorage(new SimpleCacheBridge(new ArrayCachePool())),
-            new CompressedDoctrineCacheStorage(new ArrayCache()),
             new VolatileRuntimeStorage(),
         ];
 
@@ -121,7 +109,6 @@ class PublicCacheTest extends TestCase
             'Test new content'
         );
 
-        /** @var CacheProvider $cacheProvider */
         foreach ($cacheProviders as $cacheProvider) {
             $this->rrmdir($TMP_DIR);
 

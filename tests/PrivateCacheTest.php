@@ -4,15 +4,9 @@ namespace Kevinrob\GuzzleCache\Tests;
 
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Cache\Bridge\SimpleCache\SimpleCacheBridge;
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\ChainCache;
-use Doctrine\Common\Cache\FilesystemCache;
-use Doctrine\Common\Cache\PhpFileCache;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
-use Kevinrob\GuzzleCache\Storage\CompressedDoctrineCacheStorage;
-use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Storage\FlysystemStorage;
 use Kevinrob\GuzzleCache\Storage\Psr6CacheStorage;
 use Kevinrob\GuzzleCache\Storage\Psr16CacheStorage;
@@ -85,14 +79,9 @@ class PrivateCacheTest extends TestCase
     {
         $TMP_DIR = __DIR__.'/tmp/';
         return [
-            'doctrine.arraycache' => [ new DoctrineCacheStorage(new ArrayCache()) ],
-            'doctrine.chaincache' => [ new DoctrineCacheStorage(new ChainCache([new ArrayCache()])) ],
-            'doctrine.filesystem' => [ new DoctrineCacheStorage(new FilesystemCache($TMP_DIR)), $TMP_DIR ],
-            'doctrine.phpfile' => [ new DoctrineCacheStorage(new PhpFileCache($TMP_DIR)), $TMP_DIR ],
             'flysystem' => [ new FlysystemStorage(new LocalFilesystemAdapter($TMP_DIR)), $TMP_DIR ],
             'psr6' => [ new Psr6CacheStorage(new ArrayCachePool()) ],
             'psr16' => [ new Psr16CacheStorage(new SimpleCacheBridge(new ArrayCachePool())) ],
-            'compressedDoctrineStorage' => [ new CompressedDoctrineCacheStorage(new ArrayCache()) ],
             'volatileruntimeStorage' => [ new VolatileRuntimeStorage() ]
         ];
     }
