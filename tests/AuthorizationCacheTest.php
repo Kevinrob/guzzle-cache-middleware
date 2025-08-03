@@ -17,7 +17,7 @@ class AuthorizationCacheTest extends TestCase
     public function testAuthorizationHeaderNotCachedWithMaxAge()
     {
         $storage = new VolatileRuntimeStorage();
-        $strategy = new PrivateCacheStrategy($storage);
+        $strategy = new PublicCacheStrategy($storage);
 
         $request = new Request('GET', 'https://api.example.com/data', [
             'Authorization' => 'Bearer secret-token'
@@ -40,7 +40,7 @@ class AuthorizationCacheTest extends TestCase
     public function testAuthorizationHeaderCachedWithPublic()
     {
         $storage = new VolatileRuntimeStorage();
-        $strategy = new PrivateCacheStrategy($storage);
+        $strategy = new PublicCacheStrategy($storage);
 
         $request = new Request('GET', 'https://api.example.com/data', [
             'Authorization' => 'Bearer secret-token'
@@ -64,7 +64,7 @@ class AuthorizationCacheTest extends TestCase
     public function testAuthorizationHeaderCachedWithMustRevalidate()
     {
         $storage = new VolatileRuntimeStorage();
-        $strategy = new PrivateCacheStrategy($storage);
+        $strategy = new PublicCacheStrategy($storage);
 
         $request = new Request('GET', 'https://api.example.com/data', [
             'Authorization' => 'Bearer secret-token'
@@ -88,7 +88,7 @@ class AuthorizationCacheTest extends TestCase
     public function testAuthorizationHeaderCachedWithSMaxage()
     {
         $storage = new VolatileRuntimeStorage();
-        $strategy = new PrivateCacheStrategy($storage);
+        $strategy = new PublicCacheStrategy($storage);
 
         $request = new Request('GET', 'https://api.example.com/data', [
             'Authorization' => 'Bearer secret-token'
@@ -167,7 +167,7 @@ class AuthorizationCacheTest extends TestCase
     public function testMultipleAllowedDirectives()
     {
         $storage = new VolatileRuntimeStorage();
-        $strategy = new PrivateCacheStrategy($storage);
+        $strategy = new PublicCacheStrategy($storage);
 
         $request = new Request('GET', 'https://api.example.com/data', [
             'Authorization' => 'Bearer secret-token'
@@ -191,7 +191,7 @@ class AuthorizationCacheTest extends TestCase
     public function testAuthorizationHeaderCaseSensitivity()
     {
         $storage = new VolatileRuntimeStorage();
-        $strategy = new PrivateCacheStrategy($storage);
+        $strategy = new PublicCacheStrategy($storage);
 
         $requests = [
             new Request('GET', 'https://api.example.com/data', ['Authorization' => 'Bearer token']),
@@ -218,7 +218,7 @@ class AuthorizationCacheTest extends TestCase
     public function testOtherCacheControlDirectivesStillWork()
     {
         $storage = new VolatileRuntimeStorage();
-        $strategy = new PrivateCacheStrategy($storage);
+        $strategy = new PublicCacheStrategy($storage);
 
         // Test no-store still prevents caching even with authorization allowances
         $request = new Request('GET', 'https://api.example.com/data', [
@@ -234,5 +234,30 @@ class AuthorizationCacheTest extends TestCase
 
         $cached = $strategy->fetch($request);
         $this->assertNull($cached, 'No cache entry should exist when no-store is present');
+    }
+
+    /**
+     * Test that PrivateCacheStrategy still caches requests with Authorization header normally
+     */
+    public function testPrivateCacheStrategyAllowsAuthorizationCaching()
+    {
+        $storage = new VolatileRuntimeStorage();
+        $strategy = new PrivateCacheStrategy($storage);
+
+        $request = new Request('GET', 'https://api.example.com/data', [
+            'Authorization' => 'Bearer secret-token'
+        ]);
+        
+        // Private cache should cache this even with just max-age
+        $response = new Response(200, [
+            'Cache-Control' => 'max-age=3600'
+        ], 'Private cache data');
+
+        $result = $strategy->cache($request, $response);
+        $this->assertTrue($result, 'Private cache should allow caching of authenticated requests');
+
+        $cached = $strategy->fetch($request);
+        $this->assertNotNull($cached, 'Cache entry should exist in private cache for authenticated request');
+        $this->assertEquals('Private cache data', (string) $cached->getResponse()->getBody());
     }
 }

@@ -81,18 +81,6 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             return;
         }
 
-        // RFC 9111 Section 3.5: Check Authorization header caching restrictions
-        if ($request->hasHeader('Authorization')) {
-            // Requests with Authorization header should only be cached if response contains
-            // one of the following directives: public, must-revalidate, s-maxage
-            if (!$cacheControl->has('public') 
-                && !$cacheControl->has('must-revalidate') 
-                && !$cacheControl->has('s-maxage')) {
-                // No explicit authorization to cache authenticated requests
-                return;
-            }
-        }
-
         if ($cacheControl->has('no-cache')) {
             // Stale response see RFC7234 section 5.2.1.4
             $entry = new CacheEntry($request, $response, new \DateTime('-1 seconds'));
