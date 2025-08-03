@@ -37,6 +37,18 @@ class PublicCacheStrategy extends PrivateCacheStrategy
             return;
         }
 
+        // RFC 9111 Section 3.5: Check Authorization header caching restrictions for shared caches
+        if ($request->hasHeader('Authorization')) {
+            // Requests with Authorization header should only be cached if response contains
+            // one of the following directives: public, must-revalidate, s-maxage
+            if (!$cacheControl->has('public') 
+                && !$cacheControl->has('must-revalidate') 
+                && !$cacheControl->has('s-maxage')) {
+                // No explicit authorization to cache authenticated requests
+                return;
+            }
+        }
+
         return parent::getCacheObject($request, $response);
     }
 }
