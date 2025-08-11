@@ -133,14 +133,6 @@ class CacheEntryTest extends TestCase
         $this->assertEquals($cacheEntry, $originalCacheEntry);
     }
 
-    public function versionsToTestProvider()
-    {
-        return [
-            ['v4.0.0'],
-            ['v4.1.0'],
-            ['v4.1.1'],
-        ];
-    }
 
     private function setResponseHeader($name, $value)
     {
