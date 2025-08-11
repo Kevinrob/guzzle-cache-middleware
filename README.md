@@ -1,7 +1,7 @@
 # guzzle-cache-middleware
 
 [![Latest Stable Version](https://poser.pugx.org/kevinrob/guzzle-cache-middleware/v/stable)](https://packagist.org/packages/kevinrob/guzzle-cache-middleware) [![Total Downloads](https://poser.pugx.org/kevinrob/guzzle-cache-middleware/downloads)](https://packagist.org/packages/kevinrob/guzzle-cache-middleware) [![License](https://poser.pugx.org/kevinrob/guzzle-cache-middleware/license)](https://packagist.org/packages/kevinrob/guzzle-cache-middleware)
-![Tests](https://github.com/Kevinrob/guzzle-cache-middleware/workflows/Tests/badge.svg) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master) [![Code Coverage](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Kevinrob/guzzle-cache-middleware/?branch=master)
+![Tests](https://github.com/Kevinrob/guzzle-cache-middleware/workflows/Tests/badge.svg) 
 
 
 A HTTP Cache for [Guzzle](https://github.com/guzzle/guzzle) 6+. It's a simple Middleware to be added in the HandlerStack.
