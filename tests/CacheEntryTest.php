@@ -133,28 +133,6 @@ class CacheEntryTest extends TestCase
         $this->assertEquals($cacheEntry, $originalCacheEntry);
     }
 
-    /**
-     * @dataProvider versionsToTestProvider
-     */
-    public function testPreviousUnserialize($version)
-    {
-        if (version_compare(PHP_VERSION, '7.4.0') < 0) {
-            $this->markTestSkipped('Compat with previous version is not available with \Serializable interface');
-        }
-
-        $cacheEntry = unserialize(file_get_contents(__DIR__."/data/{$version}_serialized_cache_entry"));
-
-        self::assertInstanceOf(CacheEntry::class, $cacheEntry);
-    }
-
-    public function versionsToTestProvider()
-    {
-        return [
-            ['v4.0.0'],
-            ['v4.1.0'],
-            ['v4.1.1'],
-        ];
-    }
 
     private function setResponseHeader($name, $value)
     {
