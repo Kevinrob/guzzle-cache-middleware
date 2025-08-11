@@ -1,6 +1,6 @@
 init:
-	docker compose run cli composer i
+	docker compose build && docker compose run --rm cli composer install
 test:
-	docker compose run cli vendor/bin/phpunit
+	docker compose run --rm --remove-orphans cli vendor/bin/phpunit -v
 shell:
-	docker compose run cli sh
+	docker compose run --rm cli sh
