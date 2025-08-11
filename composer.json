@@ -19,14 +19,15 @@
     "guzzlehttp/psr7": "^2.7.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^9.6.21",
-    "league/flysystem": "^3.16",
-    "psr/cache": "^1.0",
+    "phpunit/phpunit": "^10.5",
+    "phpstan/phpstan": "^1.0",
+    "league/flysystem": "^3.30",
+    "psr/cache": "^2.0",
     "cache/array-adapter": "^0.4 || ^0.5 || ^1.0",
     "illuminate/cache": "^5.0",
     "cache/simple-cache-bridge": "^0.1 || ^1.0",
     "symfony/phpunit-bridge": "^7.1.4",
-    "symfony/cache": "^4.4 || ^5.0"
+    "symfony/cache": "^5.0 || ^6.0 || ^7.0"
   },
   "autoload": {
     "psr-4": {
@@ -46,7 +47,8 @@
     "laravel/framework": "To be used with Kevinrob\\GuzzleCache\\Storage\\LaravelCacheStorage"
   },
   "scripts": {
-    "test": "vendor/bin/phpunit"
+    "test": "vendor/bin/phpunit",
+    "phpstan": "vendor/bin/phpstan analyse"
   },
   "config": {
     "allow-plugins": {
