@@ -13,10 +13,10 @@ jobs:
           - "highest"
       fail-fast: false
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # 5.0.0
 
     - name: Install PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@20529878ed81ef8e78ddf08b480401e6101a850f # 2.35.3
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, dom, igbinary
@@ -25,7 +25,7 @@ jobs:
       run: composer validate
 
     - name: "Composer install ${{ matrix.dependencies }} dependencies"
-      uses: ramsey/composer-install@v2
+      uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # 3.1.1
       with:
         dependency-versions: "${{ matrix.dependencies }}"
       env:
