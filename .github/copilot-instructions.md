@@ -33,7 +33,6 @@ Tests are written using PHPUnit and located in the `tests/` directory.
 
 ### Additional Commands
 - `make shell`: Enter the Docker container shell for debugging
-- `composer test`: Alternative way to run tests directly with Composer
 
 ## Architecture and Code Organization
 
