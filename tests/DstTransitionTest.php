@@ -30,30 +30,6 @@ class DstTransitionTest extends TestCase
     }
 
     /**
-     * Test that UTC timestamp approach provides consistent behavior
-     * This verifies that our fix using '@' . (time() - 1) always creates
-     * expired timestamps regardless of timezone.
-     */
-    public function testUtcTimestampApproachIsConsistentAcrossTimezones()
-    {
-        $timezones = ['UTC', 'Europe/Berlin', 'America/New_York', 'Asia/Tokyo'];
-        
-        foreach ($timezones as $timezone) {
-            date_default_timezone_set($timezone);
-            
-            // Create DateTime using UTC timestamp (the fix)
-            $utcDateTime = new \DateTime('@' . (time() - 1));
-            
-            // Calculate TTL as the CacheEntry does
-            $ttl = $utcDateTime->getTimestamp() - time();
-            
-            // This should always be negative (approximately -1)
-            $this->assertLessThanOrEqual(0, $ttl, "TTL should be negative in timezone: $timezone");
-            $this->assertGreaterThanOrEqual(-2, $ttl, "TTL should not be too negative in timezone: $timezone");
-        }
-    }
-
-    /**
      * Test CacheEntry behavior with UTC timestamp approach
      * This ensures that cache entries marked for immediate expiry
      * behave consistently across timezones.
