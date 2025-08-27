@@ -42,6 +42,11 @@ class RequestCacheControlTest extends TestCase
                         (new Response())
                             ->withAddedHeader('Cache-Control', 'max-age=3')
                     );
+                case '/1s-stale-while-revalidate':
+                    return new FulfilledPromise(
+                        (new Response())
+                            ->withAddedHeader('Cache-Control', 'max-age=1, stale-while-revalidate=3')
+                    );
             }
 
             throw new \InvalidArgumentException();
@@ -162,6 +167,41 @@ class RequestCacheControlTest extends TestCase
             CacheMiddleware::HEADER_CACHE_MISS,
             $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
         );
+
+        $response = $this->client->get('http://test.com/1s-stale-while-revalidate', [
+            'headers' => [
+                'Cache-Control' => 'max-stale',
+            ]
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_MISS,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        sleep(2);
+
+        $response = $this->client->get('http://test.com/1s-stale-while-revalidate', [
+            'headers' => [
+                'Cache-Control' => 'max-stale=1',
+            ]
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_STALE,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        sleep(1);
+
+        $response = $this->client->get('http://test.com/1s-stale-while-revalidate', [
+            'headers' => [
+                'Cache-Control' => 'max-stale=1',
+            ]
+        ]);
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_MISS,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
     }
 
     public function testMinFreshHeader()
