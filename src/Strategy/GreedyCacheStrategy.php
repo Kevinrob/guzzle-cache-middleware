@@ -117,6 +117,6 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
      */
     public function delete(RequestInterface $request)
     {
-        return $this->storage->delete($this->getCacheKey($request));
+        return $this->storage->delete($this->getCacheKey($request, $this->varyHeaders));
     }
 }
