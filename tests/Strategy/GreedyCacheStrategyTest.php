@@ -8,6 +8,7 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Kevinrob\GuzzleCache\CacheMiddleware;
+use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Psr\Http\Message\RequestInterface;
@@ -72,5 +73,52 @@ class GreedyCacheStrategyTest extends TestCase
 
         $response = $this->client->send($request);
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
+    }
+
+    public function testGreedyCacheStrategyDeletion()
+    {
+        $storage = new VolatileRuntimeStorage();
+        $strategy = new GreedyCacheStrategy($storage, 60);
+
+        $request = new Request('GET', 'http://test.com/');
+        $response = new Response(200, [], 'Test content');
+
+        $result = $strategy->cache($request, $response);
+        $this->assertTrue($result, 'Response should be cached');
+
+        $cached = $strategy->fetch($request);
+        $this->assertNotNull($cached, 'Cache entry should exist');
+        $this->assertEquals('Test content', (string) $cached->getResponse()->getBody());
+
+        $deleted = $strategy->delete($request);
+        $this->assertTrue($deleted, 'Cache entry should be deleted successfully');
+
+        $cached = $strategy->fetch($request);
+        $this->assertNull($cached, 'Cache entry should no longer exist after deletion');
+    }
+
+    public function testGreedyDeletionWithVaryHeaders()
+    {
+        $storage = new VolatileRuntimeStorage();
+        $varyHeaders = new KeyValueHttpHeader(['Authorization']);
+        $strategy = new GreedyCacheStrategy($storage, 60, $varyHeaders);
+
+        $request = new Request('GET', 'http://test.com/', [
+            'Authorization' => 'Bearer token123'
+        ]);
+        $response = new Response(200, [], 'Authorized content');
+
+        $result = $strategy->cache($request, $response);
+        $this->assertTrue($result, 'Response should be cached with vary headers');
+
+        $cached = $strategy->fetch($request);
+        $this->assertNotNull($cached, 'Cache entry should exist with vary headers');
+        $this->assertEquals('Authorized content', (string) $cached->getResponse()->getBody());
+
+        $deleted = $strategy->delete($request);
+        $this->assertTrue($deleted, 'Cache entry should be deleted successfully with vary headers');
+
+        $cached = $strategy->fetch($request);
+        $this->assertNull($cached, 'Cache entry should no longer exist after deletion with vary headers');
     }
 }
