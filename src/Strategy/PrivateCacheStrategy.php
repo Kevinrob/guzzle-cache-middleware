@@ -83,7 +83,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         if ($cacheControl->has('no-cache')) {
             // Stale response see RFC7234 section 5.2.1.4
-            $entry = new CacheEntry($request, $response, new \DateTime('-1 seconds'));
+            $entry = new CacheEntry($request, $response, new \DateTime('@' . (time() - 1)));
 
             return $entry->hasValidationInformation() ? $entry : null;
         }
@@ -109,7 +109,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             }
         }
 
-        return new CacheEntry($request, $response, new \DateTime('-1 seconds'));
+        return new CacheEntry($request, $response, new \DateTime('@' . (time() - 1)));
     }
 
     /**
