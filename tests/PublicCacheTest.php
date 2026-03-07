@@ -88,7 +88,7 @@ class PublicCacheTest extends TestCase
     {
         $TMP_DIR = sys_get_temp_dir().'/guzzle-cache-tests-public-'.uniqid().'/';
         if (!is_dir($TMP_DIR)) {
-            mkdir($TMP_DIR, 0777, true);
+            mkdir($TMP_DIR, 0755, true);
         }
 
         $cacheProviders = [

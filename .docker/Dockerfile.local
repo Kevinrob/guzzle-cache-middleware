@@ -3,11 +3,11 @@ ENV XDG_CACHE_HOME=/tmp/.cache
 ENV COMPOSER_CACHE_DIR=${XDG_CACHE_HOME}/composer
 # Install basic dependencies for build
 RUN apk add --no-cache autoconf build-base zlib-dev libzip-dev
-RUN --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
+RUN --mount=type=bind,from=mlocati/php-extension-installer:2.7,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
       install-php-extensions zip
 RUN addgroup -S app && adduser -S app -G app
 RUN mkdir -p /app && chown -R app /app && mkdir -p /tmp && chown -R app /tmp \
-      && mkdir -p /app/tests/tmp && chown -R app:app /app/tests/tmp && chmod 777 /app/tests/tmp
+      && mkdir -p /app/tests/tmp && chown -R app:app /app/tests/tmp && chmod 775 /app/tests/tmp
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 USER app
 WORKDIR /app
