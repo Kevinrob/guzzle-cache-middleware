@@ -28,20 +28,28 @@ class HeaderExpireTest extends TestCase
      */
     protected $sendError = false;
 
+    /**
+     * @var \Symfony\Component\Clock\MockClock
+     */
+    protected $mockClock;
+
     protected function setUp(): void
     {
+        $this->mockClock = new \Symfony\Component\Clock\MockClock();
+        \Kevinrob\GuzzleCache\Clock::set($this->mockClock);
+
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {
             switch ($request->getUri()->getPath()) {
                 case '/expired':
                     return new FulfilledPromise(
                         (new Response())
-                            ->withHeader('Expires', gmdate('D, d M Y H:i:s T', time() - 10))
+                            ->withHeader('Expires', gmdate('D, d M Y H:i:s T', $this->mockClock->now()->getTimestamp() - 10))
                     );
                 case '/2s':
                     return new FulfilledPromise(
                         (new Response())
-                            ->withHeader('Expires', gmdate('D, d M Y H:i:s T', time() + 2))
+                            ->withHeader('Expires', gmdate('D, d M Y H:i:s T', $this->mockClock->now()->getTimestamp() + 2))
                     );
                 case '/stale-if-error':
                     if ($this->sendError) {
@@ -80,7 +88,7 @@ class HeaderExpireTest extends TestCase
         $response = $this->client->get('http://test.com/2s');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(5);
+        $this->mockClock->sleep(5);
 
         $response = $this->client->get('http://test.com/2s');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
@@ -90,7 +98,7 @@ class HeaderExpireTest extends TestCase
     {
         $this->client->get('http://test.com/stale-if-error');
 
-        sleep(1);
+        $this->mockClock->sleep(1);
 
         $this->sendError = true;
         $response = $this->client->get('http://test.com/stale-if-error');

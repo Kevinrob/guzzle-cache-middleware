@@ -17,8 +17,16 @@ class ResponseCacheControlTest extends TestCase
      */
     protected $client;
 
+    /**
+     * @var \Symfony\Component\Clock\MockClock
+     */
+    protected $mockClock;
+
     protected function setUp(): void
     {
+        $this->mockClock = new \Symfony\Component\Clock\MockClock();
+        \Kevinrob\GuzzleCache\Clock::set($this->mockClock);
+
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {
             switch ($request->getUri()->getPath()) {
@@ -51,7 +59,7 @@ class ResponseCacheControlTest extends TestCase
                     return new FulfilledPromise(
                         (new Response())
                             ->withAddedHeader('Cache-Control', 'public')
-                            ->withAddedHeader('Expires', gmdate('D, d M Y H:i:s T', time() + 2))
+                            ->withAddedHeader('Expires', gmdate('D, d M Y H:i:s T', $this->mockClock->now()->getTimestamp() + 2))
                     );
               case '/no-headers':
                     return new FulfilledPromise(
@@ -76,7 +84,7 @@ class ResponseCacheControlTest extends TestCase
         $response = $this->client->get('http://test.com/2s');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(4);
+        $this->mockClock->sleep(4);
 
         $response = $this->client->get('http://test.com/2s');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
@@ -89,7 +97,7 @@ class ResponseCacheControlTest extends TestCase
         $response = $this->client->get('http://test.com/2s-complex');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(5);
+        $this->mockClock->sleep(5);
 
         $response = $this->client->get('http://test.com/2s-complex');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
@@ -118,7 +126,7 @@ class ResponseCacheControlTest extends TestCase
         $response = $this->client->get('http://test.com/2s-expires');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(6);
+        $this->mockClock->sleep(6);
 
         $response = $this->client->get('http://test.com/2s-expires');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));

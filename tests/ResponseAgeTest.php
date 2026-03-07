@@ -17,8 +17,16 @@ class ResponseAgeTest extends TestCase
      */
     protected $client;
 
+    /**
+     * @var \Symfony\Component\Clock\MockClock
+     */
+    protected $mockClock;
+
     protected function setUp(): void
     {
+        $this->mockClock = new \Symfony\Component\Clock\MockClock();
+        \Kevinrob\GuzzleCache\Clock::set($this->mockClock);
+
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {
             switch ($request->getUri()->getPath()) {
@@ -44,7 +52,7 @@ class ResponseAgeTest extends TestCase
         $response = $this->client->get('http://test.com/2s');
         $this->assertFalse($response->hasHeader('Age'));
 
-        sleep(1);
+        $this->mockClock->sleep(1);
 
         $response = $this->client->get('http://test.com/2s');
         $this->assertEquals(

@@ -3,6 +3,7 @@
 namespace Kevinrob\GuzzleCache\Strategy;
 
 use Kevinrob\GuzzleCache\CacheEntry;
+use Kevinrob\GuzzleCache\Clock;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Psr\Http\Message\RequestInterface;
@@ -68,7 +69,7 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
         $warningMessage = sprintf('%d - "%s" "%s"',
             299,
             'Cached although the response headers indicate not to do it!',
-            (new \DateTime())->format(\DateTime::RFC1123)
+            Clock::now()->format(\DateTime::RFC1123)
         );
 
         $response = $response->withAddedHeader('Warning', $warningMessage);
@@ -103,7 +104,7 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
             $ttl = (int)reset($ttlHeaderValues);
         }
 
-        return new CacheEntry($request->withoutHeader(static::HEADER_TTL), $response, new \DateTime(sprintf('%+d seconds', $ttl)));
+        return new CacheEntry($request->withoutHeader(static::HEADER_TTL), $response, Clock::now()->modify(sprintf('%+d seconds', $ttl)));
     }
 
     public function fetch(RequestInterface $request)

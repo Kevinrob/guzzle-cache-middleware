@@ -20,22 +20,22 @@ class CacheEntry implements \Serializable
     protected $response;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $staleAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $staleIfErrorTo;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $staleWhileRevalidateTo;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateCreated;
 
@@ -47,41 +47,41 @@ class CacheEntry implements \Serializable
     protected $timestampStale;
 
     /**
-     * @param RequestInterface $request
+     * @param RequestInterface  $request
      * @param ResponseInterface $response
-     * @param \DateTime $staleAt
-     * @param \DateTime|null $staleIfErrorTo if null, detected with the headers (RFC 5861)
-     * @param \DateTime|null $staleWhileRevalidateTo
+     * @param \DateTimeInterface $staleAt
+     * @param \DateTimeInterface|null $staleIfErrorTo if null, detected with the headers (RFC 5861)
+     * @param \DateTimeInterface|null $staleWhileRevalidateTo
      */
     public function __construct(
         RequestInterface $request,
         ResponseInterface $response,
-        \DateTime $staleAt,
-        ?\DateTime $staleIfErrorTo = null,
-        ?\DateTime $staleWhileRevalidateTo = null
+        \DateTimeInterface $staleAt,
+        ?\DateTimeInterface $staleIfErrorTo = null,
+        ?\DateTimeInterface $staleWhileRevalidateTo = null
     ) {
-        $this->dateCreated = new \DateTime();
+        $this->dateCreated = Clock::now();
 
         $this->request = $request;
         $this->response = $response;
-        $this->staleAt = $staleAt;
+        $this->staleAt = self::toImmutable($staleAt);
 
         $values = new KeyValueHttpHeader($response->getHeader('Cache-Control'));
 
         if ($staleIfErrorTo === null && $values->has('stale-if-error')) {
-            $this->staleIfErrorTo = (new \DateTime(
+            $this->staleIfErrorTo = (new \DateTimeImmutable(
                 '@'.($this->staleAt->getTimestamp() + (int) $values->get('stale-if-error'))
             ));
         } else {
-            $this->staleIfErrorTo = $staleIfErrorTo;
+            $this->staleIfErrorTo = self::toImmutable($staleIfErrorTo);
         }
 
         if ($staleWhileRevalidateTo === null && $values->has('stale-while-revalidate')) {
-            $this->staleWhileRevalidateTo = new \DateTime(
+            $this->staleWhileRevalidateTo = new \DateTimeImmutable(
                 '@'.($this->staleAt->getTimestamp() + (int) $values->get('stale-while-revalidate'))
             );
         } else {
-            $this->staleWhileRevalidateTo = $staleWhileRevalidateTo;
+            $this->staleWhileRevalidateTo = self::toImmutable($staleWhileRevalidateTo);
         }
     }
 
@@ -152,7 +152,7 @@ class CacheEntry implements \Serializable
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getStaleAt()
     {
@@ -185,7 +185,7 @@ class CacheEntry implements \Serializable
             $this->timestampStale = $this->staleAt->getTimestamp();
         }
 
-        return time() - $this->timestampStale;
+        return Clock::now()->getTimestamp() - $this->timestampStale;
     }
 
     /**
@@ -194,7 +194,7 @@ class CacheEntry implements \Serializable
     public function serveStaleIfError()
     {
         return $this->staleIfErrorTo !== null
-            && $this->staleIfErrorTo->getTimestamp() >= (new \DateTime())->getTimestamp();
+            && $this->staleIfErrorTo->getTimestamp() >= Clock::now()->getTimestamp();
     }
 
     /**
@@ -203,7 +203,7 @@ class CacheEntry implements \Serializable
     public function staleWhileValidate()
     {
         return $this->staleWhileRevalidateTo !== null
-            && $this->staleWhileRevalidateTo->getTimestamp() >= (new \DateTime())->getTimestamp();
+            && $this->staleWhileRevalidateTo->getTimestamp() >= Clock::now()->getTimestamp();
     }
 
     /**
@@ -231,19 +231,20 @@ class CacheEntry implements \Serializable
         }
 
         $ttl = 0;
+        $now = Clock::now()->getTimestamp();
 
         // Keep it when stale if error
         if ($this->staleIfErrorTo !== null) {
-            $ttl = max($ttl, $this->staleIfErrorTo->getTimestamp() - time());
+            $ttl = max($ttl, $this->staleIfErrorTo->getTimestamp() - $now);
         }
 
         // Keep it when stale-while-revalidate
         if ($this->staleWhileRevalidateTo !== null) {
-            $ttl = max($ttl, $this->staleWhileRevalidateTo->getTimestamp() - time());
+            $ttl = max($ttl, $this->staleWhileRevalidateTo->getTimestamp() - $now);
         }
 
         // Keep it until it become stale
-        $ttl = max($ttl, $this->staleAt->getTimestamp() - time());
+        $ttl = max($ttl, $this->staleAt->getTimestamp() - $now);
 
         // Don't return 0, it's reserved for infinite TTL
         return $ttl !== 0 ? (int) $ttl : -1;
@@ -254,7 +255,7 @@ class CacheEntry implements \Serializable
      */
     public function getAge()
     {
-        return time() - $this->dateCreated->getTimestamp();
+        return Clock::now()->getTimestamp() - $this->dateCreated->getTimestamp();
     }
 
     public function __serialize(): array
@@ -279,11 +280,24 @@ class CacheEntry implements \Serializable
         }
         $this->request = self::restoreStreamBody($data[$prefix.'request']);
         $this->response = $data[$prefix.'response'] !== null ? self::restoreStreamBody($data[$prefix.'response']) : null;
-        $this->staleAt = $data[$prefix.'staleAt'];
-        $this->staleIfErrorTo = $data[$prefix.'staleIfErrorTo'];
-        $this->staleWhileRevalidateTo = $data[$prefix.'staleWhileRevalidateTo'];
-        $this->dateCreated = $data[$prefix.'dateCreated'];
+        $this->staleAt = self::toImmutable($data[$prefix.'staleAt']);
+        $this->staleIfErrorTo = self::toImmutable($data[$prefix.'staleIfErrorTo']);
+        $this->staleWhileRevalidateTo = self::toImmutable($data[$prefix.'staleWhileRevalidateTo']);
+        $this->dateCreated = self::toImmutable($data[$prefix.'dateCreated']);
         $this->timestampStale = $data[$prefix.'timestampStale'];
+    }
+
+    /**
+     * @param \DateTimeInterface|null $date
+     * @return \DateTimeImmutable|null
+     */
+    private static function toImmutable(?\DateTimeInterface $date): ?\DateTimeImmutable
+    {
+        if ($date instanceof \DateTime) {
+            return \DateTimeImmutable::createFromInterface($date);
+        }
+
+        return $date;
     }
 
     /**
