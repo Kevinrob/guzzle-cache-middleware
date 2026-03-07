@@ -84,8 +84,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         if ($cacheControl->has('no-cache')) {
             // Stale response see RFC7234 section 5.2.1.4
-            $now = Clock::now();
-            $entry = new CacheEntry($request, $response, $now->setTimestamp($now->getTimestamp() - 1));
+            $entry = $this->createStaleCacheEntry($request, $response);
 
             return $entry->hasValidationInformation() ? $entry : null;
         }
@@ -112,7 +111,18 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             }
         }
 
+        return $this->createStaleCacheEntry($request, $response);
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @return CacheEntry
+     */
+    private function createStaleCacheEntry(RequestInterface $request, ResponseInterface $response): CacheEntry
+    {
         $now = Clock::now();
+
         return new CacheEntry($request, $response, $now->setTimestamp($now->getTimestamp() - 1));
     }
 

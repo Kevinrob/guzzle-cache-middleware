@@ -17,6 +17,9 @@ use PHPUnit\Framework\TestCase;
 
 class PrivateCacheTest extends TestCase
 {
+    /**
+     * @runInSeparateProcess
+     */
     public function testDstTransitionDoesNotIncorrectlyCache()
     {
         $defaultTz = date_default_timezone_get();
