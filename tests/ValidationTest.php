@@ -28,8 +28,16 @@ class ValidationTest extends TestCase
      */
     protected $cache;
 
+    /**
+     * @var \Symfony\Component\Clock\MockClock
+     */
+    protected $mockClock;
+
     protected function setUp(): void
     {
+        $this->mockClock = new \Symfony\Component\Clock\MockClock();
+        \Kevinrob\GuzzleCache\Clock::set($this->mockClock);
+
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {
             switch ($request->getUri()->getPath()) {
@@ -94,7 +102,7 @@ class ValidationTest extends TestCase
         $this->assertEquals('1', $response->getHeaderLine('X-Base-Info'));
         $this->assertEquals('1', $response->getHeaderLine('X-Replaced'));
 
-        sleep(2);
+        $this->mockClock->sleep(2);
 
         $response = $this->client->get('http://test.com/etag');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
@@ -106,7 +114,7 @@ class ValidationTest extends TestCase
     {
         $this->client->get('http://test.com/etag-changed');
 
-        sleep(2);
+        $this->mockClock->sleep(2);
 
         $response = $this->client->get('http://test.com/etag-changed');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
@@ -116,7 +124,7 @@ class ValidationTest extends TestCase
     {
         $this->client->get('http://test.com/stale-while-revalidate');
 
-        sleep(2);
+        $this->mockClock->sleep(2);
 
         $response = $this->client->get('http://test.com/stale-while-revalidate');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_STALE, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));

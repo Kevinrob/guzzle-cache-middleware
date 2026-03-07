@@ -3,6 +3,7 @@
 namespace Kevinrob\GuzzleCache\Strategy;
 
 use Kevinrob\GuzzleCache\CacheEntry;
+use Kevinrob\GuzzleCache\Clock;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
@@ -83,7 +84,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         if ($cacheControl->has('no-cache')) {
             // Stale response see RFC7234 section 5.2.1.4
-            $entry = new CacheEntry($request, $response, new \DateTime('-1 seconds'));
+            $entry = new CacheEntry($request, $response, Clock::now()->modify('-1 seconds'));
 
             return $entry->hasValidationInformation() ? $entry : null;
         }
@@ -93,7 +94,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
                 return new CacheEntry(
                     $request,
                     $response,
-                    new \DateTime('+'.(int) $cacheControl->get($key).'seconds')
+                    Clock::now()->modify('+'.(int) $cacheControl->get($key).'seconds')
                 );
             }
         }
@@ -109,7 +110,7 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             }
         }
 
-        return new CacheEntry($request, $response, new \DateTime('-1 seconds'));
+        return new CacheEntry($request, $response, Clock::now()->modify('-1 seconds'));
     }
 
     /**

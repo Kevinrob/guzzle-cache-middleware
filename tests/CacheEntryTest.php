@@ -141,6 +141,6 @@ class CacheEntryTest extends TestCase
 
     private function makeDateTimeOffset($offset = 0)
     {
-        return \DateTime::createFromFormat('U', time() + $offset);
+        return \DateTimeImmutable::createFromFormat('U', \Kevinrob\GuzzleCache\Clock::now()->getTimestamp() + $offset);
     }
 }

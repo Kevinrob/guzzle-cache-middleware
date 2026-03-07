@@ -21,8 +21,16 @@ class GreedyCacheStrategyTest extends TestCase
      */
     protected $client;
 
+    /**
+     * @var \Symfony\Component\Clock\MockClock
+     */
+    protected $mockClock;
+
     protected function setUp(): void
     {
+        $this->mockClock = new \Symfony\Component\Clock\MockClock();
+        \Kevinrob\GuzzleCache\Clock::set($this->mockClock);
+
         // Create default HandlerStack
         $stack = HandlerStack::create(function (RequestInterface $request, array $options) {
             return new FulfilledPromise((new Response()));
@@ -44,7 +52,7 @@ class GreedyCacheStrategyTest extends TestCase
         $response = $this->client->get('http://test.com/');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(5);
+        $this->mockClock->sleep(5);
 
         $response = $this->client->get('http://test.com/');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
@@ -69,7 +77,7 @@ class GreedyCacheStrategyTest extends TestCase
         $response = $this->client->send($request);
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(6);
+        $this->mockClock->sleep(6);
 
         $response = $this->client->send($request);
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));

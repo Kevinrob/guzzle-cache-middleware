@@ -46,7 +46,7 @@ class CacheMiddlewareTest extends TestCase
         $strategy->method('fetch')->willReturn(new CacheEntry(
             $request,
             $response,
-            new \DateTime('-1 second')
+            \Kevinrob\GuzzleCache\Clock::now()->modify('-1 second')
         ));
         $handler = function () {
             return new RejectedPromise(new \RuntimeException('Unexpected error'));
