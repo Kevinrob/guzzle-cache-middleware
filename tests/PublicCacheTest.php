@@ -86,7 +86,10 @@ class PublicCacheTest extends TestCase
 
     public function testCacheProvider()
     {
-        $TMP_DIR = __DIR__.'/tmp/';
+        $TMP_DIR = sys_get_temp_dir().'/guzzle-cache-tests-public-'.uniqid().'/';
+        if (!is_dir($TMP_DIR)) {
+            mkdir($TMP_DIR, 0777, true);
+        }
 
         $cacheProviders = [
             new FlysystemStorage(new LocalFilesystemAdapter($TMP_DIR)),

@@ -77,7 +77,10 @@ class PrivateCacheTest extends TestCase
 
     public function cacheProvider()
     {
-        $TMP_DIR = __DIR__.'/tmp/';
+        $TMP_DIR = sys_get_temp_dir().'/guzzle-cache-tests-private-'.uniqid().'/';
+        if (!is_dir($TMP_DIR)) {
+            mkdir($TMP_DIR, 0777, true);
+        }
         return [
             'flysystem' => [ new FlysystemStorage(new LocalFilesystemAdapter($TMP_DIR)), $TMP_DIR ],
             'psr6' => [ new Psr6CacheStorage(new ArrayCachePool()) ],

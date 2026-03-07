@@ -76,7 +76,7 @@ class ResponseCacheControlTest extends TestCase
         $response = $this->client->get('http://test.com/2s');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(3);
+        sleep(4);
 
         $response = $this->client->get('http://test.com/2s');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
@@ -89,7 +89,7 @@ class ResponseCacheControlTest extends TestCase
         $response = $this->client->get('http://test.com/2s-complex');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(3);
+        sleep(4);
 
         $response = $this->client->get('http://test.com/2s-complex');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
@@ -118,7 +118,7 @@ class ResponseCacheControlTest extends TestCase
         $response = $this->client->get('http://test.com/2s-expires');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(3);
+        sleep(4);
 
         $response = $this->client->get('http://test.com/2s-expires');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_MISS, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
