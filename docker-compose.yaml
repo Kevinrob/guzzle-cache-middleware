@@ -7,4 +7,3 @@ services:
     volumes:
       - ./:/app
       - ~/.composer/cache/:/tmp/cache/
-      - ./.docker/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini:ro

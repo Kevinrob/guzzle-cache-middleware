@@ -88,7 +88,7 @@ class RequestCacheControlTest extends TestCase
         $response = $this->client->get('http://test.com/3s');
         $this->assertEquals(CacheMiddleware::HEADER_CACHE_HIT, $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO));
 
-        sleep(2);
+        sleep(4);
 
         $response = $this->client->get('http://test.com/3s', [
             'headers' => [
@@ -151,7 +151,7 @@ class RequestCacheControlTest extends TestCase
             $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
         );
 
-        sleep(2);
+        sleep(3);
 
         $response = $this->client->get('http://test.com/1s', [
             'headers' => [
