@@ -17,8 +17,50 @@ use PHPUnit\Framework\TestCase;
 
 class PrivateCacheTest extends TestCase
 {
+    public function testDstTransitionDoesNotIncorrectlyCache()
+    {
+        $defaultTz = date_default_timezone_get();
+        date_default_timezone_set('Europe/Berlin');
+
+        try {
+            // Set clock to a specific time during the DST transition (Summer -> Winter)
+            // Oct 27, 2024 at 02:00:56 CEST
+            $transitionTime = new \DateTimeImmutable('2024-10-27 02:00:56', new \DateTimeZone('Europe/Berlin'));
+            $mockClock = new \Symfony\Component\Clock\MockClock($transitionTime);
+            \Kevinrob\GuzzleCache\Clock::set($mockClock);
+
+            $request = new Request('GET', 'test.local');
+            $response = new Response(
+                200, [
+                    'Cache-Control' => 'no-cache', // This forces a -1 second expiration
+                    'Etag' => '"dummy"', // Required to allow caching of no-cache responses
+                ],
+                'Test content'
+            );
+
+            $cache = new PrivateCacheStrategy(
+                new VolatileRuntimeStorage()
+            );
+
+            // Cache the response
+            $cache->cache($request, $response);
+
+            // Fetch the cached entry
+            $entry = $cache->fetch($request);
+
+            // It should not be null, but it should be STALE (expired)
+            $this->assertNotNull($entry, 'The entry should be stored in cache.');
+            $this->assertTrue($entry->isStale(), 'The entry should be stale (expired) even during DST transition.');
+            $this->assertGreaterThan(0, $entry->getStaleAge(), 'The stale age should be positive.');
+        } finally {
+            date_default_timezone_set($defaultTz);
+            \Kevinrob\GuzzleCache\Clock::set(new \Symfony\Component\Clock\NativeClock()); // Reset to real-time clock
+        }
+    }
+
     /**
      * @param CacheStorageInterface $cacheProvider
+
      * @param $TMP_DIR
      * @return void
      * @dataProvider cacheProvider

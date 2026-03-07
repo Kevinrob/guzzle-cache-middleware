@@ -84,17 +84,19 @@ class PrivateCacheStrategy implements CacheStrategyInterface
 
         if ($cacheControl->has('no-cache')) {
             // Stale response see RFC7234 section 5.2.1.4
-            $entry = new CacheEntry($request, $response, Clock::now()->modify('-1 seconds'));
+            $now = Clock::now();
+            $entry = new CacheEntry($request, $response, $now->setTimestamp($now->getTimestamp() - 1));
 
             return $entry->hasValidationInformation() ? $entry : null;
         }
 
         foreach ($this->ageKey as $key) {
             if ($cacheControl->has($key)) {
+                $now = Clock::now();
                 return new CacheEntry(
                     $request,
                     $response,
-                    Clock::now()->modify('+'.(int) $cacheControl->get($key).'seconds')
+                    $now->setTimestamp($now->getTimestamp() + (int) $cacheControl->get($key))
                 );
             }
         }
@@ -110,7 +112,8 @@ class PrivateCacheStrategy implements CacheStrategyInterface
             }
         }
 
-        return new CacheEntry($request, $response, Clock::now()->modify('-1 seconds'));
+        $now = Clock::now();
+        return new CacheEntry($request, $response, $now->setTimestamp($now->getTimestamp() - 1));
     }
 
     /**

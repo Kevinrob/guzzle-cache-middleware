@@ -104,7 +104,8 @@ class GreedyCacheStrategy extends PrivateCacheStrategy
             $ttl = (int)reset($ttlHeaderValues);
         }
 
-        return new CacheEntry($request->withoutHeader(static::HEADER_TTL), $response, Clock::now()->modify(sprintf('%+d seconds', $ttl)));
+        $now = Clock::now();
+        return new CacheEntry($request->withoutHeader(static::HEADER_TTL), $response, $now->setTimestamp($now->getTimestamp() + $ttl));
     }
 
     public function fetch(RequestInterface $request)
