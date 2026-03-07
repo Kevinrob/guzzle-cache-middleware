@@ -60,7 +60,6 @@ class PrivateCacheTest extends TestCase
 
     /**
      * @param CacheStorageInterface $cacheProvider
-
      * @param $TMP_DIR
      * @return void
      * @dataProvider cacheProvider
