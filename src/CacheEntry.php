@@ -64,7 +64,7 @@ class CacheEntry implements \Serializable
 
         $this->request = $request;
         $this->response = $response;
-        $this->staleAt = $staleAt instanceof \DateTime ? \DateTimeImmutable::createFromInterface($staleAt) : $staleAt;
+        $this->staleAt = self::toImmutable($staleAt);
 
         $values = new KeyValueHttpHeader($response->getHeader('Cache-Control'));
 
@@ -73,7 +73,7 @@ class CacheEntry implements \Serializable
                 '@'.($this->staleAt->getTimestamp() + (int) $values->get('stale-if-error'))
             ));
         } else {
-            $this->staleIfErrorTo = $staleIfErrorTo instanceof \DateTime ? \DateTimeImmutable::createFromInterface($staleIfErrorTo) : $staleIfErrorTo;
+            $this->staleIfErrorTo = self::toImmutable($staleIfErrorTo);
         }
 
         if ($staleWhileRevalidateTo === null && $values->has('stale-while-revalidate')) {
@@ -81,7 +81,7 @@ class CacheEntry implements \Serializable
                 '@'.($this->staleAt->getTimestamp() + (int) $values->get('stale-while-revalidate'))
             );
         } else {
-            $this->staleWhileRevalidateTo = $staleWhileRevalidateTo instanceof \DateTime ? \DateTimeImmutable::createFromInterface($staleWhileRevalidateTo) : $staleWhileRevalidateTo;
+            $this->staleWhileRevalidateTo = self::toImmutable($staleWhileRevalidateTo);
         }
     }
 
