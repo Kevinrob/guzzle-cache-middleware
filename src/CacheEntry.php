@@ -273,18 +273,41 @@ class CacheEntry implements \Serializable
 
     public function __unserialize(array $data): void
     {
-        $prefix = '';
-        if (isset($data["\0*\0request"])) {
-            // We are unserializing a cache entry which was serialized with a version < 4.1.1
-            $prefix = "\0*\0";
+        try {
+            $prefix = '';
+            if (isset($data["\0*\0request"])) {
+                // We are unserializing a cache entry which was serialized with a version < 4.1.1
+                $prefix = "\0*\0";
+            }
+
+            $this->request = ($data[$prefix.'request'] ?? null) !== null ? self::restoreStreamBody($data[$prefix.'request']) : null;
+            if ($this->request === null) {
+                throw new \InvalidArgumentException('request is missing or invalid');
+            }
+
+            $this->response = ($data[$prefix.'response'] ?? null) !== null ? self::restoreStreamBody($data[$prefix.'response']) : null;
+            if ($this->response === null) {
+                throw new \InvalidArgumentException('response is missing or invalid');
+            }
+            
+            $this->staleAt = self::toImmutable($data[$prefix.'staleAt'] ?? null);
+            if ($this->staleAt === null) {
+                throw new \InvalidArgumentException('staleAt is missing or invalid');
+            }
+
+            $this->staleIfErrorTo = self::toImmutable($data[$prefix.'staleIfErrorTo'] ?? null);
+            $this->staleWhileRevalidateTo = self::toImmutable($data[$prefix.'staleWhileRevalidateTo'] ?? null);
+            
+            $this->dateCreated = self::toImmutable($data[$prefix.'dateCreated'] ?? null);
+            if ($this->dateCreated === null) {
+                throw new \InvalidArgumentException('dateCreated is missing or invalid');
+            }
+
+            $this->timestampStale = $data[$prefix.'timestampStale'] ?? null;
+        } catch (\Throwable $e) {
+            // If the stream is corrupted or incompatible, we completely invalidate this cache entry
+            throw new \InvalidArgumentException('Corrupted cache entry', 0, $e);
         }
-        $this->request = self::restoreStreamBody($data[$prefix.'request']);
-        $this->response = $data[$prefix.'response'] !== null ? self::restoreStreamBody($data[$prefix.'response']) : null;
-        $this->staleAt = self::toImmutable($data[$prefix.'staleAt']);
-        $this->staleIfErrorTo = self::toImmutable($data[$prefix.'staleIfErrorTo']);
-        $this->staleWhileRevalidateTo = self::toImmutable($data[$prefix.'staleWhileRevalidateTo']);
-        $this->dateCreated = self::toImmutable($data[$prefix.'dateCreated']);
-        $this->timestampStale = $data[$prefix.'timestampStale'];
     }
 
     /**

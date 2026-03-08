@@ -26,17 +26,22 @@ class FlysystemStorage implements CacheStorageInterface
     public function fetch($key)
     {
         if ($this->filesystem->fileExists($key)) {
-            // The file exist, read it!
-            $data = @unserialize(
-                $this->filesystem->read($key)
-            );
+            // The file exists, read it!
+            try {
+                $data = @unserialize(
+                    $this->filesystem->read($key)
+                );
 
-            if ($data instanceof CacheEntry) {
-                return $data;
+                if ($data instanceof CacheEntry) {
+                    return $data;
+                }
+            } catch (\Throwable $e) {
+                // If unserialize fails (e.g. InvalidArgumentException from corrupted cache)
+                return null;
             }
         }
 
-        return;
+        return null;
     }
 
     /**

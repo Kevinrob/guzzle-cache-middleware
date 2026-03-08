@@ -38,13 +38,17 @@ class Psr6CacheStorage implements CacheStorageInterface
      */
     public function fetch($key)
     {
-        $item = $this->cachePool->getItem($key);
-        $this->lastItem = $item;
+        try {
+            $item = $this->cachePool->getItem($key);
+            $this->lastItem = $item;
 
-        $cache = $item->get();
+            $cache = $item->get();
 
-        if ($cache instanceof CacheEntry) {
-            return $cache;
+            if ($cache instanceof CacheEntry) {
+                return $cache;
+            }
+        } catch (\Throwable $e) {
+            return null;
         }
 
         return null;

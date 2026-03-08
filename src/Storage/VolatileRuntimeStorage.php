@@ -26,7 +26,7 @@ class VolatileRuntimeStorage implements CacheStorageInterface
             return $this->cache[$key];
         }
 
-        return;
+        return null;
     }
 
     /**

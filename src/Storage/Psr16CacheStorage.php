@@ -22,9 +22,13 @@ class Psr16CacheStorage implements CacheStorageInterface
      */
     public function fetch($key)
     {
-        $data = $this->cache->get($key);
-        if ($data instanceof CacheEntry) {
-            return $data;
+        try {
+            $data = $this->cache->get($key);
+            if ($data instanceof CacheEntry) {
+                return $data;
+            }
+        } catch (\Throwable $e) {
+            return null;
         }
 
         return null;
