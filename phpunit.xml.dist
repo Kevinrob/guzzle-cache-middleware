@@ -3,7 +3,8 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="./vendor/autoload.php">
+         bootstrap="./vendor/autoload.php"
+         cacheResultFile="/tmp/.phpunit.result.cache">
   <coverage processUncoveredFiles="true">
     <include>
       <directory suffix=".php">src</directory>
