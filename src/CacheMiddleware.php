@@ -284,11 +284,6 @@ class CacheMiddleware
         return $response;
     }
 
-    /**
-     * @param ResponseInterface $response
-     * @param array $options
-     * @return ResponseInterface
-     */
     protected function applySink(ResponseInterface $response, array $options): ResponseInterface
     {
         if (isset($options['sink'])) {
@@ -300,19 +295,16 @@ class CacheMiddleware
         return $response;
     }
 
-    /**
-     * @param StreamInterface $body
-     * @param string|resource|StreamInterface $sink
-     * @return StreamInterface
-     */
-    protected function writeToSink(StreamInterface $body, $sink)
+    protected function writeToSink(StreamInterface $body, mixed $sink): StreamInterface
     {
         if (is_string($sink)) {
             $sinkStream = Utils::streamFor(Utils::tryFopen($sink, 'w'));
         } elseif (is_resource($sink)) {
             $sinkStream = Utils::streamFor($sink);
-        } else {
+        } elseif ($sink instanceof StreamInterface) {
             $sinkStream = $sink;
+        } else {
+            throw new \InvalidArgumentException('`sink` must be a resource, string, or StreamInterface');
         }
 
         try {
