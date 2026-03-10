@@ -29,7 +29,8 @@ class FlysystemStorage implements CacheStorageInterface
             // The file exists, read it!
             try {
                 $data = @unserialize(
-                    $this->filesystem->read($key)
+                    $this->filesystem->read($key),
+                    ['allowed_classes' => CacheEntry::getAllowedClasses()]
                 );
 
                 if ($data instanceof CacheEntry) {
