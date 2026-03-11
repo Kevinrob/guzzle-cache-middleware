@@ -8,10 +8,12 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\RejectedPromise;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Utils;
 use Kevinrob\GuzzleCache\Strategy\CacheStrategyInterface;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 /**
  * Class CacheMiddleware.
@@ -152,25 +154,23 @@ class CacheMiddleware
             // If cache => return new FulfilledPromise(...) with response
             $cacheEntry = $this->cacheStorage->fetch($request);
             if ($cacheEntry instanceof CacheEntry) {
-                $body = $cacheEntry->getResponse()->getBody();
-                if ($body->tell() > 0) {
-                    $body->rewind();
-                }
+                $response = $cacheEntry->getResponse();
+                $response->getBody()->rewind();
 
                 if ($cacheEntry->isFresh()
                     && ($minFreshCache === null || $cacheEntry->getStaleAge() + (int)$minFreshCache <= 0)
                 ) {
                     // Cache HIT!
-                    return new FulfilledPromise(
-                        $cacheEntry->getResponse()->withHeader(static::HEADER_CACHE_INFO, static::HEADER_CACHE_HIT)
-                    );
+                    $response = $response->withHeader(static::HEADER_CACHE_INFO, static::HEADER_CACHE_HIT);
+
+                    return new FulfilledPromise($this->applySink($response, $options));
                 } elseif ($staleResponse
                     || ($maxStaleCache !== null && $cacheEntry->getStaleAge() <= $maxStaleCache)
                 ) {
                     // Staled cache!
-                    return new FulfilledPromise(
-                        $cacheEntry->getResponse()->withHeader(static::HEADER_CACHE_INFO, static::HEADER_CACHE_HIT)
-                    );
+                    $response = $response->withHeader(static::HEADER_CACHE_INFO, static::HEADER_CACHE_HIT);
+
+                    return new FulfilledPromise($this->applySink($response, $options));
                 } elseif ($cacheEntry->hasValidationInformation() && !$onlyFromCache) {
                     // Re-validation header
                     $request = static::getRequestWithReValidationHeader($request, $cacheEntry);
@@ -178,10 +178,9 @@ class CacheMiddleware
                     if ($cacheEntry->staleWhileValidate()) {
                         static::addReValidationRequest($request, $this->cacheStorage, $cacheEntry);
 
-                        return new FulfilledPromise(
-                            $cacheEntry->getResponse()
-                                ->withHeader(static::HEADER_CACHE_INFO, static::HEADER_CACHE_STALE)
-                        );
+                        $response = $response->withHeader(static::HEADER_CACHE_INFO, static::HEADER_CACHE_STALE);
+
+                        return new FulfilledPromise($this->applySink($response, $options));
                     }
                 }
             } else {
@@ -199,12 +198,12 @@ class CacheMiddleware
             $promise = $handler($request, $options);
 
             return $promise->then(
-                function (ResponseInterface $response) use ($request, $cacheEntry) {
+                function (ResponseInterface $response) use ($request, $cacheEntry, $options) {
                     // Check if error and looking for a staled content
                     if ($response->getStatusCode() >= 500) {
                         $responseStale = static::getStaleResponse($cacheEntry);
                         if ($responseStale instanceof ResponseInterface) {
-                            return $responseStale;
+                            return $this->applySink($responseStale, $options);
                         }
                     }
 
@@ -229,6 +228,7 @@ class CacheMiddleware
                             }
                         }
 
+                        $response = $this->applySink($response, $options);
                         $update = true;
                     } else {
                         $response = $response->withHeader(static::HEADER_CACHE_INFO, static::HEADER_CACHE_MISS);
@@ -236,10 +236,10 @@ class CacheMiddleware
 
                     return static::addToCache($this->cacheStorage, $request, $response, $update);
                 },
-                function ($reason) use ($cacheEntry) {
+                function ($reason) use ($cacheEntry, $options) {
                     $response = static::getStaleResponse($cacheEntry);
                     if ($response instanceof ResponseInterface) {
-                        return $response;
+                        return $this->applySink($response, $options);
                     }
 
                     return new RejectedPromise($reason);
@@ -266,7 +266,7 @@ class CacheMiddleware
         // If the body is not seekable, we have to replace it by a seekable one
         if (!$body->isSeekable()) {
             $response = $response->withBody(
-                \GuzzleHttp\Psr7\Utils::streamFor($body->getContents())
+                Utils::streamFor($body->getContents())
             );
         }
 
@@ -282,6 +282,42 @@ class CacheMiddleware
         }
 
         return $response;
+    }
+
+    protected function applySink(ResponseInterface $response, array $options): ResponseInterface
+    {
+        if (isset($options['sink'])) {
+            return $response->withBody(
+                $this->writeToSink($response->getBody(), $options['sink'])
+            );
+        }
+
+        return $response;
+    }
+
+    protected function writeToSink(StreamInterface $body, mixed $sink): StreamInterface
+    {
+        if (is_string($sink)) {
+            $sinkStream = Utils::streamFor(Utils::tryFopen($sink, 'w'));
+        } elseif (is_resource($sink)) {
+            $sinkStream = Utils::streamFor($sink);
+        } elseif ($sink instanceof StreamInterface) {
+            $sinkStream = $sink;
+        } else {
+            throw new \InvalidArgumentException('`sink` must be a resource, string, or StreamInterface');
+        }
+
+        try {
+            $body->rewind();
+            Utils::copyToStream($body, $sinkStream);
+        } finally {
+            $body->rewind();
+            if ($sinkStream->isSeekable()) {
+                $sinkStream->rewind();
+            }
+        }
+
+        return $sinkStream;
     }
 
     /**
@@ -343,7 +379,7 @@ class CacheMiddleware
                 ->withHeader(static::HEADER_CACHE_INFO, static::HEADER_CACHE_STALE);
         }
 
-        return;
+        return null;
     }
 
     /**

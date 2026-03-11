@@ -3,6 +3,7 @@
 namespace Kevinrob\GuzzleCache;
 
 use GuzzleHttp\Psr7\PumpStream;
+use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -400,7 +401,7 @@ class CacheEntry implements \Serializable
     private static function restoreStreamBody(MessageInterface $message): MessageInterface
     {
         return $message->withBody(
-            \GuzzleHttp\Psr7\Utils::streamFor((string) $message->getBody())
+            Utils::streamFor((string) $message->getBody())
         );
     }
 
