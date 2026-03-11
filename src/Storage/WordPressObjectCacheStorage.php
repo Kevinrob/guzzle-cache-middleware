@@ -27,12 +27,13 @@ class WordPressObjectCacheStorage implements CacheStorageInterface
     public function fetch($key)
     {
         try {
-            $cache = unserialize(wp_cache_get($key, $this->group));
+            $cache = @unserialize(wp_cache_get($key, $this->group), ['allowed_classes' => CacheEntry::getAllowedClasses()]);
             if ($cache instanceof CacheEntry) {
                 return $cache;
             }
-        } catch (\Exception $ignored) {
+        } catch (\Throwable $ignored) {
             // Don't fail if we can't load it
+            return null;
         }
 
         return null;

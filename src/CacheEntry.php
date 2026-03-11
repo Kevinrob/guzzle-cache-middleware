@@ -10,6 +10,52 @@ use Psr\Http\Message\ResponseInterface;
 class CacheEntry implements \Serializable
 {
     /**
+     * List of classes allowed to be unserialized for security reasons (RCE prevention).
+     * By default, it includes all classes required for a standard Guzzle/Middleware setup.
+     *
+     * @var string[]
+     */
+    private static $allowedClasses = [
+        self::class,
+        BodyStore::class,
+        \DateTimeImmutable::class,
+        \DateTime::class,
+        \Symfony\Component\Clock\DatePoint::class,
+        \GuzzleHttp\Psr7\Request::class,
+        \GuzzleHttp\Psr7\Response::class,
+        \GuzzleHttp\Psr7\Uri::class,
+        \GuzzleHttp\Psr7\PumpStream::class,
+        \GuzzleHttp\Psr7\BufferStream::class,
+        \GuzzleHttp\Psr7\Stream::class,
+    ];
+
+    /**
+     * Add a class to the list of allowed classes for unserialization.
+     * This is useful if you use a custom PSR-7 implementation (e.g. Nyholm, Diactoros)
+     * or store custom objects within the cache.
+     *
+     * Example: CacheEntry::addAllowedClass(\Nyholm\Psr7\Response::class);
+     *
+     * @param string $className The fully qualified class name
+     */
+    public static function addAllowedClass(string $className): void
+    {
+        if (!in_array($className, self::$allowedClasses, true)) {
+            self::$allowedClasses[] = $className;
+        }
+    }
+
+    /**
+     * Get the list of allowed classes for PHP's unserialize 'allowed_classes' option.
+     *
+     * @return string[]
+     */
+    public static function getAllowedClasses(): array
+    {
+        return self::$allowedClasses;
+    }
+
+    /**
      * @var RequestInterface
      */
     protected $request;
@@ -273,18 +319,41 @@ class CacheEntry implements \Serializable
 
     public function __unserialize(array $data): void
     {
-        $prefix = '';
-        if (isset($data["\0*\0request"])) {
-            // We are unserializing a cache entry which was serialized with a version < 4.1.1
-            $prefix = "\0*\0";
+        try {
+            $prefix = '';
+            if (isset($data["\0*\0request"])) {
+                // We are unserializing a cache entry which was serialized with a version < 4.1.1
+                $prefix = "\0*\0";
+            }
+
+            $this->request = ($data[$prefix.'request'] ?? null) !== null ? self::restoreStreamBody($data[$prefix.'request']) : null;
+            if ($this->request === null) {
+                throw new \InvalidArgumentException('request is missing or invalid');
+            }
+
+            $this->response = ($data[$prefix.'response'] ?? null) !== null ? self::restoreStreamBody($data[$prefix.'response']) : null;
+            if ($this->response === null) {
+                throw new \InvalidArgumentException('response is missing or invalid');
+            }
+
+            $this->staleAt = self::toImmutable($data[$prefix.'staleAt'] ?? null);
+            if ($this->staleAt === null) {
+                throw new \InvalidArgumentException('staleAt is missing or invalid');
+            }
+
+            $this->staleIfErrorTo = self::toImmutable($data[$prefix.'staleIfErrorTo'] ?? null);
+            $this->staleWhileRevalidateTo = self::toImmutable($data[$prefix.'staleWhileRevalidateTo'] ?? null);
+
+            $this->dateCreated = self::toImmutable($data[$prefix.'dateCreated'] ?? null);
+            if ($this->dateCreated === null) {
+                throw new \InvalidArgumentException('dateCreated is missing or invalid');
+            }
+
+            $this->timestampStale = $data[$prefix.'timestampStale'] ?? null;
+        } catch (\Throwable $e) {
+            // If the stream is corrupted or incompatible, we completely invalidate this cache entry
+            throw new \InvalidArgumentException('Corrupted cache entry', 0, $e);
         }
-        $this->request = self::restoreStreamBody($data[$prefix.'request']);
-        $this->response = $data[$prefix.'response'] !== null ? self::restoreStreamBody($data[$prefix.'response']) : null;
-        $this->staleAt = self::toImmutable($data[$prefix.'staleAt']);
-        $this->staleIfErrorTo = self::toImmutable($data[$prefix.'staleIfErrorTo']);
-        $this->staleWhileRevalidateTo = self::toImmutable($data[$prefix.'staleWhileRevalidateTo']);
-        $this->dateCreated = self::toImmutable($data[$prefix.'dateCreated']);
-        $this->timestampStale = $data[$prefix.'timestampStale'];
     }
 
     /**
@@ -342,6 +411,6 @@ class CacheEntry implements \Serializable
 
     public function unserialize($data)
     {
-        $this->__unserialize(unserialize($data));
+        $this->__unserialize(unserialize($data, ['allowed_classes' => self::$allowedClasses]));
     }
 }
