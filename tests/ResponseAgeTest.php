@@ -75,6 +75,8 @@ class ResponseAgeTest extends TestCase
         );
 
         // Age header value must be a string to comply with psr/http-message
-        $this->assertIsString($response->getHeaderLine('Age'));
+        $ageHeaderValues = $response->getHeader('Age');
+        $this->assertNotEmpty($ageHeaderValues);
+        $this->assertIsString($ageHeaderValues[0]);
     }
 }

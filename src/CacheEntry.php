@@ -138,7 +138,7 @@ class CacheEntry implements \Serializable
     public function getResponse()
     {
         return $this->response
-            ->withHeader('Age', (string)$this->getAge());
+            ->withHeader('Age', (string) $this->getAge());
     }
 
     /**
