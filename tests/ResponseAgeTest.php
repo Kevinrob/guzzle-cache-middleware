@@ -61,4 +61,22 @@ class ResponseAgeTest extends TestCase
         );
         $this->assertGreaterThanOrEqual(1, $response->getHeaderLine('Age'));
     }
+
+    public function testAgeHeaderValueIsString(): void
+    {
+        $this->client->get('http://test.com/2s');
+
+        $this->mockClock->sleep(1);
+
+        $response = $this->client->get('http://test.com/2s');
+        $this->assertEquals(
+            CacheMiddleware::HEADER_CACHE_HIT,
+            $response->getHeaderLine(CacheMiddleware::HEADER_CACHE_INFO)
+        );
+
+        // Age header value must be a string to comply with psr/http-message
+        $ageHeaderValues = $response->getHeader('Age');
+        $this->assertNotEmpty($ageHeaderValues);
+        $this->assertIsString($ageHeaderValues[0]);
+    }
 }
