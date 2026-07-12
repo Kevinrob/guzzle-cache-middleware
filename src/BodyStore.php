@@ -5,6 +5,8 @@ namespace Kevinrob\GuzzleCache;
 /**
  *
  * This object is only meant to provide a callable to `GuzzleHttp\Psr7\PumpStream`.
+ * It is only kept so cache entries written by older versions of this library
+ * can still be unserialized (new entries use SerializableBodyStream).
  *
  * @internal don't use it in your project.
  */

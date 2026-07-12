@@ -431,6 +431,6 @@ class CacheMiddleware
             $this->cacheStorage->delete($request->withMethod($method));
         }
 
-        return $response->withHeader(static::HEADER_INVALIDATION, true);
+        return $response->withHeader(static::HEADER_INVALIDATION, '1');
     }
 }

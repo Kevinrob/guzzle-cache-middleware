@@ -54,7 +54,7 @@ class InvalidateCacheTest extends TestCase
         $this->client->get('resource');
         $this->client->head('resource');
 
-        $response = $this->client->{$unsafeMethod}('resource');
+        $response = $this->client->request($unsafeMethod, 'resource');
         $this->assertSame('1', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
 
         $response = $this->client->get('resource');
@@ -71,7 +71,7 @@ class InvalidateCacheTest extends TestCase
     {
         $this->client->get('resource');
 
-        $response = $this->client->{$safeMethod}('resource');
+        $response = $this->client->request($safeMethod, 'resource');
         $this->assertSame('', $response->getHeaderLine(CacheMiddleware::HEADER_INVALIDATION));
 
         $response = $this->client->get('resource');
@@ -81,19 +81,19 @@ class InvalidateCacheTest extends TestCase
     public function unsafeMethods()
     {
         return [
-            'delete' => ['delete'],
-            'put' => ['put'],
-            'post' => ['post'],
+            'delete' => ['DELETE'],
+            'put' => ['PUT'],
+            'post' => ['POST'],
         ];
     }
 
     public function safemethods()
     {
         return [
-            'get' => ['get'],
-            'options' => ['options'],
-            'trace' => ['trace'],
-            'head' => ['head'],
+            'get' => ['GET'],
+            'options' => ['OPTIONS'],
+            'trace' => ['TRACE'],
+            'head' => ['HEAD'],
         ];
     }
 }

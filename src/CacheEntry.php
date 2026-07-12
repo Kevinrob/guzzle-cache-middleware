@@ -2,7 +2,6 @@
 
 namespace Kevinrob\GuzzleCache;
 
-use GuzzleHttp\Psr7\PumpStream;
 use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
@@ -19,12 +18,17 @@ class CacheEntry implements \Serializable
     private static $allowedClasses = [
         self::class,
         BodyStore::class,
+        SerializableBodyStream::class,
         \DateTimeImmutable::class,
         \DateTime::class,
         \Symfony\Component\Clock\DatePoint::class,
         \GuzzleHttp\Psr7\Request::class,
         \GuzzleHttp\Psr7\Response::class,
         \GuzzleHttp\Psr7\Uri::class,
+        // Kept (with BodyStore above) so cache entries written by older
+        // versions of this library can still be unserialized. guzzlehttp/psr7 3
+        // streams refuse native unserialization, so with psr7 3 installed such
+        // entries safely degrade to a cache miss instead.
         \GuzzleHttp\Psr7\PumpStream::class,
         \GuzzleHttp\Psr7\BufferStream::class,
         \GuzzleHttp\Psr7\Stream::class,
@@ -380,15 +384,8 @@ class CacheEntry implements \Serializable
      */
     private static function toSerializeableMessage(MessageInterface $message): MessageInterface
     {
-        $bodyString = (string)$message->getBody();
-
         return $message->withBody(
-            new PumpStream(
-                new BodyStore($bodyString),
-                [
-                    'size' => strlen($bodyString),
-                ]
-            )
+            new SerializableBodyStream((string) $message->getBody())
         );
     }
 

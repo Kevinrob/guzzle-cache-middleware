@@ -83,6 +83,30 @@ class CacheEntryTest extends TestCase
         $this->assertEquals(70, $cacheEntry->getTTL());
     }
 
+    public function testCacheEntryShouldBeSerializableWithNativeSerialization()
+    {
+        $request = new Request(
+            'GET',
+            'test.local',
+            [],
+            'Sample body' // Always include a body in the request to be sure there is a stream in it
+        );
+        $response = new Response(
+            200, [
+            'Cache-Control' => 'max-age=60',
+        ],
+            'Test content'
+        );
+        $cacheEntry = new CacheEntry($request, $response, $this->makeDateTimeOffset(10));
+
+        /**
+         * @var CacheEntry $cacheEntryPostDeserialization
+         */
+        $cacheEntryPostDeserialization = unserialize(serialize($cacheEntry), ['allowed_classes' => CacheEntry::getAllowedClasses()]);
+        $this->assertEquals((string)$cacheEntry->getOriginalRequest()->getBody(), (string)$cacheEntryPostDeserialization->getOriginalRequest()->getBody());
+        $this->assertEquals((string)$cacheEntry->getOriginalResponse()->getBody(), (string)$cacheEntryPostDeserialization->getOriginalResponse()->getBody());
+    }
+
     /**
      * @requires extension igbinary
      */
