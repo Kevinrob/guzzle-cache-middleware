@@ -62,7 +62,7 @@ class GreedyCacheStrategyTest extends TestCase
     {
         /** @var Request $request */
         $request = (new Request('GET', 'http://test.com/2'))
-            ->withHeader(GreedyCacheStrategy::HEADER_TTL, -2);
+            ->withHeader(GreedyCacheStrategy::HEADER_TTL, '-2');
         $this->client->send($request);
 
         $response = $this->client->send($request);
@@ -70,7 +70,7 @@ class GreedyCacheStrategyTest extends TestCase
 
         /** @var Request $request */
         $request = (new Request('GET', 'http://test.com/2'))
-            ->withHeader(GreedyCacheStrategy::HEADER_TTL, 5);
+            ->withHeader(GreedyCacheStrategy::HEADER_TTL, '5');
 
         $this->client->send($request);
 
